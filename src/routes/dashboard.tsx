@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import { Gauge, History, LayoutGrid, Settings, Wind, WifiOff } from "lucide-react";
 import { useI18n, type TKey } from "@/lib/i18n";
 import { LangToggle } from "@/components/LangToggle";
+import { useSelectedDevice } from "@/lib/queries";
+import { cachedReading } from "@/lib/airsense";
+import { formatTime } from "@/lib/status";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/dashboard")({
@@ -17,12 +20,18 @@ const nav: { to: string; label: TKey; icon: React.ReactNode }[] = [
 ];
 
 function DashboardLayout() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const { deviceId } = useSelectedDevice();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [online, setOnline] = useState(true);
+  const [lastSeen, setLastSeen] = useState<string | null>(null);
 
   useEffect(() => {
-    const update = () => setOnline(navigator.onLine);
+    const update = () => {
+      setOnline(navigator.onLine);
+      const cached = deviceId ? cachedReading(deviceId) : null;
+      setLastSeen(cached?.timestamp ?? null);
+    };
     update();
     window.addEventListener("online", update);
     window.addEventListener("offline", update);
@@ -30,7 +39,7 @@ function DashboardLayout() {
       window.removeEventListener("online", update);
       window.removeEventListener("offline", update);
     };
-  }, []);
+  }, [deviceId]);
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
@@ -65,7 +74,7 @@ function DashboardLayout() {
         {!online && (
           <div className="flex items-center justify-center gap-2 bg-moderate-soft px-4 py-2 text-xs text-moderate-foreground">
             <WifiOff className="h-3.5 w-3.5" />
-            {t("dash.offlineBanner")}
+            {t("dash.offlineBanner")} {lastSeen ? formatTime(lastSeen, lang) : "—"}
           </div>
         )}
       </header>
