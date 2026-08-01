@@ -88,12 +88,12 @@ function HistoryPage() {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
+      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-4">
         <div className="min-w-0">
           <h1 className="truncate font-display text-2xl text-ink sm:text-3xl">{t("hist.title")}</h1>
           <p className="truncate text-sm text-muted-foreground">{device?.name ?? "—"}</p>
         </div>
-        <div className="flex shrink-0 rounded-full border bg-card p-1">
+        <div className="flex w-fit shrink-0 rounded-full border bg-card p-1">
           {ranges.map((r) => (
             <button
               key={r}
@@ -193,12 +193,12 @@ function HistoryPage() {
         ) : (
           <ul className="mt-4 divide-y">
             {events.map((e) => (
-              <li key={e.t} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 py-3">
+              <li key={e.t} className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 py-3 sm:grid-cols-[auto_minmax(0,1fr)_auto]">
                 <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-poor-soft text-poor">
                   <AlertTriangle className="h-4 w-4" />
                 </span>
-                <span className="min-w-0 truncate text-sm">{t("hist.eventPoor")}</span>
-                <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+                <span className="min-w-0 text-sm">{t("hist.eventPoor")}</span>
+                <span className="col-start-2 shrink-0 text-xs tabular-nums text-muted-foreground sm:col-start-auto">
                   {formatTime(e.t, lang)} · {e.mq135} ppm
                 </span>
               </li>
