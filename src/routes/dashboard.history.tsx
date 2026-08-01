@@ -90,7 +90,7 @@ function HistoryPage() {
     <div className="space-y-5">
       <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-4">
         <div className="min-w-0">
-          <h1 className="truncate font-display text-2xl text-ink sm:text-3xl">{t("hist.title")}</h1>
+          <h1 className="font-display text-2xl text-ink sm:text-3xl">{t("hist.title")}</h1>
           <p className="truncate text-sm text-muted-foreground">{device?.name ?? "—"}</p>
         </div>
         <div className="flex w-fit shrink-0 rounded-full border bg-card p-1">
