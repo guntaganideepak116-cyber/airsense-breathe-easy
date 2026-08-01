@@ -50,7 +50,7 @@ function Overview() {
           <p className="truncate text-sm text-muted-foreground">{device?.name ?? "—"}</p>
         </div>
         {devices.length > 1 && (
-          <Select value={deviceId ?? undefined} onValueChange={select}>
+          <Select {...(deviceId ? { value: deviceId } : {})} onValueChange={select}>
             <SelectTrigger className="w-44 rounded-full">
               <SelectValue />
             </SelectTrigger>
