@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { api, cacheReading, cachedReading, type Range } from "@/lib/airsense";
+import { useEffect, useRef, useState } from "react";
+import { api, cacheReading, cachedReading, type Range, type Reading } from "@/lib/airsense";
+
 
 const SELECTED_KEY = "airsense-selected-device";
 
