@@ -190,12 +190,38 @@
 }
 
 @utility grain-panel {
-  background-image: radial-gradient(
-    circle at 20% 20%,
-    color-mix(in oklab, var(--primary) 10%, transparent),
-    transparent 55%
-  );
+  background-image: radial-gradient(circle at 20% 20%, var(--page-glow-1), transparent 55%),
+    radial-gradient(circle at 85% 10%, var(--page-glow-2), transparent 50%);
 }
+
+/* Soft luminous accents — dark UIs read better with glow than flat blocks. */
+@utility glow-primary {
+  box-shadow: var(--glow-primary);
+}
+
+@utility glow-status {
+  box-shadow: 0 18px 48px -20px color-mix(in oklab, var(--status-color, var(--primary)) 60%, transparent);
+}
+
+@utility value-pulse {
+  animation: value-pulse 900ms ease-out;
+}
+
+@keyframes value-pulse {
+  0% {
+    transform: scale(1);
+    text-shadow: none;
+  }
+  35% {
+    transform: scale(1.045);
+    text-shadow: 0 0 22px color-mix(in oklab, var(--status-color, var(--primary)) 65%, transparent);
+  }
+  100% {
+    transform: scale(1);
+    text-shadow: none;
+  }
+}
+
 
 @keyframes breathe {
   0%,
