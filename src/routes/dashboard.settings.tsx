@@ -107,8 +107,7 @@ function SettingsPage() {
 
       <section className="rounded-3xl border bg-card p-6">
         <p className="font-semibold">{t("set.devices")}</p>
-      <section className="rounded-3xl border bg-card p-6">
-        <p className="font-semibold">{t("set.devices")}</p>
+
         <p className="mt-1 text-sm text-muted-foreground">{t("dev.manageDesc")}</p>
         <ul className="mt-4 space-y-3">
           {(devices ?? []).map((d) => (
