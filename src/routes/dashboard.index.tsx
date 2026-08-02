@@ -1,13 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { BellRing, CheckCircle2, Droplets, Pencil, Thermometer, Wifi, WifiOff } from "lucide-react";
+import { BellRing, CheckCircle2, Droplets, Pencil, Radio, Thermometer, Wifi, WifiOff } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { statusTheme, formatTime } from "@/lib/status";
-import { useDeviceMutations, useLatest, useSelectedDevice } from "@/lib/queries";
+import { useDeviceMutations, useDeviceStream, useLatest, useSelectedDevice } from "@/lib/queries";
+import { useAirAlert } from "@/lib/use-air-alert";
 import { BreathingOrb } from "@/components/BreathingOrb";
+import { PushOptIn } from "@/components/PushOptIn";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+
 import {
   Select,
   SelectContent,
