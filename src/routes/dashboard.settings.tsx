@@ -152,7 +152,6 @@ function SettingsPage() {
         </Button>
       </section>
 
-      </section>
 
       <section className="rounded-3xl border bg-card p-6">
         <p className="font-semibold">{t("set.lang")}</p>
