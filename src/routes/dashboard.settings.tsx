@@ -4,7 +4,8 @@ import { BellRing, LogOut, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import { useDeviceMutations, useDevices } from "@/lib/queries";
-import { api } from "@/lib/airsense";
+import { formatTime } from "@/lib/status";
+import { disablePush, enablePush, pushPreference, pushState } from "@/lib/push";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,23 +30,25 @@ function SettingsPage() {
   const { data: devices } = useDevices();
   const { rename, remove } = useDeviceMutations();
   const [push, setPush] = useState(false);
+  const [supported, setSupported] = useState(true);
   const [threshold, setThreshold] = useState(700);
 
   useEffect(() => {
-    setPush(typeof Notification !== "undefined" && Notification.permission === "granted");
+    const state = pushState();
+    setSupported(state !== "unsupported");
+    setPush(state === "granted" && pushPreference());
     const saved = localStorage.getItem("airsense-threshold");
     if (saved) setThreshold(Number(saved));
   }, []);
 
-  const enablePush = async () => {
-    if (typeof Notification === "undefined") return;
-    const permission = await Notification.requestPermission();
-    if (permission === "granted") {
-      setPush(true);
-      await api.subscribePush({ endpoint: "pending-service-worker-subscription" });
-      toast.success(t("set.saved"));
-    }
+  const turnOn = async () => {
+    const next = await enablePush();
+    setPush(next === "granted");
+    if (next === "granted") toast.success(t("push.enabled"));
+    else if (next === "denied") toast.error(t("push.blocked"));
+    else if (next === "unsupported") toast.error(t("push.unsupported"));
   };
+
 
   return (
     <div className="space-y-5">
