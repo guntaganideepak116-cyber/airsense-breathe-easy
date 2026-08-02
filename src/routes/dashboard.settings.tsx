@@ -72,14 +72,17 @@ function SettingsPage() {
           </div>
           <Switch
             checked={push}
+            disabled={!supported}
+            aria-label={t("set.push")}
             onCheckedChange={(v) => {
-              if (v) void enablePush();
+              if (v) void turnOn();
               else {
                 setPush(false);
-                void api.unsubscribePush();
+                void disablePush();
               }
             }}
           />
+
         </div>
 
         <div className="mt-4 rounded-2xl border p-4">
