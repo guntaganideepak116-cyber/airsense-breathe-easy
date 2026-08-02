@@ -37,13 +37,20 @@ export const Route = createFileRoute("/dashboard/")({
 function Overview() {
   const { t, lang } = useI18n();
   const { devices, device, deviceId, select } = useSelectedDevice();
-  const { data: reading, isLoading } = useLatest(deviceId);
+  const { data: polled, isLoading } = useLatest(deviceId);
+  const { reading: streamed, status: streamStatus, tick } = useDeviceStream(deviceId);
   const { rename } = useDeviceMutations();
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState("");
 
+  const reading = streamed ?? polled;
+  useAirAlert(streamed, device?.name);
+
   const status = reading?.status ?? "good";
   const theme = statusTheme[status];
+  const live = streamStatus === "live";
+
+
 
   return (
     <div className="space-y-5">
@@ -68,7 +75,9 @@ function Overview() {
         )}
       </div>
 
-      {isLoading || !reading ? (
+      <PushOptIn />
+
+      {isLoading && !reading ? (
         <Skeleton className="h-72 rounded-3xl" />
       ) : (
         <section className={cn("status-transition rounded-3xl border p-6", theme.soft)}>
@@ -77,21 +86,31 @@ function Overview() {
             <div className="min-w-0">
               <div className="flex items-center gap-2 text-sm text-foreground/60">
                 <span className={cn("h-2 w-2 animate-pulse rounded-full", theme.dot)} />
-                {t("dash.airquality")} · {t("dash.live")}
+                {t("dash.airquality")} ·{" "}
+                <span className="inline-flex items-center gap-1">
+                  <Radio className={cn("h-3 w-3", live && "text-good")} />
+                  {t(live ? "dash.live" : streamStatus === "reconnecting" ? "rooms.reconnecting" : "rooms.connecting")}
+                </span>
               </div>
               <p className={cn("mt-2 font-display text-5xl leading-tight status-transition", theme.text)}>
                 {t(theme.label)}
               </p>
               <p className="mt-2 text-sm text-foreground/70">
-                {t("dash.sensorReading")}: <span className="tabular-nums">{reading.mq135}</span> ppm
+                {t("dash.sensorReading")}:{" "}
+                <span key={tick} className="tabular-nums value-pulse inline-block">
+                  {reading?.mq135 ?? "—"}
+                </span>{" "}
+                ppm
               </p>
               <p className="mt-1 text-xs text-foreground/60">
-                {t("dash.updated")}: <span className="tabular-nums">{formatTime(reading.timestamp, lang)}</span>
+                {t("dash.updated")}:{" "}
+                <span className="tabular-nums">{reading ? formatTime(reading.timestamp, lang) : "—"}</span>
               </p>
             </div>
           </div>
         </section>
       )}
+
 
       <section className="rounded-3xl border bg-card p-6">
         <p className="text-sm font-semibold">{t("dash.guidance")}</p>
