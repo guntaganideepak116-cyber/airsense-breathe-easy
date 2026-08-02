@@ -53,6 +53,71 @@ export function useHistory(deviceId: string | null, range: Range) {
   });
 }
 
+export type StreamStatus = "connecting" | "live" | "reconnecting";
+
+/**
+ * Live readings over Server-Sent Events (`/api/device/:id/stream`).
+ * Reconnects with exponential backoff and always closes the connection on unmount.
+ */
+export function useDeviceStream(deviceId: string | null) {
+  const qc = useQueryClient();
+  const [reading, setReading] = useState<Reading | null>(null);
+  const [status, setStatus] = useState<StreamStatus>("connecting");
+  const [tick, setTick] = useState(0);
+  const attempts = useRef(0);
+
+  useEffect(() => {
+    if (!deviceId || typeof window === "undefined" || typeof EventSource === "undefined") return;
+
+    let source: EventSource | null = null;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+    let cancelled = false;
+
+    const cached = cachedReading(deviceId);
+    if (cached) setReading(cached);
+
+    const connect = () => {
+      if (cancelled) return;
+      setStatus(attempts.current === 0 ? "connecting" : "reconnecting");
+      source = new EventSource(`/api/device/${encodeURIComponent(deviceId)}/stream`);
+
+      source.addEventListener("reading", (event) => {
+        try {
+          const next = JSON.parse((event as MessageEvent).data) as Reading;
+          attempts.current = 0;
+          setStatus("live");
+          setReading(next);
+          setTick((n) => n + 1);
+          cacheReading(next);
+          qc.setQueryData(["latest", deviceId], next);
+        } catch {
+          /* ignore malformed frame */
+        }
+      });
+
+      source.onerror = () => {
+        source?.close();
+        source = null;
+        if (cancelled) return;
+        setStatus("reconnecting");
+        const delay = Math.min(1000 * 2 ** attempts.current, 15000);
+        attempts.current += 1;
+        retryTimer = setTimeout(connect, delay);
+      };
+    };
+
+    connect();
+
+    return () => {
+      cancelled = true;
+      if (retryTimer) clearTimeout(retryTimer);
+      source?.close();
+    };
+  }, [deviceId, qc]);
+
+  return { reading, status, tick };
+}
+
 export function useDeviceMutations() {
   const qc = useQueryClient();
   const invalidate = () => qc.invalidateQueries({ queryKey: ["devices"] });
@@ -66,3 +131,4 @@ export function useDeviceMutations() {
     remove: useMutation({ mutationFn: (id: string) => api.removeDevice(id), onSuccess: invalidate }),
   };
 }
+
