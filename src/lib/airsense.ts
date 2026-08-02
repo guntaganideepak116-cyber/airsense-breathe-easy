@@ -171,8 +171,8 @@ export const api = {
       id: created?.id ?? `dev-${Date.now()}`,
       name,
       online: false,
-      lastSeen: undefined,
     };
+
     writeStore([...readStore(), device]);
     return { device, apiKey };
   },
