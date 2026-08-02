@@ -22,8 +22,10 @@ export default defineConfig({
         devOptions: { enabled: false },
         manifest: false,
         workbox: {
+          importScripts: ["/push-sw.js"],
           globPatterns: ["**/*.{js,css,ico,png,svg,woff2}"],
           navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//],
+
           runtimeCaching: [
             {
               // HTML navigations: always try the network first.
