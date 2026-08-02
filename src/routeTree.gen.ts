@@ -12,10 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ApiDevicesRouteImport } from './routes/api/devices'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as DashboardHistoryRouteImport } from './routes/dashboard.history'
 import { Route as DashboardRoomsRouteImport } from './routes/dashboard.rooms'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
+import { Route as ApiPushSubscribeRouteImport } from './routes/api/push.subscribe'
+import { Route as ApiPushVapidRouteImport } from './routes/api/push.vapid'
+import { Route as ApiDeviceIdStreamRouteImport } from './routes/api/device.$id.stream'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -30,6 +34,11 @@ const AuthRoute = AuthRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDevicesRoute = ApiDevicesRouteImport.update({
+  id: '/api/devices',
+  path: '/api/devices',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
@@ -52,33 +61,60 @@ const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => DashboardRoute,
 } as any)
+const ApiPushSubscribeRoute = ApiPushSubscribeRouteImport.update({
+  id: '/api/push/subscribe',
+  path: '/api/push/subscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPushVapidRoute = ApiPushVapidRouteImport.update({
+  id: '/api/push/vapid',
+  path: '/api/push/vapid',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDeviceIdStreamRoute = ApiDeviceIdStreamRouteImport.update({
+  id: '/api/device/$id/stream',
+  path: '/api/device/$id/stream',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/api/devices': typeof ApiDevicesRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/api/push/subscribe': typeof ApiPushSubscribeRoute
+  '/api/push/vapid': typeof ApiPushVapidRoute
+  '/api/device/$id/stream': typeof ApiDeviceIdStreamRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/api/devices': typeof ApiDevicesRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/api/push/subscribe': typeof ApiPushSubscribeRoute
+  '/api/push/vapid': typeof ApiPushVapidRoute
+  '/api/device/$id/stream': typeof ApiDeviceIdStreamRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/api/devices': typeof ApiDevicesRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/api/push/subscribe': typeof ApiPushSubscribeRoute
+  '/api/push/vapid': typeof ApiPushVapidRoute
+  '/api/device/$id/stream': typeof ApiDeviceIdStreamRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -86,33 +122,49 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/api/devices'
     | '/dashboard/history'
     | '/dashboard/rooms'
     | '/dashboard/settings'
     | '/dashboard/'
+    | '/api/push/subscribe'
+    | '/api/push/vapid'
+    | '/api/device/$id/stream'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/api/devices'
     | '/dashboard/history'
     | '/dashboard/rooms'
     | '/dashboard/settings'
     | '/dashboard'
+    | '/api/push/subscribe'
+    | '/api/push/vapid'
+    | '/api/device/$id/stream'
   id:
     | '__root__'
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/api/devices'
     | '/dashboard/history'
     | '/dashboard/rooms'
     | '/dashboard/settings'
     | '/dashboard/'
+    | '/api/push/subscribe'
+    | '/api/push/vapid'
+    | '/api/device/$id/stream'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  ApiDevicesRoute: typeof ApiDevicesRoute
+  ApiPushSubscribeRoute: typeof ApiPushSubscribeRoute
+  ApiPushVapidRoute: typeof ApiPushVapidRoute
+  ApiDeviceIdStreamRoute: typeof ApiDeviceIdStreamRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -136,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/devices': {
+      id: '/api/devices'
+      path: '/api/devices'
+      fullPath: '/api/devices'
+      preLoaderRoute: typeof ApiDevicesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/': {
@@ -166,6 +225,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSettingsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/api/push/subscribe': {
+      id: '/api/push/subscribe'
+      path: '/api/push/subscribe'
+      fullPath: '/api/push/subscribe'
+      preLoaderRoute: typeof ApiPushSubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/push/vapid': {
+      id: '/api/push/vapid'
+      path: '/api/push/vapid'
+      fullPath: '/api/push/vapid'
+      preLoaderRoute: typeof ApiPushVapidRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/device/$id/stream': {
+      id: '/api/device/$id/stream'
+      path: '/api/device/$id/stream'
+      fullPath: '/api/device/$id/stream'
+      preLoaderRoute: typeof ApiDeviceIdStreamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -191,6 +271,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  ApiDevicesRoute: ApiDevicesRoute,
+  ApiPushSubscribeRoute: ApiPushSubscribeRoute,
+  ApiPushVapidRoute: ApiPushVapidRoute,
+  ApiDeviceIdStreamRoute: ApiDeviceIdStreamRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

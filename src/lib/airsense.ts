@@ -17,7 +17,11 @@ export type Device = {
   id: string;
   name: string;
   online: boolean;
+  lastSeen?: string;
 };
+
+export type DeviceCredentials = { device: Device; apiKey: string };
+
 
 export type Reading = {
   deviceId: string;
@@ -145,13 +149,34 @@ export const api = {
   async devices(): Promise<Device[]> {
     return (await tryFetch<Device[]>("/api/devices")) ?? readStore();
   },
-  async createDevice(name: string): Promise<Device> {
-    const created =
-      (await tryFetch<Device>("/api/devices", { method: "POST", body: JSON.stringify({ name }) })) ??
-      ({ id: `dev-${Date.now()}`, name, online: true } satisfies Device);
-    writeStore([...readStore(), created]);
-    return created;
+  /**
+   * Registers a device. The server mints the deviceId + apiKey; the key is
+   * returned once here and never persisted, so the UI must show it immediately.
+   */
+  async createDevice(name: string): Promise<DeviceCredentials> {
+    let created: (Device & { apiKey?: string }) | null = null;
+    try {
+      const res = await fetch("/api/devices", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      if (res.ok) created = (await res.json()) as Device & { apiKey: string };
+    } catch {
+      created = null;
+    }
+
+    const apiKey = created?.apiKey ?? `ask_local_${Math.random().toString(16).slice(2, 14)}`;
+    const device: Device = {
+      id: created?.id ?? `dev-${Date.now()}`,
+      name,
+      online: false,
+    };
+
+    writeStore([...readStore(), device]);
+    return { device, apiKey };
   },
+
   async updateDevice(id: string, patch: Partial<Device>): Promise<Device[]> {
     await tryFetch<Device>(`/api/devices/${id}`, { method: "PATCH", body: JSON.stringify(patch) });
     const next = readStore().map((d) => (d.id === id ? { ...d, ...patch } : d));

@@ -1,13 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus, Wifi, WifiOff } from "lucide-react";
+import { Plus, Radio, Wifi, WifiOff } from "lucide-react";
 import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import { statusTheme } from "@/lib/status";
-import { useDeviceMutations, useSelectedDevice } from "@/lib/queries";
+import { useDeviceMutations, useDeviceStream, useSelectedDevice } from "@/lib/queries";
+import { useAirAlert } from "@/lib/use-air-alert";
 import { classify, type Device } from "@/lib/airsense";
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/airsense";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +19,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { DeviceCredentialsDialog, type Credentials } from "@/components/DeviceCredentialsDialog";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/dashboard/rooms")({
@@ -41,6 +41,20 @@ function RoomsPage() {
   const { create } = useDeviceMutations();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
+  const [credentials, setCredentials] = useState<Credentials | null>(null);
+
+  const submit = () => {
+    const value = name.trim();
+    if (!value) return;
+    create.mutate(value, {
+      onSuccess: ({ device, apiKey }) => {
+        setCredentials({ deviceId: device.id, apiKey });
+        toast.success(t("dev.created"));
+      },
+    });
+    setName("");
+    setOpen(false);
+  };
 
   return (
     <div className="space-y-5">
@@ -60,19 +74,16 @@ function RoomsPage() {
             </DialogHeader>
             <div className="space-y-2">
               <Label htmlFor="room">{t("rooms.name")}</Label>
-              <Input id="room" value={name} onChange={(e) => setName(e.target.value)} className="rounded-xl" />
+              <Input
+                id="room"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && submit()}
+                className="rounded-xl"
+              />
             </div>
             <DialogFooter>
-              <Button
-                className="rounded-xl"
-                onClick={() => {
-                  if (!name.trim()) return;
-                  create.mutate(name.trim());
-                  toast.success(t("rooms.created"));
-                  setName("");
-                  setOpen(false);
-                }}
-              >
+              <Button className="rounded-xl" disabled={create.isPending} onClick={submit}>
                 {t("dash.save")}
               </Button>
             </DialogFooter>
@@ -85,6 +96,8 @@ function RoomsPage() {
           <RoomCard key={d.id} device={d} onOpen={() => select(d.id)} />
         ))}
       </div>
+
+      <DeviceCredentialsDialog credentials={credentials} onClose={() => setCredentials(null)} />
     </div>
   );
 }
@@ -92,13 +105,12 @@ function RoomsPage() {
 function RoomCard({ device, onOpen }: { device: Device; onOpen: () => void }) {
   const { t } = useI18n();
   const navigate = useNavigate();
-  const { data } = useQuery({
-    queryKey: ["latest", device.id],
-    queryFn: () => api.latest(device.id),
-    refetchInterval: 10000,
-  });
-  const status = data?.status ?? classify(350);
+  const { reading, status: streamStatus, tick } = useDeviceStream(device.id);
+  useAirAlert(reading, device.name);
+
+  const status = reading?.status ?? classify(350);
   const theme = statusTheme[status];
+  const live = streamStatus === "live";
 
   return (
     <button
@@ -116,11 +128,11 @@ function RoomCard({ device, onOpen }: { device: Device; onOpen: () => void }) {
         <span
           className={cn(
             "flex shrink-0 items-center gap-1 rounded-full bg-card/70 px-2 py-0.5 text-[11px]",
-            device.online ? "text-good" : "text-muted-foreground",
+            live ? "text-good" : "text-muted-foreground",
           )}
         >
-          {device.online ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
-          {t(device.online ? "dash.online" : "dash.offline")}
+          {live ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
+          {t(live ? "dash.online" : "dash.offline")}
         </span>
       </div>
       <div className="mt-4 flex items-center gap-3">
@@ -128,9 +140,17 @@ function RoomCard({ device, onOpen }: { device: Device; onOpen: () => void }) {
         <p className={cn("font-display text-2xl", theme.text)}>{t(theme.label)}</p>
       </div>
       <p className="mt-2 text-xs text-foreground/60">
-        {t("dash.sensorReading")}: <span className="tabular-nums">{data?.mq135 ?? "—"}</span> ppm
+        {t("dash.sensorReading")}:{" "}
+        <span key={tick} className="tabular-nums value-pulse inline-block">
+          {reading?.mq135 ?? "—"}
+        </span>{" "}
+        ppm
       </p>
-      <p className="mt-4 text-xs font-medium text-primary">{t("dash.viewRoom")} →</p>
+      <p className="mt-3 flex items-center gap-1.5 text-[11px] text-foreground/50">
+        <Radio className={cn("h-3 w-3", live && "text-good")} />
+        {t(live ? "rooms.live" : streamStatus === "reconnecting" ? "rooms.reconnecting" : "rooms.connecting")}
+      </p>
+      <p className="mt-3 text-xs font-medium text-primary">{t("dash.viewRoom")} →</p>
     </button>
   );
 }
