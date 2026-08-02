@@ -158,6 +158,45 @@ export const dict = {
   "rooms.removed": { te: "గది తొలగించబడింది", en: "Room removed" },
   "rooms.renamed": { te: "పేరు మార్చబడింది", en: "Renamed" },
   "rooms.remove": { te: "తొలగించు", en: "Remove" },
+  "rooms.live": { te: "లైవ్ స్ట్రీమ్", en: "Live stream" },
+  "rooms.reconnecting": { te: "మళ్లీ కలుపుతున్నాం…", en: "Reconnecting…" },
+  "rooms.connecting": { te: "కలుపుతున్నాం…", en: "Connecting…" },
+
+  "dev.created": { te: "పరికరం నమోదైంది", en: "Device registered" },
+  "dev.credsTitle": { te: "ఈ వివరాలు ఇప్పుడే కాపీ చేసుకోండి", en: "Copy these credentials now" },
+  "dev.credsDesc": {
+    te: "ఈ API కీ ఒక్కసారి మాత్రమే చూపబడుతుంది. దీన్ని మీ ESP32 పరికర కోడ్‌లో పెట్టండి.",
+    en: "This API key is shown only once. Paste it into your ESP32 device firmware.",
+  },
+  "dev.deviceId": { te: "పరికర ID", en: "Device ID" },
+  "dev.apiKey": { te: "API కీ", en: "API key" },
+  "dev.copy": { te: "కాపీ", en: "Copy" },
+  "dev.copied": { te: "కాపీ అయ్యింది", en: "Copied" },
+  "dev.warning": {
+    te: "హెచ్చరిక: ఈ విండో మూసిన తర్వాత API కీ మళ్లీ చూడలేరు.",
+    en: "Warning: once you close this window the API key cannot be retrieved again.",
+  },
+  "dev.saved": { te: "నేను భద్రపరిచాను", en: "I've saved it" },
+  "dev.lastSeen": { te: "చివరిగా కనిపించింది", en: "Last seen" },
+  "dev.never": { te: "ఇంకా కనెక్ట్ కాలేదు", en: "Not connected yet" },
+  "dev.manageDesc": { te: "మీ సెన్సార్ పరికరాలకు పేరు మార్చండి లేదా తొలగించండి.", en: "Rename or remove your sensor devices." },
+  "dev.removeConfirm": { te: "ఈ పరికరాన్ని తొలగించాలా?", en: "Remove this device?" },
+  "dev.removeDesc": { te: "దాని రీడింగ్‌లు ఇకపై డాష్‌బోర్డ్‌లో కనిపించవు.", en: "Its readings will no longer appear on your dashboard." },
+
+  "push.title": { te: "గాలి పాడైతే వెంటనే తెలుసుకోండి", en: "Know the moment air turns poor" },
+  "push.desc": {
+    te: "బ్రౌజర్ నోటిఫికేషన్లు ఆన్ చేయండి — యాప్ మూసి ఉన్నా హెచ్చరిక వస్తుంది.",
+    en: "Turn on browser notifications — alerts reach you even when the app is closed.",
+  },
+  "push.enable": { te: "నోటిఫికేషన్లు ఆన్ చేయండి", en: "Turn on alerts" },
+  "push.later": { te: "తర్వాత", en: "Not now" },
+  "push.enabled": { te: "నోటిఫికేషన్లు ఆన్‌లో ఉన్నాయి", en: "Alerts are on" },
+  "push.blocked": {
+    te: "బ్రౌజర్‌లో నోటిఫికేషన్లు నిరోధించబడ్డాయి. సైట్ సెట్టింగ్‌లలో అనుమతించండి.",
+    en: "Notifications are blocked in your browser. Allow them in site settings.",
+  },
+  "push.unsupported": { te: "ఈ బ్రౌజర్‌లో నోటిఫికేషన్లు పనిచేయవు.", en: "This browser does not support notifications." },
+
 
   "set.title": { te: "సెట్టింగ్‌లు", en: "Settings" },
   "set.notif": { te: "నోటిఫికేషన్ ప్రాధాన్యతలు", en: "Notification preferences" },
