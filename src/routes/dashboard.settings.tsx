@@ -107,38 +107,52 @@ function SettingsPage() {
 
       <section className="rounded-3xl border bg-card p-6">
         <p className="font-semibold">{t("set.devices")}</p>
+      <section className="rounded-3xl border bg-card p-6">
+        <p className="font-semibold">{t("set.devices")}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{t("dev.manageDesc")}</p>
         <ul className="mt-4 space-y-3">
           {(devices ?? []).map((d) => (
-            <li key={d.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-              <Input
-                defaultValue={d.name}
-                className="rounded-xl"
-                onBlur={(e) => {
-                  const value = e.target.value.trim();
-                  if (value && value !== d.name) {
-                    rename.mutate({ id: d.id, name: value });
-                    toast.success(t("rooms.renamed"));
-                  }
-                }}
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="shrink-0 rounded-full text-poor"
-                aria-label={t("rooms.remove")}
-                onClick={() => {
-                  remove.mutate(d.id);
-                  toast.success(t("rooms.removed"));
-                }}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+            <li key={d.id} className="rounded-2xl border p-3">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                <Input
+                  defaultValue={d.name}
+                  className="rounded-xl"
+                  onBlur={(e) => {
+                    const value = e.target.value.trim();
+                    if (value && value !== d.name) {
+                      rename.mutate({ id: d.id, name: value });
+                      toast.success(t("rooms.renamed"));
+                    }
+                  }}
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="shrink-0 rounded-full text-poor"
+                  aria-label={t("rooms.remove")}
+                  onClick={() => {
+                    if (!window.confirm(`${t("dev.removeConfirm")}\n${t("dev.removeDesc")}`)) return;
+                    remove.mutate(d.id);
+                    toast.success(t("rooms.removed"));
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="mt-2 grid gap-1 px-1 text-xs text-muted-foreground sm:grid-cols-2">
+                <span className="truncate font-mono">{d.id}</span>
+                <span className="sm:text-right">
+                  {t("dev.lastSeen")}: {d.lastSeen ? formatTime(d.lastSeen, lang) : t("dev.never")}
+                </span>
+              </div>
             </li>
           ))}
         </ul>
         <Button asChild variant="outline" className="mt-4 rounded-full">
           <Link to="/dashboard/rooms">{t("rooms.add")}</Link>
         </Button>
+      </section>
+
       </section>
 
       <section className="rounded-3xl border bg-card p-6">
