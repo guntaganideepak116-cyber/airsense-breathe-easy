@@ -17,7 +17,11 @@ export type Device = {
   id: string;
   name: string;
   online: boolean;
+  lastSeen?: string;
 };
+
+export type DeviceCredentials = { device: Device; apiKey: string };
+
 
 export type Reading = {
   deviceId: string;
