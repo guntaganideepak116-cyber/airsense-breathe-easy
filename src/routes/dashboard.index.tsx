@@ -138,7 +138,7 @@ function Overview() {
         <section className="rounded-3xl border bg-card p-6">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
             <p className="truncate text-sm font-semibold">{t("dash.device")}</p>
-            {device?.online ? (
+            {live ? (
               <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-good-soft px-2.5 py-1 text-xs text-good">
                 <Wifi className="h-3.5 w-3.5" /> {t("dash.online")}
               </span>
