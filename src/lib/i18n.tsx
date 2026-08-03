@@ -224,6 +224,131 @@ export const dict = {
   "pwa.installDesc": { te: "హోమ్ స్క్రీన్ నుండే తెరవండి, ఆఫ్‌లైన్‌లోనూ చివరి రీడింగ్ చూడండి.", en: "Open it from your home screen and see the last reading even offline." },
   "pwa.installBtn": { te: "ఇన్‌స్టాల్", en: "Install" },
   "pwa.later": { te: "తర్వాత", en: "Later" },
+
+  "today.title": { te: "ఈ రోజు సారాంశం", en: "Today's summary" },
+  "today.typical": { te: "ఈ రోజు సాధారణ స్థితి", en: "Typical today" },
+  "today.episodes": { te: "'పేలవం' సంఘటనలు", en: "Poor episodes" },
+  "today.duration": { te: "పేలవమైన గాలిలో గడిచిన సమయం", en: "Time in poor air" },
+  "today.best": { te: "ప్రస్తుతం ఉత్తమ గది", en: "Best room now" },
+  "today.worst": { te: "ప్రస్తుతం చెత్త గది", en: "Worst room now" },
+  "today.minutes": { te: "నిమిషాలు", en: "min" },
+  "today.none": { te: "ఈ రోజుకి ఇంకా డేటా లేదు.", en: "No readings for today yet." },
+
+  "out.title": { te: "లోపల vs బయట", en: "Indoor vs outdoor" },
+  "out.indoor": { te: "లోపల", en: "Indoor" },
+  "out.outdoor": { te: "బయట", en: "Outdoor" },
+  "out.tooltip": {
+    te: "బయటి AQI అనేది నగరం మొత్తానికి సగటు — ఈ గదిలోని నిజమైన గాలిని అది చూపించకపోవచ్చు.",
+    te_note: "",
+    en: "Outdoor AQI is a citywide average and may not reflect this room's actual air",
+  } as { te: string; en: string },
+  "out.unavailable": { te: "బయటి AQI ప్రస్తుతం అందుబాటులో లేదు", en: "Outdoor AQI unavailable right now" },
+  "out.loading": { te: "బయటి AQI తెస్తున్నాం…", en: "Fetching outdoor AQI…" },
+  "out.city": { te: "నగరం", en: "City" },
+  "out.cityDesc": {
+    te: "బయటి AQI పోలిక కోసం మీకు దగ్గరి నగరాన్ని ఎంచుకోండి.",
+    en: "Pick the city nearest you for the outdoor AQI comparison.",
+  },
+  "out.source": { te: "మూలం: Open-Meteo పబ్లిక్ AQI", en: "Source: Open-Meteo public AQI" },
+  "out.aqi": { te: "AQI", en: "AQI" },
+  "out.gap": {
+    te: "ఈ గదిలోని గాలి బయటి నగర సగటుతో సరిపోలడం లేదు.",
+    en: "This room's air does not match the citywide average.",
+  },
+
+  "action.title": { te: "ఇప్పుడు ఏం చేయాలి", en: "What to do now" },
+  "action.good": { te: "గాలి బాగుంది — ప్రస్తుతం ఏమీ చేయనవసరం లేదు.", en: "Air quality is good — no action needed." },
+  "action.goodRising": {
+    te: "గాలి ఇంకా బాగానే ఉంది, కానీ రీడింగ్ పెరుగుతోంది — గమనిస్తూ ఉండండి.",
+    en: "Air is still good but the reading is climbing — keep an eye on it.",
+  },
+  "action.moderate": { te: "గాలి మధ్యస్థంగా ఉంది — ఒక కిటికీ తెరవడం మంచిది.", en: "Air is moderate — opening a window would help." },
+  "action.moderateRising": {
+    te: "గాలి నాణ్యత తగ్గుతోంది — త్వరలో ఒక కిటికీ తెరవడం మంచిది.",
+    en: "Air quality is declining — consider opening a window soon.",
+  },
+  "action.moderateFalling": {
+    te: "గాలి మెరుగవుతోంది — ప్రస్తుత వెంటిలేషన్ పనిచేస్తోంది.",
+    en: "Air is improving — whatever you changed is working.",
+  },
+  "action.poor": {
+    te: "గాలి పేలవంగా ఉంది — వెంటనే కిటికీ తెరవండి లేదా ఫ్యాన్/వెంటిలేషన్ ఆన్ చేయండి.",
+    en: "Air quality is poor — open a window or turn on ventilation now.",
+  },
+  "action.poorFalling": {
+    te: "గాలి ఇంకా పేలవంగానే ఉంది కానీ మెరుగవుతోంది — వెంటిలేషన్ కొనసాగించండి.",
+    en: "Air is still poor but improving — keep the ventilation going.",
+  },
+  "action.trend.rising": { te: "పెరుగుతోంది", en: "Rising" },
+  "action.trend.falling": { te: "తగ్గుతోంది", en: "Improving" },
+  "action.trend.steady": { te: "స్థిరంగా ఉంది", en: "Steady" },
+  "action.disclaimer": {
+    te: "AirSense ఒక ముందస్తు హెచ్చరిక & అవగాహన సాధనం — ఇది వైద్య పరికరం కాదు, రోగ నిర్ధారణకు ఉపయోగించరాదు.",
+    en: "AirSense is an early-warning and awareness tool — not a medical or diagnostic device.",
+  },
+
+  "cmp.title": { te: "గదుల పోలిక", en: "Room comparison" },
+  "cmp.desc": { te: "చెత్త గాలి ఉన్న గది మొదట చూపిస్తున్నాం.", en: "Sorted worst-air-first so the room needing attention comes first." },
+  "cmp.room": { te: "గది", en: "Room" },
+  "cmp.status": { te: "స్థితి", en: "Status" },
+  "cmp.reading": { te: "రీడింగ్", en: "Reading" },
+  "cmp.climate": { te: "ఉష్ణోగ్రత / తేమ", en: "Temp / humidity" },
+  "cmp.updated": { te: "నవీకరణ", en: "Updated" },
+  "cmp.sortStatus": { te: "గాలి నాణ్యత", en: "Air quality" },
+  "cmp.sortName": { te: "పేరు", en: "Name" },
+  "cmp.sortBy": { te: "క్రమబద్ధీకరణ", en: "Sort by" },
+
+  "week.title": { te: "ఈ వారం నమూనా", en: "Weekly pattern" },
+  "week.clean": { te: "ఈ వారం ఒక్క 'పేలవం' సంఘటన కూడా లేదు — బాగుంది.", en: "No poor episodes this week — trending well." },
+  "week.none": { te: "నమూనా చెప్పడానికి తగిన డేటా ఇంకా లేదు.", en: "Not enough data yet to describe a pattern." },
+  "week.note": {
+    te: "ఇది గత 7 రోజుల రీడింగ్‌ల సాధారణ సగటు — అంచనా కాదు.",
+    en: "A plain average of the last 7 days of readings — not a prediction.",
+  },
+
+  "rep.title": { te: "నివేదిక", en: "Report" },
+  "rep.download": { te: "నివేదిక డౌన్‌లోడ్ చేయండి", en: "Download report" },
+  "rep.csv": { te: "CSV డౌన్‌లోడ్", en: "Download CSV" },
+  "rep.pdf": { te: "PDF డౌన్‌లోడ్", en: "Download PDF" },
+  "rep.desc": {
+    te: "ఎంచుకున్న కాలానికి రీడింగ్‌లు, స్థితి మార్పులు, హెచ్చరికలు — పాఠశాలకు ఇవ్వడానికి సిద్ధం.",
+    en: "Readings, classification changes and alerts for the selected period — ready to share with a school.",
+  },
+  "rep.done": { te: "నివేదిక డౌన్‌లోడ్ అయింది", en: "Report downloaded" },
+  "rep.pdfNote": { te: "PDF ఆంగ్లంలో ఉంటుంది (ఫాంట్ పరిమితి).", en: "The PDF is generated in English." },
+
+  "diag.title": { te: "పరికర వివరాలు", en: "Device diagnostics" },
+  "diag.raw": { te: "ముడి MQ135 విలువ", en: "Raw MQ135 value" },
+  "diag.wifi": { te: "WiFi సిగ్నల్", en: "WiFi signal" },
+  "diag.uptime": { te: "అప్‌టైమ్", en: "Uptime" },
+  "diag.firmware": { te: "ఫర్మ్‌వేర్", en: "Firmware" },
+  "diag.lastData": { te: "చివరి డేటా", en: "Last data" },
+  "diag.na": { te: "అందుబాటులో లేదు", en: "Not available" },
+
+  "tl.title": { te: "హెచ్చరికల టైమ్‌లైన్", en: "Alert timeline" },
+  "tl.desc": { te: "ఎంచుకున్న కాలంలో గాలి స్థితి — ఎడమ నుండి కుడికి.", en: "Air state across the selected period, left to right." },
+
+  "quiet.title": { te: "నిశ్శబ్ద గంటలు", en: "Quiet hours" },
+  "quiet.desc": {
+    te: "ఈ సమయంలో హెచ్చరికలు పంపబడవు — అవి లాగ్‌లో మాత్రం నమోదవుతాయి.",
+    en: "Alerts are not sent during this window — they are still recorded in history.",
+  },
+  "quiet.enable": { te: "నిశ్శబ్ద గంటలు ఆన్", en: "Enable quiet hours" },
+  "quiet.from": { te: "నుండి", en: "From" },
+  "quiet.to": { te: "వరకు", en: "To" },
+  "quiet.critical": { te: "'పేలవం' హెచ్చరికలు అప్పుడూ పంపు", en: "Still send critical Poor alerts" },
+  "quiet.criticalDesc": {
+    te: "గాలి పేలవంగా మారితే నిశ్శబ్ద గంటల్లోనూ నోటిఫికేషన్ వస్తుంది.",
+    en: "A poor-air alert will still come through during quiet hours.",
+  },
+  "quiet.active": { te: "ఇప్పుడు నిశ్శబ్ద గంటల్లో ఉన్నాం", en: "Quiet hours are active right now" },
+
+  "empty.title": { te: "ఇంకా ఏ గదీ పర్యవేక్షణలో లేదు", en: "No rooms monitored yet" },
+  "empty.desc": {
+    te: "ఒక గదిని జోడించండి — పరికర ID, API కీ వెంటనే ఇస్తాం, సెన్సార్ కనెక్ట్ చేసిన క్షణం నుండి లైవ్ రీడింగ్‌లు కనిపిస్తాయి.",
+    en: "Add a room and we'll issue its device ID and API key immediately — live readings appear the moment your sensor connects.",
+  },
+  "empty.cta": { te: "మొదటి గదిని జోడించండి", en: "Add your first room" },
 } satisfies Dict;
 
 export type TKey = keyof typeof dict;
