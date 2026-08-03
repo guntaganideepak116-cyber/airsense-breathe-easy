@@ -1,12 +1,19 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { BellRing, CheckCircle2, Droplets, Pencil, Radio, Thermometer, Wifi, WifiOff } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { statusTheme, formatTime } from "@/lib/status";
-import { useDeviceMutations, useDeviceStream, useLatest, useSelectedDevice } from "@/lib/queries";
+import { useDeviceMutations, useDeviceStream, useLatest, useSelectedDevice, useTrend } from "@/lib/queries";
 import { useAirAlert } from "@/lib/use-air-alert";
 import { BreathingOrb } from "@/components/BreathingOrb";
 import { PushOptIn } from "@/components/PushOptIn";
+import { TodaySummary } from "@/components/TodaySummary";
+import { ActionCard } from "@/components/ActionCard";
+import { IndoorOutdoor } from "@/components/IndoorOutdoor";
+import { DeviceDiagnostics } from "@/components/DeviceDiagnostics";
+import { WeeklyInsight } from "@/components/WeeklyInsight";
+import { RoomComparison } from "@/components/RoomComparison";
+import { EmptyRooms } from "@/components/EmptyRooms";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -40,6 +47,8 @@ function Overview() {
   const { data: polled, isLoading } = useLatest(deviceId);
   const { reading: streamed, status: streamStatus, tick } = useDeviceStream(deviceId);
   const { rename } = useDeviceMutations();
+  const trend = useTrend(deviceId);
+  const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState("");
 
@@ -51,6 +60,10 @@ function Overview() {
   const live = streamStatus === "live";
 
 
+
+  if (devices.length === 0) {
+    return <EmptyRooms onAdd={() => void navigate({ to: "/dashboard/rooms" })} />;
+  }
 
   return (
     <div className="space-y-5">
@@ -76,6 +89,8 @@ function Overview() {
       </div>
 
       <PushOptIn />
+
+      <TodaySummary deviceId={deviceId} devices={devices} />
 
       {isLoading && !reading ? (
         <Skeleton className="h-72 rounded-3xl" />
@@ -106,16 +121,19 @@ function Overview() {
                 {t("dash.updated")}:{" "}
                 <span className="tabular-nums">{reading ? formatTime(reading.timestamp, lang) : "—"}</span>
               </p>
+
+              <IndoorOutdoor indoor={reading?.status} className="mt-4" />
             </div>
           </div>
         </section>
       )}
 
 
-      <section className="rounded-3xl border bg-card p-6">
-        <p className="text-sm font-semibold">{t("dash.guidance")}</p>
-        <p className="mt-2 leading-relaxed text-muted-foreground">{t(theme.advice)}</p>
-      </section>
+      <ActionCard status={status} trend={trend} />
+
+      <WeeklyInsight deviceId={deviceId} />
+
+      {devices.length > 1 && <RoomComparison devices={devices} onSelect={select} />}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <ComfortCard
@@ -189,6 +207,8 @@ function Overview() {
             {t("dash.updated")}:{" "}
             <span className="tabular-nums">{reading ? formatTime(reading.timestamp, lang) : "—"}</span>
           </p>
+
+          <DeviceDiagnostics reading={reading} className="mt-4" />
         </section>
 
         <section className="rounded-3xl border bg-card p-6">
