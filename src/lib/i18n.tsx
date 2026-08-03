@@ -239,9 +239,8 @@ export const dict = {
   "out.outdoor": { te: "బయట", en: "Outdoor" },
   "out.tooltip": {
     te: "బయటి AQI అనేది నగరం మొత్తానికి సగటు — ఈ గదిలోని నిజమైన గాలిని అది చూపించకపోవచ్చు.",
-    te_note: "",
     en: "Outdoor AQI is a citywide average and may not reflect this room's actual air",
-  } as { te: string; en: string },
+  },
   "out.unavailable": { te: "బయటి AQI ప్రస్తుతం అందుబాటులో లేదు", en: "Outdoor AQI unavailable right now" },
   "out.loading": { te: "బయటి AQI తెస్తున్నాం…", en: "Fetching outdoor AQI…" },
   "out.city": { te: "నగరం", en: "City" },
