@@ -35,6 +35,7 @@ export function makeReading(deviceId: string) {
   const mq135 = mq135At(deviceId, now, bucket);
   const status = classify(mq135);
   const lastPoor = new Date(now.getTime() - (2 + noise(bucket) * 20) * 3600_000);
+  const bootedAt = now.getTime() - (6 + baseFor(deviceId)) * 3600_000;
   return {
     deviceId,
     status,
@@ -45,5 +46,9 @@ export function makeReading(deviceId: string) {
     buzzerActive: status === "poor",
     lastPoorAt: lastPoor.toISOString(),
     online: true,
+    /* Diagnostics — secondary technical detail surfaced in the collapsible panel. */
+    rssi: -Math.round(42 + noise(bucket + 5) * 38),
+    uptimeSec: Math.round((now.getTime() - bootedAt) / 1000),
+    firmware: "1.4.2",
   };
 }
