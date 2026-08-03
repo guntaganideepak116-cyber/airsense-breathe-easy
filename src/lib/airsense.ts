@@ -32,6 +32,10 @@ export type Reading = {
   timestamp: string;
   buzzerActive: boolean;
   lastPoorAt: string | null;
+  /** Diagnostics, present when the firmware reports them. */
+  rssi?: number;
+  uptimeSec?: number;
+  firmware?: string;
 };
 
 export type HistoryPoint = {
