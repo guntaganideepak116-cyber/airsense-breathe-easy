@@ -32,6 +32,10 @@ export type Reading = {
   timestamp: string;
   buzzerActive: boolean;
   lastPoorAt: string | null;
+  /** Diagnostics, present when the firmware reports them. */
+  rssi?: number;
+  uptimeSec?: number;
+  firmware?: string;
 };
 
 export type HistoryPoint = {
@@ -110,6 +114,9 @@ function latestMock(deviceId: string): Reading {
     timestamp: now.toISOString(),
     buzzerActive: status === "poor",
     lastPoorAt: lastPoor.toISOString(),
+    rssi: -Math.round(42 + noise(bucket + 5) * 38),
+    uptimeSec: Math.round((6 + baseFor(deviceId)) * 3600),
+    firmware: "1.4.2",
   };
 }
 
