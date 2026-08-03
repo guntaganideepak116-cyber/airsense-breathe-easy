@@ -135,3 +135,25 @@ export function useDeviceMutations() {
   };
 }
 
+
+/**
+ * Latest reading for several devices at once. Shares the ["latest", id] cache
+ * keys the SSE stream writes into, so rows stay live wherever a stream is open.
+ */
+export function useAllLatest(deviceIds: string[]) {
+  const results = useQueries({
+    queries: deviceIds.map((id) => ({
+      queryKey: ["latest", id],
+      queryFn: () => api.latest(id),
+      refetchInterval: 15000,
+    })),
+  });
+
+  return deviceIds.map((id, i) => ({ deviceId: id, reading: (results[i]?.data as Reading | undefined) ?? null }));
+}
+
+/** Direction of the last few hours of readings, used to phrase guidance. */
+export function useTrend(deviceId: string | null): Trend {
+  const { data } = useHistory(deviceId, "24h");
+  return trendOf(data);
+}
