@@ -3,7 +3,7 @@ import { useI18n } from "@/lib/i18n";
 import { statusTheme } from "@/lib/status";
 import { useOutdoorAqi } from "@/lib/outdoor";
 import type { AirStatus } from "@/lib/airsense";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 /**
@@ -56,6 +56,7 @@ export function IndoorOutdoor({
             outdoorTheme!.text,
           )
         )}
+        <TooltipProvider delayDuration={150}>
         <Tooltip>
           <TooltipTrigger asChild>
             <button
@@ -69,6 +70,7 @@ export function IndoorOutdoor({
           </TooltipTrigger>
           <TooltipContent className="max-w-64 text-xs leading-relaxed">{t("out.tooltip")}</TooltipContent>
         </Tooltip>
+        </TooltipProvider>
       </div>
 
       {!compact && (
