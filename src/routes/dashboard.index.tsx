@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { BellRing, CheckCircle2, Droplets, Pencil, Radio, Thermometer, Wifi, WifiOff } from "lucide-react";
+import { BellRing, CheckCircle2, Pencil, Radio, Wifi, WifiOff } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { statusTheme, formatTime } from "@/lib/status";
 import { useDeviceMutations, useDeviceStream, useLatest, useSelectedDevice, useTrend } from "@/lib/queries";
@@ -14,6 +14,7 @@ import { DeviceDiagnostics } from "@/components/DeviceDiagnostics";
 import { WeeklyInsight } from "@/components/WeeklyInsight";
 import { RoomComparison } from "@/components/RoomComparison";
 import { EmptyRooms } from "@/components/EmptyRooms";
+import { SensorReadings } from "@/components/SensorReadings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -222,32 +223,3 @@ function Overview() {
   );
 }
 
-function ComfortCard({
-  icon,
-  label,
-  value,
-  state,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  state: "ok" | "high" | "low";
-}) {
-  const { t } = useI18n();
-  const map = {
-    ok: { cls: "bg-good-soft text-good", key: "dash.comfort.ok" },
-    high: { cls: "bg-moderate-soft text-moderate", key: "dash.comfort.high" },
-    low: { cls: "bg-sky-soft text-primary", key: "dash.comfort.low" },
-  } as const;
-  const s = map[state];
-  return (
-    <section className="rounded-3xl border bg-card p-6">
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        {icon}
-        <span className="truncate">{label}</span>
-      </div>
-      <p className="mt-3 text-4xl font-semibold tabular-nums">{value}</p>
-      <span className={cn("mt-3 inline-flex rounded-full px-2.5 py-1 text-xs", s.cls)}>{t(s.key)}</span>
-    </section>
-  );
-}
