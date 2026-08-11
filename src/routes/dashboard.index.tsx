@@ -135,22 +135,8 @@ function Overview() {
 
       {devices.length > 1 && <RoomComparison devices={devices} onSelect={select} />}
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <ComfortCard
-          icon={<Thermometer className="h-4 w-4" />}
-          label={t("dash.temp")}
-          value={reading ? `${reading.temperature}°C` : "—"}
-          state={
-            !reading ? "ok" : reading.temperature > 32 ? "high" : reading.temperature < 18 ? "low" : "ok"
-          }
-        />
-        <ComfortCard
-          icon={<Droplets className="h-4 w-4" />}
-          label={t("dash.humidity")}
-          value={reading ? `${reading.humidity}%` : "—"}
-          state={!reading ? "ok" : reading.humidity > 65 ? "high" : reading.humidity < 30 ? "low" : "ok"}
-        />
-      </div>
+      <SensorReadings reading={reading} tick={tick} />
+
 
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="rounded-3xl border bg-card p-6">
