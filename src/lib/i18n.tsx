@@ -324,6 +324,28 @@ export const dict = {
   "diag.lastData": { te: "చివరి డేటా", en: "Last data" },
   "diag.na": { te: "అందుబాటులో లేదు", en: "Not available" },
 
+  "sens.title": { te: "సెన్సార్ రీడింగ్‌లు", en: "Sensor readings" },
+  "sens.desc": { te: "పరికరం నిజంగా కొలిచే విలువలు మాత్రమే.", en: "Only the values the hardware actually measures." },
+  "sens.aqi": { te: "గాలి నాణ్యత సూచిక", en: "Air Quality Index" },
+  "sens.aqiInfo": {
+    te: "సాధారణ గాలి కాలుష్య స్థాయి ఆధారంగా (MQ135 సెన్సార్) — వ్యక్తిగత వాయువుల విభజన కాదు.",
+    en: "Based on general air contamination level (MQ135 sensor) — not a breakdown of individual gases.",
+  },
+  "sens.temp.low": { te: "చల్లగా", en: "Cold" },
+  "sens.temp.ok": { te: "సౌకర్యవంతం", en: "Comfortable" },
+  "sens.temp.high": { te: "వేడిగా", en: "Hot" },
+  "sens.hum.low": { te: "పొడిగా", en: "Dry" },
+  "sens.hum.ok": { te: "సౌకర్యవంతం", en: "Comfortable" },
+  "sens.hum.high": { te: "తేమగా", en: "Humid" },
+  "sens.raw": { te: "ముడి సెన్సార్ డేటా చూడండి", en: "View raw sensor data" },
+  "sens.rawAdc": { te: "MQ135 ముడి ADC విలువ (0–4095)", en: "Raw MQ135 ADC value (0–4095)" },
+  "sens.rawIndex": { te: "కాలిబ్రేట్ చేసిన సూచిక", en: "Calibrated index" },
+  "sens.rawFormula": { te: "సూచిక = (ADC − {clean}) ÷ ({poor} − {clean}) × 100", en: "Index = (ADC − {clean}) ÷ ({poor} − {clean}) × 100" },
+  "sens.dht": { te: "DHT22 సెన్సార్", en: "DHT22 sensor" },
+  "sens.mq": { te: "MQ135 సెన్సార్", en: "MQ135 sensor" },
+
+
+
   "tl.title": { te: "హెచ్చరికల టైమ్‌లైన్", en: "Alert timeline" },
   "tl.desc": { te: "ఎంచుకున్న కాలంలో గాలి స్థితి — ఎడమ నుండి కుడికి.", en: "Air state across the selected period, left to right." },
 
