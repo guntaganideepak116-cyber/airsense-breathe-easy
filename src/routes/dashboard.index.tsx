@@ -5,8 +5,6 @@ import {
   BellRing,
   CheckCircle2,
   Download,
-  Gauge,
-  Layers,
   Pencil,
   Radio,
   Sparkles,
