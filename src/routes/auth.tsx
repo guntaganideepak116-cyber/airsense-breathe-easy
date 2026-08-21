@@ -52,7 +52,7 @@ const clerkAppearance = {
     formFieldInput:
       "bg-white/5 border border-white/10 text-white placeholder:text-white/30 rounded-xl h-11 px-3.5 text-xs sm:text-sm focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/40 transition-all",
     formButtonPrimary:
-      "bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-slate-950 font-bold rounded-xl h-11 text-xs sm:text-sm transition-all duration-200 shadow-lg shadow-cyan-500/20 mt-1",
+      "bg-linear-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-slate-950 font-bold rounded-xl h-11 text-xs sm:text-sm transition-all duration-200 shadow-lg shadow-cyan-500/20 mt-1",
     footerAction: "mt-3 flex justify-center",
     footerActionText: "text-white/40 text-xs",
     footerActionLink: "text-cyan-400 hover:text-cyan-300 font-semibold text-xs ml-1",
@@ -154,7 +154,7 @@ function MonitoringPreview() {
         {/* Mini AQI bar */}
         <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400"
+            className="h-full rounded-full bg-linear-to-r from-emerald-400 to-cyan-400"
             style={{ width: "30%" }}
           />
         </div>
@@ -220,14 +220,14 @@ function AuthPage() {
   return (
     <div className="bg-slate-950 min-h-dvh lg:h-dvh lg:max-h-dvh lg:overflow-hidden flex flex-col relative overflow-x-hidden">
       {/* Ambient background glows */}
-      <div className="pointer-events-none absolute -top-20 -left-10 w-96 h-96 sm:w-[500px] sm:h-[500px] rounded-full bg-cyan-500/10 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-5 right-1/4 w-80 h-80 sm:w-[400px] sm:h-[400px] rounded-full bg-emerald-500/10 blur-3xl" />
-      <div className="pointer-events-none absolute top-1/3 -right-10 w-72 h-72 sm:w-[320px] sm:h-[320px] rounded-full bg-cyan-400/10 blur-3xl" />
+      <div className="pointer-events-none absolute -top-20 -left-10 w-96 h-96 sm:w-125 sm:h-125 rounded-full bg-cyan-500/10 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-5 right-1/4 w-80 h-80 sm:w-100 sm:h-100 rounded-full bg-emerald-500/10 blur-3xl" />
+      <div className="pointer-events-none absolute top-1/3 -right-10 w-72 h-72 sm:w-80 sm:h-80 rounded-full bg-cyan-400/10 blur-3xl" />
 
       {/* Top Header bar with Logo & LangToggle */}
       <header className="w-full max-w-7xl mx-auto px-5 sm:px-8 pt-4 sm:pt-6 flex items-center justify-between z-20 shrink-0">
         <Link to="/" className="inline-flex items-center gap-2.5 text-decoration-none group">
-          <span className="grid place-items-center w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600 text-slate-950 shadow-lg shadow-cyan-400/30">
+          <span className="grid place-items-center w-9 h-9 rounded-xl bg-linear-to-br from-cyan-400 to-cyan-600 text-slate-950 shadow-lg shadow-cyan-400/30">
             <Wind className="h-4 sm:h-5 w-4 sm:w-5" />
           </span>
           <span className="font-display text-xl font-bold text-slate-100 tracking-tight">
@@ -249,7 +249,7 @@ function AuthPage() {
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
               Know Your Air.
               <br />
-              <span className="bg-gradient-to-r from-cyan-300 to-emerald-300 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-cyan-300 to-emerald-300 bg-clip-text text-transparent">
                 Breathe Better.
               </span>
             </h1>
@@ -290,7 +290,7 @@ function AuthPage() {
 
             {/* Auth header */}
             <div className="flex flex-col items-center text-center space-y-1.5 mb-4">
-              <span className="grid place-items-center w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400/20 to-emerald-400/10 border border-cyan-400/20">
+              <span className="grid place-items-center w-10 h-10 rounded-xl bg-linear-to-br from-cyan-400/20 to-emerald-400/10 border border-cyan-400/20">
                 <Wind className="h-4 w-4 text-cyan-400" />
               </span>
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
