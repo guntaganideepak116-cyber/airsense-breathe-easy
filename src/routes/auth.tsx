@@ -1,11 +1,19 @@
 import { SignIn, SignUp } from "@clerk/clerk-react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import { useState, useEffect, type ReactNode } from "react";
 import { Thermometer, Droplets, Wind, Activity, CheckCircle2, Wifi } from "lucide-react";
 import { LangToggle } from "@/components/LangToggle";
 import { cn } from "@/lib/utils";
 
+type AuthSearch = {
+  mode?: "signin" | "signup" | undefined;
+};
+
 export const Route = createFileRoute("/auth")({
+  validateSearch: (search: Record<string, unknown>): AuthSearch => ({
+    mode:
+      search["mode"] === "signup" ? "signup" : search["mode"] === "signin" ? "signin" : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Sign in — AirSense" },
@@ -114,7 +122,7 @@ function SensorTile({
 /** Interactive Air Quality Live Preview widget */
 function MonitoringPreview() {
   return (
-    <div className="relative w-full max-w-sm mx-auto lg:mx-0">
+    <div className="relative w-full max-w-sm">
       {/* Background radar rings */}
       <div className="absolute -inset-10 pointer-events-none">
         <RadarRings />
