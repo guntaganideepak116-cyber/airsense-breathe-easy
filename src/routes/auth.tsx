@@ -1,7 +1,6 @@
 import { SignIn, SignUp } from "@clerk/clerk-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
-import type React from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { Thermometer, Droplets, Wind, Activity, CheckCircle2, Wifi } from "lucide-react";
 import { LangToggle } from "@/components/LangToggle";
 import { cn } from "@/lib/utils";
@@ -25,6 +24,46 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+/** Shared Clerk component appearance config */
+const clerkAppearance = {
+  variables: {
+    colorPrimary: "#22d3ee",
+    colorBackground: "rgba(10,20,28,0)",
+    colorText: "#f1f5f9",
+    colorTextSecondary: "#94a3b8",
+    colorInputBackground: "rgba(255,255,255,0.06)",
+    colorInputText: "#f1f5f9",
+    borderRadius: "10px",
+    colorNeutral: "#64748b",
+  },
+  elements: {
+    rootBox: "w-full",
+    card: "bg-transparent shadow-none border-0 p-0 w-full",
+    header: "hidden",
+    headerTitle: "hidden",
+    headerSubtitle: "hidden",
+    socialButtonsBlockButton:
+      "border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all duration-200 rounded-xl h-11 text-sm font-medium",
+    socialButtonsBlockButtonText: "text-xs sm:text-sm font-medium",
+    dividerRow: "my-3",
+    dividerText: "text-white/30 text-[11px]",
+    dividerLine: "bg-white/10",
+    formFieldLabel: "text-[11px] font-medium text-white/60 mb-1",
+    formFieldInput:
+      "bg-white/[0.06] border border-white/10 text-white placeholder:text-white/30 rounded-xl h-11 px-3.5 text-xs sm:text-sm focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/40 transition-all",
+    formButtonPrimary:
+      "bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-[#071218] font-bold rounded-xl h-11 text-xs sm:text-sm transition-all duration-200 shadow-lg shadow-cyan-500/20 mt-1",
+    footerAction: "mt-3 flex justify-center",
+    footerActionText: "text-white/40 text-xs",
+    footerActionLink: "text-cyan-400 hover:text-cyan-300 font-semibold text-xs ml-1",
+    identityPreviewText: "text-white/70 text-xs",
+    identityPreviewEditButton: "text-cyan-400 text-xs",
+    formResendCodeLink: "text-cyan-400 text-xs",
+    alert: "rounded-xl border border-red-500/20 bg-red-500/10 p-2.5 my-2",
+    alertText: "text-red-400 text-xs",
+  },
+};
+
 /** Floating radar ring animation behind the monitoring preview */
 function RadarRings() {
   return (
@@ -32,13 +71,11 @@ function RadarRings() {
       {[1, 2, 3].map((i) => (
         <div
           key={i}
-          className="absolute rounded-full border"
+          className="absolute rounded-full border border-cyan-400/10 animate-ping"
           style={{
             width: `${i * 28}%`,
             height: `${i * 28}%`,
-            borderColor: "rgba(103,232,249,0.12)",
-            animation: `radar-pulse ${3 + i * 0.7}s ease-in-out infinite`,
-            animationDelay: `${i * 0.4}s`,
+            animationDuration: `${3 + i * 0.7}s`,
           }}
         />
       ))}
@@ -54,14 +91,14 @@ function SensorTile({
   unit,
   color = "text-primary",
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   label: string;
   value: string | number;
   unit?: string;
   color?: string;
 }) {
   return (
-    <div className="auth-glass-inner flex items-center gap-2.5 rounded-xl px-3 py-2">
+    <div className="bg-white/[0.035] border border-white/[0.07] flex items-center gap-2.5 rounded-xl px-3 py-2">
       <span className={cn("shrink-0", color)}>{icon}</span>
       <div className="min-w-0">
         <p className="text-[9px] font-medium uppercase tracking-widest text-white/40">{label}</p>
@@ -79,14 +116,14 @@ function SensorTile({
 /** Floating live monitoring preview card */
 function MonitoringPreview() {
   return (
-    <div className="relative mx-auto w-full max-w-[280px] sm:max-w-[300px] animate-auth-float">
+    <div className="relative mx-auto w-full max-w-[280px] sm:max-w-[300px]">
       {/* Background radar rings */}
       <div className="absolute -inset-10 pointer-events-none">
         <RadarRings />
       </div>
 
       {/* Main floating card */}
-      <div className="auth-glass relative overflow-hidden rounded-2xl p-4 sm:p-5 shadow-2xl">
+      <div className="bg-[#121c24]/75 border border-cyan-400/15 backdrop-blur-xl relative overflow-hidden rounded-2xl p-4 sm:p-5 shadow-2xl">
         {/* Cyan glow bleed inside card */}
         <div className="pointer-events-none absolute -top-6 right-4 h-16 w-16 rounded-full bg-cyan-400/20 blur-xl" />
         <div className="pointer-events-none absolute bottom-0 left-6 h-14 w-14 rounded-full bg-emerald-400/[0.15] blur-lg" />
@@ -156,21 +193,19 @@ function MonitoringPreview() {
 }
 
 function AuthPage() {
-  const [mode, setMode] = useState<"signin" | "signup">(() => {
-    if (typeof window !== "undefined" && window.location.hash.includes("signup")) {
-      return "signup";
-    }
-    return "signin";
-  });
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
 
   useEffect(() => {
+    if (typeof window !== "undefined" && window.location.hash.includes("signup")) {
+      setMode("signup");
+    }
+
     const handleHashChange = () => {
-      if (window.location.hash.includes("signup")) {
-        setMode("signup");
-      } else {
-        setMode("signin");
+      if (typeof window !== "undefined") {
+        setMode(window.location.hash.includes("signup") ? "signup" : "signin");
       }
     };
+
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
@@ -183,19 +218,21 @@ function AuthPage() {
   };
 
   return (
-    <div className="auth-root min-h-dvh lg:h-dvh lg:max-h-dvh lg:overflow-hidden flex flex-col">
+    <div className="bg-[#071218] min-h-dvh lg:h-dvh lg:max-h-dvh lg:overflow-hidden flex flex-col relative overflow-x-hidden">
       {/* Ambient background glows */}
-      <div className="auth-glow-1" />
-      <div className="auth-glow-2" />
-      <div className="auth-glow-3" />
+      <div className="pointer-events-none absolute -top-20 -left-10 w-[500px] h-[500px] rounded-full bg-cyan-500/[0.12] blur-3xl" />
+      <div className="pointer-events-none absolute bottom-5 right-1/4 w-[400px] h-[400px] rounded-full bg-emerald-500/[0.10] blur-3xl" />
+      <div className="pointer-events-none absolute top-1/3 -right-10 w-[320px] h-[320px] rounded-full bg-cyan-400/[0.08] blur-3xl" />
 
       {/* Top Header bar with Logo & LangToggle */}
       <header className="w-full max-w-7xl mx-auto px-5 sm:px-8 pt-4 sm:pt-6 flex items-center justify-between z-20 shrink-0">
-        <Link to="/" className="auth-logo group">
-          <span className="auth-logo-icon">
+        <Link to="/" className="inline-flex items-center gap-2.5 text-decoration-none group">
+          <span className="grid place-items-center w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600 text-[#071218] shadow-lg shadow-cyan-400/30">
             <Wind className="h-4 sm:h-5 w-4 sm:w-5" />
           </span>
-          <span className="auth-logo-text">AirSense</span>
+          <span className="font-display text-xl font-bold text-slate-100 tracking-tight">
+            AirSense
+          </span>
         </Link>
 
         <div className="flex items-center gap-3">
@@ -212,7 +249,9 @@ function AuthPage() {
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.12]">
               Know Your Air.
               <br />
-              <span className="auth-h1-accent">Breathe Better.</span>
+              <span className="bg-gradient-to-r from-cyan-300 to-emerald-300 bg-clip-text text-transparent">
+                Breathe Better.
+              </span>
             </h1>
             <p className="text-xs sm:text-sm text-white/70 leading-relaxed max-w-lg">
               Real-time indoor air quality monitoring for healthier homes, classrooms, offices, and
@@ -245,13 +284,13 @@ function AuthPage() {
 
         {/* ── RIGHT: Auth card ── */}
         <div className="w-full max-w-[410px] shrink-0 mx-auto lg:mx-0 flex flex-col justify-center py-2">
-          <div className="auth-card relative bg-[rgba(14,22,30,0.92)] border border-cyan-400/15 rounded-2xl p-5 sm:p-6 shadow-2xl backdrop-blur-2xl overflow-hidden w-full">
+          <div className="relative bg-[#0e161e]/90 border border-cyan-400/15 rounded-2xl p-5 sm:p-6 shadow-2xl backdrop-blur-2xl overflow-hidden w-full">
             {/* Card inner glow */}
             <div className="pointer-events-none absolute -top-8 left-1/2 h-24 w-40 -translate-x-1/2 rounded-full bg-cyan-500/[0.15] blur-2xl" />
 
             {/* Auth header */}
             <div className="flex flex-col items-center text-center space-y-1.5 mb-4">
-              <span className="auth-card-icon">
+              <span className="grid place-items-center w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400/20 to-emerald-400/10 border border-cyan-400/20">
                 <Wind className="h-4 w-4 text-cyan-400" />
               </span>
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
@@ -265,98 +304,20 @@ function AuthPage() {
             </div>
 
             {/* Clerk component wrapper */}
-            <div className="auth-clerk-wrap w-full">
+            <div className="w-full flex justify-center">
               {mode === "signin" ? (
                 <SignIn
                   routing="hash"
                   signUpUrl="#signup"
                   fallbackRedirectUrl="/dashboard"
-                  appearance={{
-                    variables: {
-                      colorPrimary: "#22d3ee",
-                      colorBackground: "rgba(10,20,28,0)",
-                      colorText: "#f1f5f9",
-                      colorTextSecondary: "#94a3b8",
-                      colorInputBackground: "rgba(255,255,255,0.06)",
-                      colorInputText: "#f1f5f9",
-                      borderRadius: "10px",
-                      colorNeutral: "#64748b",
-                    },
-                    elements: {
-                      rootBox: "w-full",
-                      card: "bg-transparent shadow-none border-0 p-0 w-full",
-                      header: "hidden",
-                      headerTitle: "hidden",
-                      headerSubtitle: "hidden",
-                      socialButtonsBlockButton:
-                        "border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all duration-200 rounded-xl h-11 text-sm font-medium",
-                      socialButtonsBlockButtonText: "text-xs sm:text-sm font-medium",
-                      dividerRow: "my-3",
-                      dividerText: "text-white/30 text-[11px]",
-                      dividerLine: "bg-white/10",
-                      formFieldLabel: "text-[11px] font-medium text-white/60 mb-1",
-                      formFieldInput:
-                        "bg-white/[0.06] border border-white/10 text-white placeholder:text-white/30 rounded-xl h-11 px-3.5 text-xs sm:text-sm focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/40 transition-all",
-                      formButtonPrimary:
-                        "bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-[#071218] font-bold rounded-xl h-11 text-xs sm:text-sm transition-all duration-200 shadow-lg shadow-cyan-500/20 mt-1",
-                      footerAction: "mt-3 flex justify-center",
-                      footerActionText: "text-white/40 text-xs",
-                      footerActionLink:
-                        "text-cyan-400 hover:text-cyan-300 font-semibold text-xs ml-1",
-                      identityPreviewText: "text-white/70 text-xs",
-                      identityPreviewEditButton: "text-cyan-400 text-xs",
-                      formResendCodeLink: "text-cyan-400 text-xs",
-                      alert: "rounded-xl border border-red-500/20 bg-red-500/10 p-2.5 my-2",
-                      alertText: "text-red-400 text-xs",
-                      internal__clerk_developer_mode_badge: "hidden",
-                    },
-                  }}
+                  appearance={clerkAppearance}
                 />
               ) : (
                 <SignUp
                   routing="hash"
                   signInUrl="#signin"
                   fallbackRedirectUrl="/dashboard"
-                  appearance={{
-                    variables: {
-                      colorPrimary: "#22d3ee",
-                      colorBackground: "rgba(10,20,28,0)",
-                      colorText: "#f1f5f9",
-                      colorTextSecondary: "#94a3b8",
-                      colorInputBackground: "rgba(255,255,255,0.06)",
-                      colorInputText: "#f1f5f9",
-                      borderRadius: "10px",
-                      colorNeutral: "#64748b",
-                    },
-                    elements: {
-                      rootBox: "w-full",
-                      card: "bg-transparent shadow-none border-0 p-0 w-full",
-                      header: "hidden",
-                      headerTitle: "hidden",
-                      headerSubtitle: "hidden",
-                      socialButtonsBlockButton:
-                        "border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all duration-200 rounded-xl h-11 text-sm font-medium",
-                      socialButtonsBlockButtonText: "text-xs sm:text-sm font-medium",
-                      dividerRow: "my-3",
-                      dividerText: "text-white/30 text-[11px]",
-                      dividerLine: "bg-white/10",
-                      formFieldLabel: "text-[11px] font-medium text-white/60 mb-1",
-                      formFieldInput:
-                        "bg-white/[0.06] border border-white/10 text-white placeholder:text-white/30 rounded-xl h-11 px-3.5 text-xs sm:text-sm focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/40 transition-all",
-                      formButtonPrimary:
-                        "bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-[#071218] font-bold rounded-xl h-11 text-xs sm:text-sm transition-all duration-200 shadow-lg shadow-cyan-500/20 mt-1",
-                      footerAction: "mt-3 flex justify-center",
-                      footerActionText: "text-white/40 text-xs",
-                      footerActionLink:
-                        "text-cyan-400 hover:text-cyan-300 font-semibold text-xs ml-1",
-                      identityPreviewText: "text-white/70 text-xs",
-                      identityPreviewEditButton: "text-cyan-400 text-xs",
-                      formResendCodeLink: "text-cyan-400 text-xs",
-                      alert: "rounded-xl border border-red-500/20 bg-red-500/10 p-2.5 my-2",
-                      alertText: "text-red-400 text-xs",
-                      internal__clerk_developer_mode_badge: "hidden",
-                    },
-                  }}
+                  appearance={clerkAppearance}
                 />
               )}
             </div>
@@ -365,7 +326,7 @@ function AuthPage() {
             <div className="mt-3 pt-2 text-center text-xs text-white/50 border-t border-white/5">
               {mode === "signin" ? (
                 <p>
-                  Don't have an account?{" "}
+                  Don&apos;t have an account?{" "}
                   <button
                     type="button"
                     onClick={() => toggleMode("signup")}
