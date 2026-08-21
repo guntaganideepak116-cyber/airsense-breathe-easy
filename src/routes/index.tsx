@@ -351,7 +351,7 @@ function Compare() {
     <section id="compare" className="mx-auto max-w-6xl scroll-mt-24 px-5 py-16 lg:py-24">
       <SectionHead kicker="compare.kicker" title="compare.title" />
       <div className="mt-8 overflow-x-auto rounded-3xl border bg-card">
-        <table className="w-full min-w-[640px] text-sm">
+        <table className="w-full min-w-160 text-sm">
           <thead>
             <tr className="border-b">
               <th className="p-4 text-left font-medium text-muted-foreground"> </th>
@@ -426,7 +426,7 @@ function Cases() {
       <div className="mt-10 grid gap-4 lg:grid-cols-3">
         {items.map((c) => (
           <article key={c.t} className="rounded-3xl border bg-card p-6">
-            <BreathingOrb status={c.status} size="sm" className="!h-24 !w-24" />
+            <BreathingOrb status={c.status} size="sm" className="h-24! w-24!" />
             <p className="mt-4 font-semibold">{t(c.t)}</p>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(c.d)}</p>
           </article>

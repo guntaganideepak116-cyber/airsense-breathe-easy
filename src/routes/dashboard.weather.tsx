@@ -42,7 +42,7 @@ function WeatherPage() {
       {/* Weather-Style Main Banner Card */}
       <section className={cn("status-transition rounded-3xl border p-6 lg:p-8", theme.soft)}>
         <div className="grid gap-6 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center">
-          <BreathingOrb status={status} size="sm" className="mx-auto !h-36 !w-36 lg:mx-0" />
+          <BreathingOrb status={status} size="sm" className="mx-auto h-36! w-36! lg:mx-0" />
           <div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <CloudSun className="h-4 w-4 text-primary" />

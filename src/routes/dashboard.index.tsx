@@ -219,7 +219,7 @@ function Overview() {
       ) : (
         <section className={cn("status-transition rounded-3xl border p-6 lg:p-8", theme.soft)}>
           <div className="grid items-center gap-6 sm:grid-cols-[auto_minmax(0,1fr)]">
-            <BreathingOrb status={status} size="sm" className="mx-auto !h-44 !w-44" />
+            <BreathingOrb status={status} size="sm" className="mx-auto h-44! w-44!" />
             <div className="min-w-0">
               <div className="flex items-center gap-2 text-sm text-foreground/60">
                 <span className={cn("h-2.5 w-2.5 animate-pulse rounded-full", theme.dot)} />

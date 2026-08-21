@@ -27,7 +27,7 @@ export function DashboardPreview({ status = "moderate" as AirStatus }) {
             </span>
           </div>
           <div className="mt-2 flex items-center gap-4">
-            <BreathingOrb status={status} size="sm" className="shrink-0 !h-28 !w-28" />
+            <BreathingOrb status={status} size="sm" className="shrink-0 h-28! w-28!" />
             <div className="min-w-0">
               <p className={cn("font-display text-4xl leading-tight", theme.text)}>
                 {t(theme.label)}
