@@ -131,9 +131,9 @@ function HistoryPage() {
       <section className="rounded-3xl border bg-card p-5">
         <p className="text-sm font-semibold">{t("hist.aqChart")}</p>
         {isLoading ? (
-          <Skeleton className="mt-4 h-64 rounded-2xl" />
+          <Skeleton className="mt-4 h-56 sm:h-64 rounded-2xl" />
         ) : (
-          <div className="mt-4 h-64">
+          <div className="mt-4 h-56 sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
                 <defs>

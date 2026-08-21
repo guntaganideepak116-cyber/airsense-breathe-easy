@@ -273,7 +273,7 @@ function RoomCard({
   isSelected: boolean;
   onSelect: () => void;
 }) {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const { reading, status: streamStatus, tick } = useDeviceStream(device.id);
   useAirAlert(reading, device.name);
@@ -286,17 +286,19 @@ function RoomCard({
     <div
       onClick={onSelect}
       className={cn(
-        "status-transition cursor-pointer rounded-3xl border p-4 transition-all hover:shadow-md",
+        "status-transition cursor-pointer rounded-2xl sm:rounded-3xl border p-4 sm:p-5 transition-all hover:shadow-md",
         theme.soft,
-        isSelected && "ring-2 ring-primary",
+        isSelected && "ring-2 ring-primary shadow-sm",
       )}
     >
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-        <p className="min-w-0 truncate font-semibold">{device.name}</p>
+      <div className="flex items-center justify-between gap-2 border-b pb-2.5">
+        <p className="min-w-0 truncate font-display font-semibold text-base text-foreground">
+          {device.name}
+        </p>
         <span
           className={cn(
-            "flex shrink-0 items-center gap-1 rounded-full bg-card/80 px-2.5 py-0.5 text-[11px]",
-            live ? "text-good" : "text-muted-foreground",
+            "flex shrink-0 items-center gap-1 rounded-full border bg-card/90 px-2.5 py-0.5 text-[11px] font-medium",
+            live ? "text-good border-good/30" : "text-muted-foreground border-border",
           )}
         >
           {live ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
@@ -304,29 +306,38 @@ function RoomCard({
         </span>
       </div>
 
-      <div className="mt-3 flex items-center justify-between">
+      <div className="mt-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span className={cn("h-3 w-3 animate-pulse rounded-full", theme.dot)} />
-          <p className={cn("font-display text-xl font-bold", theme.text)}>{t(theme.label)}</p>
+          <span className={cn("h-3 w-3 animate-pulse rounded-full shrink-0", theme.dot)} />
+          <p className={cn("font-display text-lg sm:text-xl font-bold", theme.text)}>
+            {t(theme.label)}
+          </p>
         </div>
-        <p className="font-mono text-sm font-bold text-foreground">
-          <span key={tick} className="value-pulse inline-block">
-            {reading?.mq135 ?? "—"}
-          </span>{" "}
-          <span className="text-xs font-normal text-muted-foreground">ppm</span>
-        </p>
+        <div className="text-right">
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">
+            MQ-135
+          </span>
+          <p className="font-mono text-base font-bold text-foreground tabular-nums">
+            <span key={tick} className="value-pulse inline-block">
+              {reading?.mq135 ?? "—"}
+            </span>{" "}
+            <span className="text-xs font-normal text-muted-foreground">ppm</span>
+          </p>
+        </div>
       </div>
 
-      <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
-        <span className="flex items-center gap-1">
-          <Radio className={cn("h-3 w-3", live && "text-good")} />
-          {t(
-            live
-              ? "rooms.live"
-              : streamStatus === "reconnecting"
-                ? "rooms.reconnecting"
-                : "rooms.connecting",
-          )}
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground border-t pt-2.5">
+        <span className="flex items-center gap-1 truncate text-[11px]">
+          <Radio className={cn("h-3 w-3 shrink-0", live && "text-good")} />
+          <span className="truncate">
+            {t(
+              live
+                ? "rooms.live"
+                : streamStatus === "reconnecting"
+                  ? "rooms.reconnecting"
+                  : "rooms.connecting",
+            )}
+          </span>
         </span>
         <button
           onClick={(e) => {
@@ -334,7 +345,7 @@ function RoomCard({
             onSelect();
             void navigate({ to: "/dashboard" });
           }}
-          className="font-medium text-primary hover:underline"
+          className="shrink-0 font-semibold text-primary hover:underline text-xs flex items-center gap-1"
         >
           {t("dash.viewRoom")} →
         </button>

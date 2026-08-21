@@ -157,50 +157,58 @@ function Overview() {
       </div>
 
       {/* TOP STATS SUMMARY ROW */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {/* Stat 1: Monitored Rooms */}
-        <div className="rounded-3xl border bg-card p-5 text-center shadow-sm">
-          <p className="font-display text-3xl font-bold tabular-nums text-primary">
+        <div className="rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-5 text-center shadow-sm">
+          <p className="font-display text-2xl sm:text-3xl font-bold tabular-nums text-primary">
             {devices.length}
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">{t("dash.monitoredRooms")}</p>
+          <p className="mt-1 text-[11px] sm:text-xs text-muted-foreground">
+            {t("dash.monitoredRooms")}
+          </p>
         </div>
 
         {/* Stat 2: Total Readings */}
-        <div className="rounded-3xl border bg-card p-5 text-center shadow-sm">
-          <p className="font-display text-3xl font-bold tabular-nums text-foreground">
+        <div className="rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-5 text-center shadow-sm">
+          <p className="font-display text-2xl sm:text-3xl font-bold tabular-nums text-foreground">
             {historyData ? historyData.length * 12 : 1284}
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">{t("dash.totalReadings")}</p>
+          <p className="mt-1 text-[11px] sm:text-xs text-muted-foreground">
+            {t("dash.totalReadings")}
+          </p>
         </div>
 
         {/* Stat 3: Data Span */}
-        <div className="rounded-3xl border bg-card p-5 text-center shadow-sm">
-          <p className="font-display text-3xl font-bold tabular-nums text-good">30 Days</p>
-          <p className="mt-1 text-xs text-muted-foreground">{t("dash.dataSpan")}</p>
+        <div className="rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-5 text-center shadow-sm">
+          <p className="font-display text-2xl sm:text-3xl font-bold tabular-nums text-good">
+            30 Days
+          </p>
+          <p className="mt-1 text-[11px] sm:text-xs text-muted-foreground">{t("dash.dataSpan")}</p>
         </div>
 
         {/* Stat 4: Export Data CTA */}
-        <div className="flex flex-col items-center justify-center rounded-3xl border bg-card p-5 text-center shadow-sm">
+        <div className="col-span-2 sm:col-span-1 flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-5 text-center shadow-sm">
           <Button onClick={exportCsv} size="sm" className="w-full rounded-2xl">
-            <Download className="mr-1.5 h-4 w-4" />
-            {t("dash.exportCsv")}
+            <Download className="mr-1.5 h-4 w-4 shrink-0" />
+            <span className="truncate">{t("dash.exportCsv")}</span>
           </Button>
-          <p className="mt-2 text-[11px] text-muted-foreground">
+          <p className="mt-1.5 text-[10px] sm:text-[11px] text-muted-foreground truncate">
             {reading ? formatTime(reading.timestamp, lang) : "Live"}
           </p>
         </div>
       </div>
 
       {/* DEVICE / ROOM SELECTOR PILLS */}
-      <div className="flex flex-wrap items-center gap-2 rounded-3xl border bg-card p-3">
-        <span className="mr-2 px-2 text-xs font-semibold text-muted-foreground">Select Room:</span>
+      <div className="no-scrollbar flex items-center gap-2 overflow-x-auto rounded-2xl sm:rounded-3xl border bg-card p-3">
+        <span className="shrink-0 mr-1 px-1 text-xs font-semibold text-muted-foreground whitespace-nowrap">
+          Select Room:
+        </span>
         {devices.map((d) => (
           <button
             key={d.id}
             onClick={() => select(d.id)}
             className={cn(
-              "rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200",
+              "shrink-0 whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200 min-h-[36px]",
               d.id === deviceId
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground",

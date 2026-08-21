@@ -192,6 +192,11 @@ export const dict = {
 
   "dash.title": { te: "డాష్‌బోర్డ్", en: "Dashboard" },
   "dash.overview": { te: "అవలోకనం", en: "Overview" },
+  "nav.mob.overview": { te: "అవలోకనం", en: "Overview" },
+  "nav.mob.history": { te: "చరిత్ర", en: "History" },
+  "nav.mob.tips": { te: "చిట్కాలు", en: "Tips" },
+  "nav.mob.weather": { te: "వాతావరణం", en: "Weather" },
+  "nav.mob.rooms": { te: "గదులు", en: "Rooms" },
   "dash.history": { te: "చరిత్ర & నివేదికలు", en: "History & Reports" },
   "dash.rooms": { te: "గదుల స్థానాలు", en: "Device / Room Locations" },
   "dash.recommendations": { te: "సిఫార్సులు", en: "Recommendations" },

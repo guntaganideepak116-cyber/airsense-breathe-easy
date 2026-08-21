@@ -244,3 +244,13 @@
     transform: translate3d(10px, -14px, 0);
   }
 }
+
+/* Hide scrollbars for horizontal pills */
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

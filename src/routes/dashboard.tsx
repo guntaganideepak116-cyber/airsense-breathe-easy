@@ -22,14 +22,16 @@ export const Route = createFileRoute("/dashboard")({
   component: DashboardLayout,
 });
 
+type DashboardRoutePath =
+  | "/dashboard"
+  | "/dashboard/history"
+  | "/dashboard/recommendations"
+  | "/dashboard/weather"
+  | "/dashboard/rooms"
+  | "/dashboard/settings";
+
 const navItems: {
-  to:
-    | "/dashboard"
-    | "/dashboard/history"
-    | "/dashboard/recommendations"
-    | "/dashboard/weather"
-    | "/dashboard/rooms"
-    | "/dashboard/settings";
+  to: DashboardRoutePath;
   label: TKey;
   icon: React.ReactNode;
 }[] = [
@@ -43,6 +45,22 @@ const navItems: {
   { to: "/dashboard/weather", label: "dash.weather", icon: <CloudSun className="h-4 w-4" /> },
   { to: "/dashboard/rooms", label: "dash.rooms", icon: <MapPin className="h-4 w-4" /> },
   { to: "/dashboard/settings", label: "dash.settings", icon: <Settings className="h-4 w-4" /> },
+];
+
+const mobileNavItems: {
+  to: DashboardRoutePath;
+  label: TKey;
+  icon: React.ReactNode;
+}[] = [
+  { to: "/dashboard", label: "nav.mob.overview", icon: <Gauge className="h-5 w-5" /> },
+  { to: "/dashboard/history", label: "nav.mob.history", icon: <History className="h-5 w-5" /> },
+  {
+    to: "/dashboard/recommendations",
+    label: "nav.mob.tips",
+    icon: <HeartPulse className="h-5 w-5" />,
+  },
+  { to: "/dashboard/weather", label: "nav.mob.weather", icon: <CloudSun className="h-5 w-5" /> },
+  { to: "/dashboard/rooms", label: "nav.mob.rooms", icon: <MapPin className="h-5 w-5" /> },
 ];
 
 function DashboardLayout() {
@@ -126,33 +144,40 @@ function DashboardLayout() {
 
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col min-w-0">
-        {/* Mobile Header */}
-        <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-background/90 px-4 py-3 backdrop-blur md:hidden">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-xl bg-primary text-primary-foreground">
+        {/* Compact Mobile Header */}
+        <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-background/95 px-4 py-2.5 backdrop-blur md:hidden">
+          <Link to="/" className="flex items-center gap-2 min-w-0">
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
               <Wind className="h-4 w-4" />
             </span>
-            <span className="font-display text-lg">AirSense</span>
+            <span className="font-display text-base font-bold text-foreground truncate">
+              AirSense
+            </span>
           </Link>
-          <LangToggle variant="outline" />
+          <div className="flex items-center gap-2 shrink-0">
+            <LangToggle variant="outline" />
+          </div>
         </header>
 
         {/* Offline Banner */}
         {!online && (
           <div className="flex items-center justify-center gap-2 bg-moderate-soft px-4 py-2 text-xs text-moderate-foreground">
-            <WifiOff className="h-3.5 w-3.5" />
-            {t("dash.offlineBanner")} {lastSeen ? formatTime(lastSeen, lang) : "—"}
+            <WifiOff className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">
+              {t("dash.offlineBanner")} {lastSeen ? formatTime(lastSeen, lang) : "—"}
+            </span>
           </div>
         )}
 
-        <main className="flex-1 space-y-6 px-4 py-6 md:px-8 md:py-8">
+        {/* Scrolling Main Content — Guaranteeing Bottom Padding Above Navigation Bar */}
+        <main className="flex-1 space-y-6 px-4 py-5 pb-[calc(6rem+env(safe-area-inset-bottom,0px))] md:px-8 md:py-8 md:pb-8">
           <Outlet />
         </main>
       </div>
 
-      {/* Mobile Fixed Bottom Navigation Bar */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t bg-card/95 backdrop-blur md:hidden">
-        {navItems.slice(0, 5).map((n) => {
+      {/* Native-Feeling Mobile Bottom Navigation Bar */}
+      <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t bg-card/95 pb-[env(safe-area-inset-bottom,0px)] backdrop-blur shadow-lg md:hidden">
+        {mobileNavItems.map((n) => {
           const active = pathname === n.to || (n.to === "/dashboard" && pathname === "/dashboard/");
           return (
             <Link
@@ -160,12 +185,16 @@ function DashboardLayout() {
               to={n.to}
               activeOptions={{ exact: n.to === "/dashboard" }}
               className={cn(
-                "flex flex-col items-center justify-center py-2.5 text-[10px] text-muted-foreground",
-                active && "font-semibold text-primary",
+                "flex min-w-0 flex-1 flex-col items-center justify-center min-h-[48px] py-1.5 transition-colors",
+                active
+                  ? "text-primary font-semibold"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               {n.icon}
-              <span className="mt-1 truncate px-0.5">{t(n.label)}</span>
+              <span className="mt-0.5 w-full truncate px-0.5 text-center text-[10px] sm:text-xs">
+                {t(n.label)}
+              </span>
             </Link>
           );
         })}
