@@ -22,7 +22,6 @@ export type Device = {
 
 export type DeviceCredentials = { device: Device; apiKey: string };
 
-
 export type Reading = {
   deviceId: string;
   status: AirStatus;
@@ -46,7 +45,7 @@ export type HistoryPoint = {
   status: AirStatus;
 };
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 const STORE_KEY = "airsense-devices";
 
 export function classify(mq135: number): AirStatus {
@@ -141,10 +140,26 @@ function historyMock(deviceId: string, range: Range): HistoryPoint[] {
   });
 }
 
+export const API_BASE_URL =
+  (typeof import.meta !== "undefined" && import.meta.env
+    ? import.meta.env["VITE_API_URL"] || import.meta.env["NEXT_PUBLIC_API_URL"]
+    : undefined) || "http://localhost:5000";
+
+export function resolveUrl(path: string): string {
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  const base = API_BASE_URL.replace(/\/$/, "");
+  const p = path.startsWith("/") ? path : `/${path}`;
+  return `${base}${p}`;
+}
+
 async function tryFetch<T>(url: string, init?: RequestInit): Promise<T | null> {
   if (USE_MOCK) return null;
   try {
-    const res = await fetch(url, { ...init, headers: { "Content-Type": "application/json", ...init?.headers } });
+    const fullUrl = resolveUrl(url);
+    const res = await fetch(fullUrl, {
+      ...init,
+      headers: { "Content-Type": "application/json", ...init?.headers },
+    });
     if (!res.ok) return null;
     return (await res.json()) as T;
   } catch {
@@ -163,7 +178,7 @@ export const api = {
   async createDevice(name: string): Promise<DeviceCredentials> {
     let created: (Device & { apiKey?: string }) | null = null;
     try {
-      const res = await fetch("/api/devices", {
+      const res = await fetch(resolveUrl("/api/devices"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
@@ -197,7 +212,9 @@ export const api = {
     return next;
   },
   async latest(deviceId: string): Promise<Reading> {
-    return (await tryFetch<Reading>(`/api/device/latest?deviceId=${deviceId}`)) ?? latestMock(deviceId);
+    return (
+      (await tryFetch<Reading>(`/api/device/latest?deviceId=${deviceId}`)) ?? latestMock(deviceId)
+    );
   },
   async history(deviceId: string, range: Range): Promise<HistoryPoint[]> {
     return (

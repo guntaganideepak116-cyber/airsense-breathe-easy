@@ -14,6 +14,14 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
+    server: {
+      proxy: {
+        "/api": {
+          target: "http://localhost:5000",
+          changeOrigin: true,
+        },
+      },
+    },
     plugins: [
       VitePWA({
         registerType: "autoUpdate",

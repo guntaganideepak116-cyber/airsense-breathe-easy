@@ -122,6 +122,10 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+import { ClerkProvider } from "@clerk/clerk-react";
+
+const PUBLISHABLE_KEY = import.meta.env["VITE_CLERK_PUBLISHABLE_KEY"] || "pk_test_aGVscGVkLXN0dXJnZW9uLTUuY2xlcmsuYWNjb3VudHMuZGV2JA";
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -130,16 +134,18 @@ function RootComponent() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <LanguageProvider>
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-          <InstallPrompt />
-          <Toaster position="top-center" />
-        </LanguageProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <LanguageProvider>
+            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+            <Outlet />
+            <InstallPrompt />
+            <Toaster position="top-center" />
+          </LanguageProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </ClerkProvider>
   );
 }
 

@@ -15,8 +15,14 @@ export const dict = {
   "nav.signup": { te: "ఉచితంగా ప్రారంభించండి", en: "Get started" },
   "lang.toggle": { te: "English", en: "తెలుగు" },
 
-  "hero.eyebrow": { te: "ఆంధ్రప్రదేశ్ & తెలంగాణ కుటుంబాలు, పాఠశాలల కోసం", en: "For families and schools across Andhra Pradesh & Telangana" },
-  "hero.title": { te: "గది శుభ్రంగా కనిపించవచ్చు. గాలి మాత్రం కాకపోవచ్చు.", en: "The room can look clean. The air often isn't." },
+  "hero.eyebrow": {
+    te: "ఆంధ్రప్రదేశ్ & తెలంగాణ కుటుంబాలు, పాఠశాలల కోసం",
+    en: "For families and schools across Andhra Pradesh & Telangana",
+  },
+  "hero.title": {
+    te: "గది శుభ్రంగా కనిపించవచ్చు. గాలి మాత్రం కాకపోవచ్చు.",
+    en: "The room can look clean. The air often isn't.",
+  },
   "hero.sub": {
     te: "పంట వ్యర్థాల దహనం, రోడ్డు దుమ్ము, ట్రాఫిక్ పొగ — ఇవన్నీ తరగతి గదిలోకి, పిల్లల పడక గదిలోకి కనిపించకుండా చేరతాయి. AirSense ప్రతి గదిలోని గాలిని నిరంతరం కొలుస్తుంది, గాలి పాడైన క్షణంలోనే అక్కడే హెచ్చరిస్తుంది, మీ ఫోన్‌కు చూపిస్తుంది.",
     en: "Crop-residue burning, road dust and traffic fumes drift silently into classrooms and children's bedrooms. AirSense measures the air in each room continuously, sounds a local alert the moment it turns poor, and shows it live on your phone.",
@@ -29,32 +35,59 @@ export const dict = {
   "hero.orb.label": { te: "ప్రస్తుత గాలి", en: "Air right now" },
 
   "problem.kicker": { te: "కనిపించని సమస్య", en: "The invisible problem" },
-  "problem.title": { te: "గాలి పాడైనప్పుడు దానికి వాసన ఉండదు, రంగు ఉండదు", en: "Poor air has no smell, no colour, no warning" },
+  "problem.title": {
+    te: "గాలి పాడైనప్పుడు దానికి వాసన ఉండదు, రంగు ఉండదు",
+    en: "Poor air has no smell, no colour, no warning",
+  },
   "problem.body": {
     te: "మూసి ఉంచిన తరగతి గదిలో 40 మంది పిల్లలు ఉంటే, రెండు గంటల్లోనే CO₂ మరియు VOC స్థాయిలు ఏకాగ్రత తగ్గే స్థాయికి చేరతాయి. కిటికీ తెరిస్తే బయటి దుమ్ము లోపలికి. ఏది మెరుగో తెలియాలంటే కొలత కావాలి.",
     en: "Put forty children in a closed classroom and CO₂ and VOC levels reach focus-dulling concentrations within two hours. Open the window and outdoor dust comes in. Knowing which is better requires measurement, not guesswork.",
   },
   "problem.p1.t": { te: "ఏకాగ్రత తగ్గుతుంది", en: "Focus drops" },
-  "problem.p1.d": { te: "పేలవమైన గాలిలో పిల్లల శ్రద్ధ, జ్ఞాపకశక్తి గణనీయంగా తగ్గుతాయని అధ్యయనాలు చెబుతున్నాయి.", en: "Studies link stuffy indoor air to measurable drops in children's attention and recall." },
+  "problem.p1.d": {
+    te: "పేలవమైన గాలిలో పిల్లల శ్రద్ధ, జ్ఞాపకశక్తి గణనీయంగా తగ్గుతాయని అధ్యయనాలు చెబుతున్నాయి.",
+    en: "Studies link stuffy indoor air to measurable drops in children's attention and recall.",
+  },
   "problem.p2.t": { te: "శ్వాస సమస్యలు", en: "Breathing suffers" },
-  "problem.p2.d": { te: "ఆస్తమా, అలర్జీ ఉన్న పిల్లలకు ఇంటి లోపలి కణాలు బయటి వాటికంటే ఎక్కువ ప్రమాదం.", en: "For asthmatic and allergic children, indoor particles matter more than outdoor ones." },
+  "problem.p2.d": {
+    te: "ఆస్తమా, అలర్జీ ఉన్న పిల్లలకు ఇంటి లోపలి కణాలు బయటి వాటికంటే ఎక్కువ ప్రమాదం.",
+    en: "For asthmatic and allergic children, indoor particles matter more than outdoor ones.",
+  },
   "problem.p3.t": { te: "ఎవరూ కొలవడం లేదు", en: "Nobody is measuring" },
-  "problem.p3.d": { te: "నగర స్థాయి AQI యాప్‌లు మీ గదిలోని గాలి గురించి ఏమీ చెప్పవు.", en: "City-level AQI apps say nothing about the room your child is sitting in." },
+  "problem.p3.d": {
+    te: "నగర స్థాయి AQI యాప్‌లు మీ గదిలోని గాలి గురించి ఏమీ చెప్పవు.",
+    en: "City-level AQI apps say nothing about the room your child is sitting in.",
+  },
 
   "how.kicker": { te: "ఎలా పనిచేస్తుంది", en: "How it works" },
   "how.title": { te: "సెన్సార్ నుండి మీ చేతిలోని ఫోన్ వరకు", en: "From the sensor to your hand" },
   "how.s1.t": { te: "గదిలో సెన్సార్", en: "A sensor in the room" },
-  "how.s1.d": { te: "MQ135 గాలి నాణ్యతను, DHT22 ఉష్ణోగ్రత & తేమను ప్రతి కొన్ని సెకన్లకు కొలుస్తాయి.", en: "An MQ135 reads air quality and a DHT22 reads temperature and humidity every few seconds." },
+  "how.s1.d": {
+    te: "MQ135 గాలి నాణ్యతను, DHT22 ఉష్ణోగ్రత & తేమను ప్రతి కొన్ని సెకన్లకు కొలుస్తాయి.",
+    en: "An MQ135 reads air quality and a DHT22 reads temperature and humidity every few seconds.",
+  },
   "how.s2.t": { te: "అక్కడికక్కడే హెచ్చరిక", en: "An alert in the room" },
-  "how.s2.d": { te: "గాలి పేలవంగా మారితే బజర్ మోగుతుంది, LED ఎరుపుగా మారుతుంది — ఉపాధ్యాయుడు వెంటనే కిటికీ తెరవగలరు.", en: "If air turns poor the buzzer sounds and the LED turns red, so a teacher can act immediately." },
+  "how.s2.d": {
+    te: "గాలి పేలవంగా మారితే బజర్ మోగుతుంది, LED ఎరుపుగా మారుతుంది — ఉపాధ్యాయుడు వెంటనే కిటికీ తెరవగలరు.",
+    en: "If air turns poor the buzzer sounds and the LED turns red, so a teacher can act immediately.",
+  },
   "how.s3.t": { te: "డేటా లైవ్‌గా ప్రవహిస్తుంది", en: "Data streams live" },
-  "how.s3.d": { te: "ప్రతి రీడింగ్ సెకన్లలోనే డాష్‌బోర్డ్‌కు చేరుతుంది, చరిత్రగా భద్రపరచబడుతుంది.", en: "Every reading reaches the dashboard within seconds and is stored as history." },
+  "how.s3.d": {
+    te: "ప్రతి రీడింగ్ సెకన్లలోనే డాష్‌బోర్డ్‌కు చేరుతుంది, చరిత్రగా భద్రపరచబడుతుంది.",
+    en: "Every reading reaches the dashboard within seconds and is stored as history.",
+  },
   "how.s4.t": { te: "ఎక్కడి నుండైనా చూడండి", en: "Check from anywhere" },
-  "how.s4.d": { te: "తల్లిదండ్రులు, ఉపాధ్యాయులు ఏ గదినైనా ఫోన్‌లో లేదా వెబ్‌సైట్‌లో చూడవచ్చు.", en: "Parents and teachers can check any room from the app or the website." },
+  "how.s4.d": {
+    te: "తల్లిదండ్రులు, ఉపాధ్యాయులు ఏ గదినైనా ఫోన్‌లో లేదా వెబ్‌సైట్‌లో చూడవచ్చు.",
+    en: "Parents and teachers can check any room from the app or the website.",
+  },
 
   "preview.kicker": { te: "డాష్‌బోర్డ్ ప్రివ్యూ", en: "Dashboard preview" },
   "preview.title": { te: "సైన్ అప్ చేయకముందే చూడండి", en: "See it before you sign up" },
-  "preview.note": { te: "ఇది ఉదాహరణ డేటాతో కూడిన నమూనా వీక్షణ.", en: "Illustrative view with sample data." },
+  "preview.note": {
+    te: "ఇది ఉదాహరణ డేటాతో కూడిన నమూనా వీక్షణ.",
+    en: "Illustrative view with sample data.",
+  },
 
   "compare.kicker": { te: "పోలిక", en: "Comparison" },
   "compare.title": { te: "ఇప్పుడున్న మార్గాలతో పోలిస్తే", en: "Compared with what exists today" },
@@ -76,46 +109,106 @@ export const dict = {
   "compare.partial": { te: "పాక్షికం", en: "Partial" },
 
   "features.kicker": { te: "ఫీచర్లు", en: "Features" },
-  "features.title": { te: "పాఠశాలలకు, ఇళ్లకు అవసరమైనవి మాత్రమే", en: "Only what schools and homes actually need" },
+  "features.title": {
+    te: "పాఠశాలలకు, ఇళ్లకు అవసరమైనవి మాత్రమే",
+    en: "Only what schools and homes actually need",
+  },
   "features.f1.t": { te: "రియల్-టైమ్ గది పర్యవేక్షణ", en: "Real-time room monitoring" },
-  "features.f1.d": { te: "ప్రతి కొన్ని సెకన్లకు తాజా రీడింగ్.", en: "A fresh reading every few seconds." },
+  "features.f1.d": {
+    te: "ప్రతి కొన్ని సెకన్లకు తాజా రీడింగ్.",
+    en: "A fresh reading every few seconds.",
+  },
   "features.f2.t": { te: "తక్షణ స్థానిక హెచ్చరికలు", en: "Instant local alerts" },
-  "features.f2.d": { te: "బజర్ + LED గదిలోనే హెచ్చరిస్తాయి.", en: "Buzzer and LED warn inside the room itself." },
+  "features.f2.d": {
+    te: "బజర్ + LED గదిలోనే హెచ్చరిస్తాయి.",
+    en: "Buzzer and LED warn inside the room itself.",
+  },
   "features.f3.t": { te: "రిమోట్ డాష్‌బోర్డ్", en: "Remote dashboard" },
   "features.f3.d": { te: "ఎక్కడి నుండైనా ఏ గదినైనా చూడండి.", en: "Check any room from anywhere." },
   "features.f4.t": { te: "యాప్ లేదా వెబ్‌సైట్", en: "App or website" },
-  "features.f4.d": { te: "ఫోన్‌లో ఇన్‌స్టాల్ చేసుకోవచ్చు, ఆఫ్‌లైన్‌లోనూ పనిచేస్తుంది.", en: "Installable on your phone and usable offline." },
+  "features.f4.d": {
+    te: "ఫోన్‌లో ఇన్‌స్టాల్ చేసుకోవచ్చు, ఆఫ్‌లైన్‌లోనూ పనిచేస్తుంది.",
+    en: "Installable on your phone and usable offline.",
+  },
   "features.f5.t": { te: "చరిత్ర & ధోరణులు", en: "History and trends" },
-  "features.f5.d": { te: "24 గంటలు, 7 రోజులు, 30 రోజుల ధోరణులు.", en: "24-hour, 7-day and 30-day trends." },
+  "features.f5.d": {
+    te: "24 గంటలు, 7 రోజులు, 30 రోజుల ధోరణులు.",
+    en: "24-hour, 7-day and 30-day trends.",
+  },
   "features.f6.t": { te: "తెలుగు-ఫస్ట్", en: "Telugu-first" },
-  "features.f6.d": { te: "మొత్తం యాప్ తెలుగులో; హెచ్చరికలు ఎప్పుడూ తెలుగులోనే.", en: "The whole app in Telugu; alerts always in Telugu." },
+  "features.f6.d": {
+    te: "మొత్తం యాప్ తెలుగులో; హెచ్చరికలు ఎప్పుడూ తెలుగులోనే.",
+    en: "The whole app in Telugu; alerts always in Telugu.",
+  },
 
   "cases.kicker": { te: "ఉపయోగ సందర్భాలు", en: "Use cases" },
   "cases.title": { te: "ఇలా ఉపయోగపడుతుంది", en: "Where it helps" },
-  "cases.note": { te: "ఇవి ఉదాహరణ సందర్భాలు — నిజమైన వినియోగదారుల అభిప్రాయాలు కావు.", en: "Illustrative scenarios — not real testimonials." },
+  "cases.note": {
+    te: "ఇవి ఉదాహరణ సందర్భాలు — నిజమైన వినియోగదారుల అభిప్రాయాలు కావు.",
+    en: "Illustrative scenarios — not real testimonials.",
+  },
   "cases.c1.t": { te: "పరీక్షల సమయంలో తరగతి గది", en: "A classroom during exams" },
-  "cases.c1.d": { te: "మూసిన కిటికీలు, 40 మంది విద్యార్థులు. మధ్యాహ్నం 3 గంటలకు గాలి పేలవంగా మారితే బజర్ మోగుతుంది, ఉపాధ్యాయుడు కిటికీ తెరుస్తారు.", en: "Closed windows, forty students. When air turns poor at 3 PM the buzzer sounds and the teacher opens a window." },
+  "cases.c1.d": {
+    te: "మూసిన కిటికీలు, 40 మంది విద్యార్థులు. మధ్యాహ్నం 3 గంటలకు గాలి పేలవంగా మారితే బజర్ మోగుతుంది, ఉపాధ్యాయుడు కిటికీ తెరుస్తారు.",
+    en: "Closed windows, forty students. When air turns poor at 3 PM the buzzer sounds and the teacher opens a window.",
+  },
   "cases.c2.t": { te: "పిల్లల పడక గది", en: "A child's bedroom" },
-  "cases.c2.d": { te: "రాత్రి పొగ, దోమల కాయిల్ పొగ పెరిగితే తల్లిదండ్రుల ఫోన్‌కు నోటిఫికేషన్ వస్తుంది.", en: "If smoke or mosquito-coil fumes build up at night, the parent's phone gets a notification." },
+  "cases.c2.d": {
+    te: "రాత్రి పొగ, దోమల కాయిల్ పొగ పెరిగితే తల్లిదండ్రుల ఫోన్‌కు నోటిఫికేషన్ వస్తుంది.",
+    en: "If smoke or mosquito-coil fumes build up at night, the parent's phone gets a notification.",
+  },
   "cases.c3.t": { te: "హాస్టల్ కామన్ రూమ్", en: "A hostel common room" },
-  "cases.c3.d": { te: "వార్డెన్ అన్ని గదులను ఒకే స్క్రీన్‌లో చూసి, ఏ గదిలో గాలి పాడైందో వెంటనే తెలుసుకుంటారు.", en: "A warden sees every room on one screen and knows instantly which one needs air." },
+  "cases.c3.d": {
+    te: "వార్డెన్ అన్ని గదులను ఒకే స్క్రీన్‌లో చూసి, ఏ గదిలో గాలి పాడైందో వెంటనే తెలుసుకుంటారు.",
+    en: "A warden sees every room on one screen and knows instantly which one needs air.",
+  },
 
   "cta.title": { te: "ఒక గదితో ప్రారంభించండి", en: "Start with one room" },
-  "cta.sub": { te: "సెటప్ కొన్ని నిమిషాలే. మొదటి రీడింగ్ వచ్చాక తేడా మీకే తెలుస్తుంది.", en: "Setup takes minutes. The first reading usually says everything." },
-  "footer.rights": { te: "AirSense — ఆంధ్రప్రదేశ్ & తెలంగాణ కోసం రూపొందించబడింది", en: "AirSense — built for Andhra Pradesh & Telangana" },
+  "cta.sub": {
+    te: "సెటప్ కొన్ని నిమిషాలే. మొదటి రీడింగ్ వచ్చాక తేడా మీకే తెలుస్తుంది.",
+    en: "Setup takes minutes. The first reading usually says everything.",
+  },
+  "footer.rights": {
+    te: "AirSense — ఆంధ్రప్రదేశ్ & తెలంగాణ కోసం రూపొందించబడింది",
+    en: "AirSense — built for Andhra Pradesh & Telangana",
+  },
 
   "status.good": { te: "బాగుంది", en: "Good" },
   "status.moderate": { te: "మధ్యస్థం", en: "Moderate" },
   "status.poor": { te: "పేలవం", en: "Poor" },
-  "status.good.advice": { te: "గాలి బాగుంది — ప్రస్తుతం ఏమీ చేయనవసరం లేదు.", en: "Air is good — nothing to do right now." },
-  "status.moderate.advice": { te: "గాలి మధ్యస్థంగా ఉంది — ఒక కిటికీ తెరవడం మంచిది.", en: "Air is moderate — consider opening a window." },
-  "status.poor.advice": { te: "గాలి పేలవంగా ఉంది — వెంటనే కిటికీలు తెరవండి, ఫ్యాన్ ఆన్ చేయండి, పొగ మూలాలను ఆపండి.", en: "Air is poor — open windows now, switch on a fan and stop any source of smoke." },
+  "status.good.advice": {
+    te: "గాలి బాగుంది — ప్రస్తుతం ఏమీ చేయనవసరం లేదు.",
+    en: "Air is good — nothing to do right now.",
+  },
+  "status.moderate.advice": {
+    te: "గాలి మధ్యస్థంగా ఉంది — ఒక కిటికీ తెరవడం మంచిది.",
+    en: "Air is moderate — consider opening a window.",
+  },
+  "status.poor.advice": {
+    te: "గాలి పేలవంగా ఉంది — వెంటనే కిటికీలు తెరవండి, ఫ్యాన్ ఆన్ చేయండి, పొగ మూలాలను ఆపండి.",
+    en: "Air is poor — open windows now, switch on a fan and stop any source of smoke.",
+  },
 
   "dash.title": { te: "డాష్‌బోర్డ్", en: "Dashboard" },
   "dash.overview": { te: "అవలోకనం", en: "Overview" },
-  "dash.history": { te: "చరిత్ర", en: "History" },
-  "dash.rooms": { te: "గదులు", en: "Rooms" },
+  "dash.history": { te: "చరిత్ర & నివేదికలు", en: "History & Reports" },
+  "dash.rooms": { te: "గదుల స్థానాలు", en: "Device / Room Locations" },
+  "dash.recommendations": { te: "సిఫార్సులు", en: "Recommendations" },
+  "dash.weather": { te: "వాతావరణ స్థితి", en: "Weather Status" },
   "dash.settings": { te: "సెట్టింగ్‌లు", en: "Settings" },
+  "dash.exportCsv": { te: "డేటా ఎగుమతి (CSV)", en: "Export Data" },
+  "dash.totalReadings": { te: "సేకరించిన రీడింగ్‌లు", en: "Total Readings" },
+  "dash.dataSpan": { te: "డేటా కాలపరిమితి", en: "Data Span" },
+  "dash.monitoredRooms": { te: "పర్యవేక్షిస్తున్న గదులు", en: "Monitored Rooms" },
+  "dash.selectTable": { te: "లైవ్ పరికరాల పట్టిక", en: "All Devices Live Data" },
+  "dash.recordCount": { te: "నమోదైన రికార్డులు", en: "Live Records" },
+  "nav.backHome": { te: "హోమ్‌కు వెళ్లండి", en: "Back Home" },
+  "rec.title": { te: "ఆరోగ్య & కార్యాచరణ సిఫార్సులు", en: "Air Quality Recommendations" },
+  "rec.general": { te: "సాధారణ మార్గదర్శకత్వం", en: "General Guidance" },
+  "rec.sensitive": { te: "సున్నితమైన విభాగాలు", en: "Sensitive Groups" },
+  "rec.activity": { te: "కార్యాచరణ సలహాలు", en: "Activity Guidance" },
+  "rec.scale": { te: "AQI నాణ్యతా ప్రమాణాల స్కేల్", en: "AQI Scale Reference" },
+  "weather.title": { te: "వాతావరణం & అవుట్‌డోర్ గాలి నాణ్యత", en: "Weather & Outdoor Air Quality" },
   "dash.airquality": { te: "గాలి నాణ్యత", en: "Air quality" },
   "dash.sensorReading": { te: "MQ135 రీడింగ్", en: "MQ135 reading" },
   "dash.temp": { te: "ఉష్ణోగ్రత", en: "Temperature" },
@@ -132,11 +225,17 @@ export const dict = {
   "dash.cancel": { te: "రద్దు", en: "Cancel" },
   "dash.alertStatus": { te: "హెచ్చరిక స్థితి", en: "Alert status" },
   "dash.lastPoor": { te: "చివరి 'పేలవం' సంఘటన", en: "Last poor-air event" },
-  "dash.noPoor": { te: "గత 30 రోజుల్లో పేలవమైన గాలి నమోదు కాలేదు.", en: "No poor-air event in the last 30 days." },
+  "dash.noPoor": {
+    te: "గత 30 రోజుల్లో పేలవమైన గాలి నమోదు కాలేదు.",
+    en: "No poor-air event in the last 30 days.",
+  },
   "dash.buzzerFired": { te: "బజర్ మోగింది", en: "Buzzer triggered" },
   "dash.guidance": { te: "ఇప్పుడు ఏం చేయాలి", en: "What to do now" },
   "dash.live": { te: "లైవ్", en: "Live" },
-  "dash.offlineBanner": { te: "ఆఫ్‌లైన్ — చివరిగా తెలిసిన డేటా చూపిస్తున్నాం", en: "Offline — showing last known data from" },
+  "dash.offlineBanner": {
+    te: "ఆఫ్‌లైన్ — చివరిగా తెలిసిన డేటా చూపిస్తున్నాం",
+    en: "Offline — showing last known data from",
+  },
   "dash.viewRoom": { te: "ఈ గదిని చూడండి", en: "View room" },
 
   "hist.title": { te: "చరిత్ర & ధోరణులు", en: "History & trends" },
@@ -152,7 +251,10 @@ export const dict = {
 
   "rooms.title": { te: "అన్ని గదులు", en: "All rooms" },
   "rooms.add": { te: "కొత్త గది జోడించండి", en: "Add a room" },
-  "rooms.addDesc": { te: "పరికరం పేరు ఇవ్వండి — ఉదా. \"తరగతి 4B\"", en: "Give the device a name — e.g. \"Classroom 4B\"" },
+  "rooms.addDesc": {
+    te: 'పరికరం పేరు ఇవ్వండి — ఉదా. "తరగతి 4B"',
+    en: 'Give the device a name — e.g. "Classroom 4B"',
+  },
   "rooms.name": { te: "గది పేరు", en: "Room name" },
   "rooms.created": { te: "గది జోడించబడింది", en: "Room added" },
   "rooms.removed": { te: "గది తొలగించబడింది", en: "Room removed" },
@@ -179,9 +281,15 @@ export const dict = {
   "dev.saved": { te: "నేను భద్రపరిచాను", en: "I've saved it" },
   "dev.lastSeen": { te: "చివరిగా కనిపించింది", en: "Last seen" },
   "dev.never": { te: "ఇంకా కనెక్ట్ కాలేదు", en: "Not connected yet" },
-  "dev.manageDesc": { te: "మీ సెన్సార్ పరికరాలకు పేరు మార్చండి లేదా తొలగించండి.", en: "Rename or remove your sensor devices." },
+  "dev.manageDesc": {
+    te: "మీ సెన్సార్ పరికరాలకు పేరు మార్చండి లేదా తొలగించండి.",
+    en: "Rename or remove your sensor devices.",
+  },
   "dev.removeConfirm": { te: "ఈ పరికరాన్ని తొలగించాలా?", en: "Remove this device?" },
-  "dev.removeDesc": { te: "దాని రీడింగ్‌లు ఇకపై డాష్‌బోర్డ్‌లో కనిపించవు.", en: "Its readings will no longer appear on your dashboard." },
+  "dev.removeDesc": {
+    te: "దాని రీడింగ్‌లు ఇకపై డాష్‌బోర్డ్‌లో కనిపించవు.",
+    en: "Its readings will no longer appear on your dashboard.",
+  },
 
   "push.title": { te: "గాలి పాడైతే వెంటనే తెలుసుకోండి", en: "Know the moment air turns poor" },
   "push.desc": {
@@ -195,14 +303,22 @@ export const dict = {
     te: "బ్రౌజర్‌లో నోటిఫికేషన్లు నిరోధించబడ్డాయి. సైట్ సెట్టింగ్‌లలో అనుమతించండి.",
     en: "Notifications are blocked in your browser. Allow them in site settings.",
   },
-  "push.unsupported": { te: "ఈ బ్రౌజర్‌లో నోటిఫికేషన్లు పనిచేయవు.", en: "This browser does not support notifications." },
-
+  "push.unsupported": {
+    te: "ఈ బ్రౌజర్‌లో నోటిఫికేషన్లు పనిచేయవు.",
+    en: "This browser does not support notifications.",
+  },
 
   "set.title": { te: "సెట్టింగ్‌లు", en: "Settings" },
   "set.notif": { te: "నోటిఫికేషన్ ప్రాధాన్యతలు", en: "Notification preferences" },
   "set.push": { te: "పుష్ హెచ్చరికలు", en: "Push alerts" },
-  "set.pushDesc": { te: "పర్యవేక్షిస్తున్న గదిలో గాలి పేలవంగా మారిన క్షణంలోనే మీకు తెలియజేస్తాం.", en: "Get notified the moment air quality turns poor in a monitored room." },
-  "set.pushNote": { te: "హెచ్చరికలు ఎప్పుడూ తెలుగులోనే పంపబడతాయి — అవి అత్యవసర సందేశాలు.", en: "Alerts are always sent in Telugu, since they are time-critical." },
+  "set.pushDesc": {
+    te: "పర్యవేక్షిస్తున్న గదిలో గాలి పేలవంగా మారిన క్షణంలోనే మీకు తెలియజేస్తాం.",
+    en: "Get notified the moment air quality turns poor in a monitored room.",
+  },
+  "set.pushNote": {
+    te: "హెచ్చరికలు ఎప్పుడూ తెలుగులోనే పంపబడతాయి — అవి అత్యవసర సందేశాలు.",
+    en: "Alerts are always sent in Telugu, since they are time-critical.",
+  },
   "set.enable": { te: "అనుమతించండి", en: "Enable" },
   "set.threshold": { te: "హెచ్చరిక థ్రెషోల్డ్ (MQ135)", en: "Alert threshold (MQ135)" },
   "set.devices": { te: "పరికర నిర్వహణ", en: "Device management" },
@@ -218,10 +334,19 @@ export const dict = {
   "auth.continue": { te: "కొనసాగించండి", en: "Continue" },
   "auth.toSignup": { te: "ఖాతా లేదా? సృష్టించండి", en: "No account? Create one" },
   "auth.toSignin": { te: "ఇప్పటికే ఖాతా ఉందా? సైన్ ఇన్", en: "Already have an account? Sign in" },
-  "auth.note": { te: "డెమో మోడ్: ఏ వివరాలతోనైనా డాష్‌బోర్డ్‌లోకి ప్రవేశించవచ్చు.", en: "Demo mode: any details will take you to the dashboard." },
+  "auth.note": {
+    te: "డెమో మోడ్: ఏ వివరాలతోనైనా డాష్‌బోర్డ్‌లోకి ప్రవేశించవచ్చు.",
+    en: "Demo mode: any details will take you to the dashboard.",
+  },
 
-  "pwa.install": { te: "AirSense ను ఫోన్‌లో ఇన్‌స్టాల్ చేయండి", en: "Install AirSense on your phone" },
-  "pwa.installDesc": { te: "హోమ్ స్క్రీన్ నుండే తెరవండి, ఆఫ్‌లైన్‌లోనూ చివరి రీడింగ్ చూడండి.", en: "Open it from your home screen and see the last reading even offline." },
+  "pwa.install": {
+    te: "AirSense ను ఫోన్‌లో ఇన్‌స్టాల్ చేయండి",
+    en: "Install AirSense on your phone",
+  },
+  "pwa.installDesc": {
+    te: "హోమ్ స్క్రీన్ నుండే తెరవండి, ఆఫ్‌లైన్‌లోనూ చివరి రీడింగ్ చూడండి.",
+    en: "Open it from your home screen and see the last reading even offline.",
+  },
   "pwa.installBtn": { te: "ఇన్‌స్టాల్", en: "Install" },
   "pwa.later": { te: "తర్వాత", en: "Later" },
 
@@ -241,7 +366,10 @@ export const dict = {
     te: "బయటి AQI అనేది నగరం మొత్తానికి సగటు — ఈ గదిలోని నిజమైన గాలిని అది చూపించకపోవచ్చు.",
     en: "Outdoor AQI is a citywide average and may not reflect this room's actual air",
   },
-  "out.unavailable": { te: "బయటి AQI ప్రస్తుతం అందుబాటులో లేదు", en: "Outdoor AQI unavailable right now" },
+  "out.unavailable": {
+    te: "బయటి AQI ప్రస్తుతం అందుబాటులో లేదు",
+    en: "Outdoor AQI unavailable right now",
+  },
   "out.loading": { te: "బయటి AQI తెస్తున్నాం…", en: "Fetching outdoor AQI…" },
   "out.city": { te: "నగరం", en: "City" },
   "out.cityDesc": {
@@ -256,12 +384,18 @@ export const dict = {
   },
 
   "action.title": { te: "ఇప్పుడు ఏం చేయాలి", en: "What to do now" },
-  "action.good": { te: "గాలి బాగుంది — ప్రస్తుతం ఏమీ చేయనవసరం లేదు.", en: "Air quality is good — no action needed." },
+  "action.good": {
+    te: "గాలి బాగుంది — ప్రస్తుతం ఏమీ చేయనవసరం లేదు.",
+    en: "Air quality is good — no action needed.",
+  },
   "action.goodRising": {
     te: "గాలి ఇంకా బాగానే ఉంది, కానీ రీడింగ్ పెరుగుతోంది — గమనిస్తూ ఉండండి.",
     en: "Air is still good but the reading is climbing — keep an eye on it.",
   },
-  "action.moderate": { te: "గాలి మధ్యస్థంగా ఉంది — ఒక కిటికీ తెరవడం మంచిది.", en: "Air is moderate — opening a window would help." },
+  "action.moderate": {
+    te: "గాలి మధ్యస్థంగా ఉంది — ఒక కిటికీ తెరవడం మంచిది.",
+    en: "Air is moderate — opening a window would help.",
+  },
   "action.moderateRising": {
     te: "గాలి నాణ్యత తగ్గుతోంది — త్వరలో ఒక కిటికీ తెరవడం మంచిది.",
     en: "Air quality is declining — consider opening a window soon.",
@@ -287,7 +421,10 @@ export const dict = {
   },
 
   "cmp.title": { te: "గదుల పోలిక", en: "Room comparison" },
-  "cmp.desc": { te: "చెత్త గాలి ఉన్న గది మొదట చూపిస్తున్నాం.", en: "Sorted worst-air-first so the room needing attention comes first." },
+  "cmp.desc": {
+    te: "చెత్త గాలి ఉన్న గది మొదట చూపిస్తున్నాం.",
+    en: "Sorted worst-air-first so the room needing attention comes first.",
+  },
   "cmp.room": { te: "గది", en: "Room" },
   "cmp.status": { te: "స్థితి", en: "Status" },
   "cmp.reading": { te: "రీడింగ్", en: "Reading" },
@@ -298,8 +435,14 @@ export const dict = {
   "cmp.sortBy": { te: "క్రమబద్ధీకరణ", en: "Sort by" },
 
   "week.title": { te: "ఈ వారం నమూనా", en: "Weekly pattern" },
-  "week.clean": { te: "ఈ వారం ఒక్క 'పేలవం' సంఘటన కూడా లేదు — బాగుంది.", en: "No poor episodes this week — trending well." },
-  "week.none": { te: "నమూనా చెప్పడానికి తగిన డేటా ఇంకా లేదు.", en: "Not enough data yet to describe a pattern." },
+  "week.clean": {
+    te: "ఈ వారం ఒక్క 'పేలవం' సంఘటన కూడా లేదు — బాగుంది.",
+    en: "No poor episodes this week — trending well.",
+  },
+  "week.none": {
+    te: "నమూనా చెప్పడానికి తగిన డేటా ఇంకా లేదు.",
+    en: "Not enough data yet to describe a pattern.",
+  },
   "week.note": {
     te: "ఇది గత 7 రోజుల రీడింగ్‌ల సాధారణ సగటు — అంచనా కాదు.",
     en: "A plain average of the last 7 days of readings — not a prediction.",
@@ -314,7 +457,10 @@ export const dict = {
     en: "Readings, classification changes and alerts for the selected period — ready to share with a school.",
   },
   "rep.done": { te: "నివేదిక డౌన్‌లోడ్ అయింది", en: "Report downloaded" },
-  "rep.pdfNote": { te: "PDF ఆంగ్లంలో ఉంటుంది (ఫాంట్ పరిమితి).", en: "The PDF is generated in English." },
+  "rep.pdfNote": {
+    te: "PDF ఆంగ్లంలో ఉంటుంది (ఫాంట్ పరిమితి).",
+    en: "The PDF is generated in English.",
+  },
 
   "diag.title": { te: "పరికర వివరాలు", en: "Device diagnostics" },
   "diag.raw": { te: "ముడి MQ135 విలువ", en: "Raw MQ135 value" },
@@ -325,7 +471,10 @@ export const dict = {
   "diag.na": { te: "అందుబాటులో లేదు", en: "Not available" },
 
   "sens.title": { te: "సెన్సార్ రీడింగ్‌లు", en: "Sensor readings" },
-  "sens.desc": { te: "పరికరం నిజంగా కొలిచే విలువలు మాత్రమే.", en: "Only the values the hardware actually measures." },
+  "sens.desc": {
+    te: "పరికరం నిజంగా కొలిచే విలువలు మాత్రమే.",
+    en: "Only the values the hardware actually measures.",
+  },
   "sens.aqi": { te: "గాలి నాణ్యత సూచిక", en: "Air Quality Index" },
   "sens.aqiInfo": {
     te: "సాధారణ గాలి కాలుష్య స్థాయి ఆధారంగా (MQ135 సెన్సార్) — వ్యక్తిగత వాయువుల విభజన కాదు.",
@@ -340,14 +489,18 @@ export const dict = {
   "sens.raw": { te: "ముడి సెన్సార్ డేటా చూడండి", en: "View raw sensor data" },
   "sens.rawAdc": { te: "MQ135 ముడి ADC విలువ (0–4095)", en: "Raw MQ135 ADC value (0–4095)" },
   "sens.rawIndex": { te: "కాలిబ్రేట్ చేసిన సూచిక", en: "Calibrated index" },
-  "sens.rawFormula": { te: "సూచిక = (ADC − {clean}) ÷ ({poor} − {clean}) × 100", en: "Index = (ADC − {clean}) ÷ ({poor} − {clean}) × 100" },
+  "sens.rawFormula": {
+    te: "సూచిక = (ADC − {clean}) ÷ ({poor} − {clean}) × 100",
+    en: "Index = (ADC − {clean}) ÷ ({poor} − {clean}) × 100",
+  },
   "sens.dht": { te: "DHT22 సెన్సార్", en: "DHT22 sensor" },
   "sens.mq": { te: "MQ135 సెన్సార్", en: "MQ135 sensor" },
 
-
-
   "tl.title": { te: "హెచ్చరికల టైమ్‌లైన్", en: "Alert timeline" },
-  "tl.desc": { te: "ఎంచుకున్న కాలంలో గాలి స్థితి — ఎడమ నుండి కుడికి.", en: "Air state across the selected period, left to right." },
+  "tl.desc": {
+    te: "ఎంచుకున్న కాలంలో గాలి స్థితి — ఎడమ నుండి కుడికి.",
+    en: "Air state across the selected period, left to right.",
+  },
 
   "quiet.title": { te: "నిశ్శబ్ద గంటలు", en: "Quiet hours" },
   "quiet.desc": {
@@ -357,7 +510,10 @@ export const dict = {
   "quiet.enable": { te: "నిశ్శబ్ద గంటలు ఆన్", en: "Enable quiet hours" },
   "quiet.from": { te: "నుండి", en: "From" },
   "quiet.to": { te: "వరకు", en: "To" },
-  "quiet.critical": { te: "'పేలవం' హెచ్చరికలు అప్పుడూ పంపు", en: "Still send critical Poor alerts" },
+  "quiet.critical": {
+    te: "'పేలవం' హెచ్చరికలు అప్పుడూ పంపు",
+    en: "Still send critical Poor alerts",
+  },
   "quiet.criticalDesc": {
     te: "గాలి పేలవంగా మారితే నిశ్శబ్ద గంటల్లోనూ నోటిఫికేషన్ వస్తుంది.",
     en: "A poor-air alert will still come through during quiet hours.",
@@ -374,17 +530,25 @@ export const dict = {
 
 export type TKey = keyof typeof dict;
 
-const LangContext = createContext<{ lang: Lang; setLang: (l: Lang) => void; t: (k: TKey) => string }>({
+const LangContext = createContext<{
+  lang: Lang;
+  setLang: (l: Lang) => void;
+  t: (k: TKey | (string & {})) => string;
+}>({
   lang: "te",
   setLang: () => {},
-  t: (k) => dict[k].te,
+  t: (k) => {
+    const item = dict[k as TKey];
+    return item ? item.te : String(k);
+  },
 });
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>("te");
 
   useEffect(() => {
-    const saved = typeof window !== "undefined" ? (localStorage.getItem("airsense-lang") as Lang | null) : null;
+    const saved =
+      typeof window !== "undefined" ? (localStorage.getItem("airsense-lang") as Lang | null) : null;
     if (saved === "en" || saved === "te") setLangState(saved);
   }, []);
 
@@ -401,7 +565,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const t = useCallback((k: TKey) => dict[k][lang] ?? dict[k].te, [lang]);
+  const t = useCallback(
+    (k: TKey | (string & {})) => {
+      const item = dict[k as TKey];
+      if (!item) return String(k);
+      return item[lang] ?? item.te;
+    },
+    [lang],
+  );
 
   const value = useMemo(() => ({ lang, setLang, t }), [lang, setLang, t]);
   return <LangContext.Provider value={value}>{children}</LangContext.Provider>;

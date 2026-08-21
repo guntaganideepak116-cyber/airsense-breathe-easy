@@ -15,8 +15,10 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ApiDevicesRouteImport } from './routes/api/devices'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as DashboardHistoryRouteImport } from './routes/dashboard.history'
+import { Route as DashboardRecommendationsRouteImport } from './routes/dashboard.recommendations'
 import { Route as DashboardRoomsRouteImport } from './routes/dashboard.rooms'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
+import { Route as DashboardWeatherRouteImport } from './routes/dashboard.weather'
 import { Route as ApiPushSubscribeRouteImport } from './routes/api/push.subscribe'
 import { Route as ApiPushVapidRouteImport } from './routes/api/push.vapid'
 import { Route as ApiDeviceIdStreamRouteImport } from './routes/api/device.$id.stream'
@@ -51,6 +53,12 @@ const DashboardHistoryRoute = DashboardHistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardRecommendationsRoute =
+  DashboardRecommendationsRouteImport.update({
+    id: '/recommendations',
+    path: '/recommendations',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const DashboardRoomsRoute = DashboardRoomsRouteImport.update({
   id: '/rooms',
   path: '/rooms',
@@ -59,6 +67,11 @@ const DashboardRoomsRoute = DashboardRoomsRouteImport.update({
 const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardWeatherRoute = DashboardWeatherRouteImport.update({
+  id: '/weather',
+  path: '/weather',
   getParentRoute: () => DashboardRoute,
 } as any)
 const ApiPushSubscribeRoute = ApiPushSubscribeRouteImport.update({
@@ -83,8 +96,10 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteWithChildren
   '/api/devices': typeof ApiDevicesRoute
   '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/recommendations': typeof DashboardRecommendationsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/weather': typeof DashboardWeatherRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/vapid': typeof ApiPushVapidRoute
@@ -95,8 +110,10 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/api/devices': typeof ApiDevicesRoute
   '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/recommendations': typeof DashboardRecommendationsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/weather': typeof DashboardWeatherRoute
   '/dashboard': typeof DashboardIndexRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/vapid': typeof ApiPushVapidRoute
@@ -109,8 +126,10 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteWithChildren
   '/api/devices': typeof ApiDevicesRoute
   '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/recommendations': typeof DashboardRecommendationsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/weather': typeof DashboardWeatherRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/vapid': typeof ApiPushVapidRoute
@@ -124,8 +143,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/api/devices'
     | '/dashboard/history'
+    | '/dashboard/recommendations'
     | '/dashboard/rooms'
     | '/dashboard/settings'
+    | '/dashboard/weather'
     | '/dashboard/'
     | '/api/push/subscribe'
     | '/api/push/vapid'
@@ -136,8 +157,10 @@ export interface FileRouteTypes {
     | '/auth'
     | '/api/devices'
     | '/dashboard/history'
+    | '/dashboard/recommendations'
     | '/dashboard/rooms'
     | '/dashboard/settings'
+    | '/dashboard/weather'
     | '/dashboard'
     | '/api/push/subscribe'
     | '/api/push/vapid'
@@ -149,8 +172,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/api/devices'
     | '/dashboard/history'
+    | '/dashboard/recommendations'
     | '/dashboard/rooms'
     | '/dashboard/settings'
+    | '/dashboard/weather'
     | '/dashboard/'
     | '/api/push/subscribe'
     | '/api/push/vapid'
@@ -211,6 +236,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardHistoryRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/recommendations': {
+      id: '/dashboard/recommendations'
+      path: '/recommendations'
+      fullPath: '/dashboard/recommendations'
+      preLoaderRoute: typeof DashboardRecommendationsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/rooms': {
       id: '/dashboard/rooms'
       path: '/rooms'
@@ -223,6 +255,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/dashboard/settings'
       preLoaderRoute: typeof DashboardSettingsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/weather': {
+      id: '/dashboard/weather'
+      path: '/weather'
+      fullPath: '/dashboard/weather'
+      preLoaderRoute: typeof DashboardWeatherRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/api/push/subscribe': {
@@ -251,15 +290,19 @@ declare module '@tanstack/react-router' {
 
 interface DashboardRouteChildren {
   DashboardHistoryRoute: typeof DashboardHistoryRoute
+  DashboardRecommendationsRoute: typeof DashboardRecommendationsRoute
   DashboardRoomsRoute: typeof DashboardRoomsRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
+  DashboardWeatherRoute: typeof DashboardWeatherRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardHistoryRoute: DashboardHistoryRoute,
+  DashboardRecommendationsRoute: DashboardRecommendationsRoute,
   DashboardRoomsRoute: DashboardRoomsRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
+  DashboardWeatherRoute: DashboardWeatherRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 
@@ -279,3 +322,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

@@ -1,10 +1,14 @@
 import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { api, cacheReading, cachedReading, type Range, type Reading } from "@/lib/airsense";
+import {
+  api,
+  cacheReading,
+  cachedReading,
+  resolveUrl,
+  type Range,
+  type Reading,
+} from "@/lib/airsense";
 import { trendOf, type Trend } from "@/lib/insights";
-
-
-
 
 const SELECTED_KEY = "airsense-selected-device";
 
@@ -21,14 +25,20 @@ export function useSelectedDevice() {
     if (saved) setSelected(saved);
   }, []);
 
-  const id = selected && devices?.some((d) => d.id === selected) ? selected : (devices?.[0]?.id ?? null);
+  const id =
+    selected && devices?.some((d) => d.id === selected) ? selected : (devices?.[0]?.id ?? null);
 
   const select = (deviceId: string) => {
     localStorage.setItem(SELECTED_KEY, deviceId);
     setSelected(deviceId);
   };
 
-  return { devices: devices ?? [], deviceId: id, device: devices?.find((d) => d.id === id) ?? null, select };
+  return {
+    devices: devices ?? [],
+    deviceId: id,
+    device: devices?.find((d) => d.id === id) ?? null,
+    select,
+  };
 }
 
 /** Polls the latest reading; the real backend exposes SSE at /api/device/stream. */
@@ -38,7 +48,8 @@ export function useLatest(deviceId: string | null) {
     queryFn: () => api.latest(deviceId!),
     enabled: !!deviceId,
     refetchInterval: 8000,
-    placeholderData: (prev) => prev ?? (deviceId ? (cachedReading(deviceId) ?? undefined) : undefined),
+    placeholderData: (prev) =>
+      prev ?? (deviceId ? (cachedReading(deviceId) ?? undefined) : undefined),
   });
 
   useEffect(() => {
@@ -82,7 +93,7 @@ export function useDeviceStream(deviceId: string | null) {
     const connect = () => {
       if (cancelled) return;
       setStatus(attempts.current === 0 ? "connecting" : "reconnecting");
-      source = new EventSource(`/api/device/${encodeURIComponent(deviceId)}/stream`);
+      source = new EventSource(resolveUrl(`/api/device/${encodeURIComponent(deviceId)}/stream`));
 
       source.addEventListener("reading", (event) => {
         try {
@@ -126,15 +137,20 @@ export function useDeviceMutations() {
   const invalidate = () => qc.invalidateQueries({ queryKey: ["devices"] });
 
   return {
-    create: useMutation({ mutationFn: (name: string) => api.createDevice(name), onSuccess: invalidate }),
+    create: useMutation({
+      mutationFn: (name: string) => api.createDevice(name),
+      onSuccess: invalidate,
+    }),
     rename: useMutation({
       mutationFn: ({ id, name }: { id: string; name: string }) => api.updateDevice(id, { name }),
       onSuccess: invalidate,
     }),
-    remove: useMutation({ mutationFn: (id: string) => api.removeDevice(id), onSuccess: invalidate }),
+    remove: useMutation({
+      mutationFn: (id: string) => api.removeDevice(id),
+      onSuccess: invalidate,
+    }),
   };
 }
-
 
 /**
  * Latest reading for several devices at once. Shares the ["latest", id] cache
@@ -149,7 +165,10 @@ export function useAllLatest(deviceIds: string[]) {
     })),
   });
 
-  return deviceIds.map((id, i) => ({ deviceId: id, reading: (results[i]?.data as Reading | undefined) ?? null }));
+  return deviceIds.map((id, i) => ({
+    deviceId: id,
+    reading: (results[i]?.data as Reading | undefined) ?? null,
+  }));
 }
 
 /** Direction of the last few hours of readings, used to phrase guidance. */
