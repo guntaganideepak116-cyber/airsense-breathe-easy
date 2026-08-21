@@ -17,7 +17,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { registerServiceWorker } from "@/lib/register-sw";
 
-
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -124,7 +123,9 @@ function RootShell({ children }: { children: ReactNode }) {
 
 import { ClerkProvider } from "@clerk/clerk-react";
 
-const PUBLISHABLE_KEY = import.meta.env["VITE_CLERK_PUBLISHABLE_KEY"] || "pk_test_aGVscGVkLXN0dXJnZW9uLTUuY2xlcmsuYWNjb3VudHMuZGV2JA";
+const PUBLISHABLE_KEY =
+  import.meta.env["VITE_CLERK_PUBLISHABLE_KEY"] ||
+  "pk_test_aGVscGVkLXN0dXJnZW9uLTUuY2xlcmsuYWNjb3VudHMuZGV2JA";
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
@@ -148,4 +149,3 @@ function RootComponent() {
     </ClerkProvider>
   );
 }
-

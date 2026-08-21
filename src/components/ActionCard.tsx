@@ -30,7 +30,11 @@ export function ActionCard({ status, trend }: { status: AirStatus; trend: Trend 
         <span
           className={cn(
             "flex items-center gap-1.5 rounded-full bg-card/70 px-2.5 py-1 text-[11px]",
-            trend === "rising" ? "text-poor" : trend === "falling" ? "text-good" : "text-muted-foreground",
+            trend === "rising"
+              ? "text-poor"
+              : trend === "falling"
+                ? "text-good"
+                : "text-muted-foreground",
           )}
         >
           {trendIcon}
@@ -39,7 +43,9 @@ export function ActionCard({ status, trend }: { status: AirStatus; trend: Trend 
       </div>
 
       <p className={cn("mt-3 text-base leading-relaxed", theme.text)}>{t(key)}</p>
-      <p className="mt-3 text-[11px] leading-relaxed text-foreground/50">{t("action.disclaimer")}</p>
+      <p className="mt-3 text-[11px] leading-relaxed text-foreground/50">
+        {t("action.disclaimer")}
+      </p>
     </section>
   );
 }

@@ -10,9 +10,15 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — AirSense" },
-      { name: "description", content: "Sign in to AirSense to see live indoor air quality for every room you monitor." },
+      {
+        name: "description",
+        content: "Sign in to AirSense to see live indoor air quality for every room you monitor.",
+      },
       { property: "og:title", content: "Sign in — AirSense" },
-      { property: "og:description", content: "Access your AirSense rooms, live readings and alerts." },
+      {
+        property: "og:description",
+        content: "Access your AirSense rooms, live readings and alerts.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),

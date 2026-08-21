@@ -1,5 +1,4 @@
 /* AirSense push handlers — imported into the generated Workbox service worker. */
-/* eslint-disable no-undef */
 
 self.addEventListener("push", (event) => {
   let payload = {};
@@ -11,7 +10,9 @@ self.addEventListener("push", (event) => {
 
   const title = payload.title || "AirSense";
   const deviceId = payload.deviceId || "";
-  const url = payload.url || (deviceId ? `/dashboard/rooms?room=${encodeURIComponent(deviceId)}` : "/dashboard");
+  const url =
+    payload.url ||
+    (deviceId ? `/dashboard/rooms?room=${encodeURIComponent(deviceId)}` : "/dashboard");
 
   event.waitUntil(
     self.registration.showNotification(title, {

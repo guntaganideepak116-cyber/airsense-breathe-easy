@@ -10,7 +10,13 @@ import { cn } from "@/lib/utils";
 type SortKey = "status" | "name";
 
 /** Every room in one sortable table, worst air first by default. */
-export function RoomComparison({ devices, onSelect }: { devices: Device[]; onSelect?: (id: string) => void }) {
+export function RoomComparison({
+  devices,
+  onSelect,
+}: {
+  devices: Device[];
+  onSelect?: (id: string) => void;
+}) {
   const { t, lang } = useI18n();
   const [sort, setSort] = useState<SortKey>("status");
   const latest = useAllLatest(devices.map((d) => d.id));
@@ -59,16 +65,26 @@ export function RoomComparison({ devices, onSelect }: { devices: Device[]; onSel
                 <tr
                   key={device.id}
                   onClick={() => onSelect?.(device.id)}
-                  className={cn("align-middle", onSelect && "cursor-pointer transition-colors hover:bg-secondary/50")}
+                  className={cn(
+                    "align-middle",
+                    onSelect && "cursor-pointer transition-colors hover:bg-secondary/50",
+                  )}
                 >
                   <td className="max-w-40 truncate py-3 pr-3 font-medium">{device.name}</td>
                   <td className="py-3 pr-3">
-                    <span className={cn("flex items-center gap-2", theme?.text ?? "text-muted-foreground")}>
+                    <span
+                      className={cn(
+                        "flex items-center gap-2",
+                        theme?.text ?? "text-muted-foreground",
+                      )}
+                    >
                       <span className={cn("h-2 w-2 rounded-full", theme?.dot ?? "bg-muted")} />
                       {theme ? t(theme.label) : "—"}
                     </span>
                   </td>
-                  <td className="py-3 pr-3 tabular-nums">{reading ? `${reading.mq135} ppm` : "—"}</td>
+                  <td className="py-3 pr-3 tabular-nums">
+                    {reading ? `${reading.mq135} ppm` : "—"}
+                  </td>
                   <td className="py-3 pr-3 tabular-nums text-muted-foreground">
                     {reading ? `${reading.temperature}°C · ${reading.humidity}%` : "—"}
                   </td>

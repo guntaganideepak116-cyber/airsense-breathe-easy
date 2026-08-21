@@ -36,7 +36,9 @@ export function todaySummary(points: HistoryPoint[] | undefined, stepMinutes = 3
     if (p.status === "poor" && (!prev || prev.status !== "poor")) episodes += 1;
   });
 
-  const typical = (Object.keys(counts) as AirStatus[]).reduce((a, b) => (counts[b] > counts[a] ? b : a));
+  const typical = (Object.keys(counts) as AirStatus[]).reduce((a, b) =>
+    counts[b] > counts[a] ? b : a,
+  );
 
   return {
     typical,
@@ -153,8 +155,15 @@ export function bestAndWorst(
 ): { best: RoomExtreme | null; worst: RoomExtreme | null } {
   const live = rooms
     .filter((r) => r.reading)
-    .map((r) => ({ deviceId: r.deviceId, name: r.name, status: r.reading!.status, mq135: r.reading!.mq135 }));
+    .map((r) => ({
+      deviceId: r.deviceId,
+      name: r.name,
+      status: r.reading!.status,
+      mq135: r.reading!.mq135,
+    }));
   if (live.length < 2) return { best: null, worst: null };
-  const sorted = [...live].sort((a, b) => statusRank(a.status) - statusRank(b.status) || a.mq135 - b.mq135);
+  const sorted = [...live].sort(
+    (a, b) => statusRank(a.status) - statusRank(b.status) || a.mq135 - b.mq135,
+  );
   return { best: sorted[0] ?? null, worst: sorted[sorted.length - 1] ?? null };
 }

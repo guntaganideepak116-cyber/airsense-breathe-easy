@@ -35,8 +35,19 @@ export function IndoorOutdoor({
   );
 
   return (
-    <div className={cn("rounded-2xl border bg-card/60 p-3", compact && "bg-transparent p-0", className)}>
-      <div className={cn("flex flex-wrap items-center gap-x-3 gap-y-1", compact ? "text-[11px]" : "text-xs")}>
+    <div
+      className={cn(
+        "rounded-2xl border bg-card/60 p-3",
+        compact && "bg-transparent p-0",
+        className,
+      )}
+    >
+      <div
+        className={cn(
+          "flex flex-wrap items-center gap-x-3 gap-y-1",
+          compact ? "text-[11px]" : "text-xs",
+        )}
+      >
         {pill(
           t("out.indoor"),
           indoorTheme ? t(indoorTheme.label) : "—",
@@ -57,19 +68,21 @@ export function IndoorOutdoor({
           )
         )}
         <TooltipProvider delayDuration={150}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              aria-label={t("out.tooltip")}
-              onClick={(e) => e.stopPropagation()}
-              className="shrink-0 rounded-full text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <Info className="h-3.5 w-3.5" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent className="max-w-64 text-xs leading-relaxed">{t("out.tooltip")}</TooltipContent>
-        </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                aria-label={t("out.tooltip")}
+                onClick={(e) => e.stopPropagation()}
+                className="shrink-0 rounded-full text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <Info className="h-3.5 w-3.5" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-64 text-xs leading-relaxed">
+              {t("out.tooltip")}
+            </TooltipContent>
+          </Tooltip>
         </TooltipProvider>
       </div>
 

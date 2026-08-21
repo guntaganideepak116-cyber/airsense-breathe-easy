@@ -29,7 +29,9 @@ export const Route = createFileRoute("/api/device/$id/stream")({
             const send = (event: string, data: unknown) => {
               if (closed) return;
               try {
-                controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
+                controller.enqueue(
+                  encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`),
+                );
               } catch {
                 close();
               }

@@ -16,9 +16,15 @@ export const Route = createFileRoute("/dashboard/settings")({
   head: () => ({
     meta: [
       { title: "Settings — AirSense" },
-      { name: "description", content: "Manage push alerts, alert thresholds, devices and language for AirSense." },
+      {
+        name: "description",
+        content: "Manage push alerts, alert thresholds, devices and language for AirSense.",
+      },
       { property: "og:title", content: "Settings — AirSense" },
-      { property: "og:description", content: "Notification preferences, device management and Telugu/English toggle." },
+      {
+        property: "og:description",
+        content: "Notification preferences, device management and Telugu/English toggle.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -48,7 +54,6 @@ function SettingsPage() {
     else if (next === "denied") toast.error(t("push.blocked"));
     else if (next === "unsupported") toast.error(t("push.unsupported"));
   };
-
 
   return (
     <div className="space-y-5">
@@ -82,7 +87,6 @@ function SettingsPage() {
               }
             }}
           />
-
         </div>
 
         <div className="mt-4 rounded-2xl border p-4">
@@ -130,7 +134,8 @@ function SettingsPage() {
                   className="shrink-0 rounded-full text-poor"
                   aria-label={t("rooms.remove")}
                   onClick={() => {
-                    if (!window.confirm(`${t("dev.removeConfirm")}\n${t("dev.removeDesc")}`)) return;
+                    if (!window.confirm(`${t("dev.removeConfirm")}\n${t("dev.removeDesc")}`))
+                      return;
                     remove.mutate(d.id);
                     toast.success(t("rooms.removed"));
                   }}
@@ -151,7 +156,6 @@ function SettingsPage() {
           <Link to="/dashboard/rooms">{t("rooms.add")}</Link>
         </Button>
       </section>
-
 
       <section className="rounded-3xl border bg-card p-6">
         <p className="font-semibold">{t("set.lang")}</p>

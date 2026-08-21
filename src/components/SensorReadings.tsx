@@ -42,7 +42,14 @@ function Ring({
   return (
     <div className="relative mx-auto" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90" aria-hidden>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} className="stroke-muted" />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          strokeWidth={stroke}
+          className="stroke-muted"
+        />
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -53,7 +60,9 @@ function Ring({
           stroke={color}
           strokeDasharray={c}
           strokeDashoffset={c - (Math.max(0, Math.min(100, value)) / 100) * c}
-          style={{ transition: "stroke-dashoffset 700ms cubic-bezier(.22,1,.36,1), stroke 700ms ease" }}
+          style={{
+            transition: "stroke-dashoffset 700ms cubic-bezier(.22,1,.36,1), stroke 700ms ease",
+          }}
         />
       </svg>
       <div className="absolute inset-0 grid place-items-center text-center">{children}</div>
@@ -61,9 +70,19 @@ function Ring({
   );
 }
 
-function BandStrip({ active, labels }: { active: "low" | "ok" | "high"; labels: [string, string, string] }) {
+function BandStrip({
+  active,
+  labels,
+}: {
+  active: "low" | "ok" | "high";
+  labels: [string, string, string];
+}) {
   const keys = ["low", "ok", "high"] as const;
-  const tone = { low: "bg-sky-soft text-primary", ok: "bg-good-soft text-good", high: "bg-moderate-soft text-moderate" };
+  const tone = {
+    low: "bg-sky-soft text-primary",
+    ok: "bg-good-soft text-good",
+    high: "bg-moderate-soft text-moderate",
+  };
   return (
     <div className="mt-4 grid grid-cols-3 gap-1 text-center text-[11px]">
       {keys.map((k, i) => (
@@ -104,7 +123,10 @@ export function SensorReadings({
 
   const temp = reading?.temperature ?? null;
   const tBand = tempBand(temp ?? 24);
-  const tPct = temp == null ? 0 : Math.max(0, Math.min(100, ((temp - TEMP_MIN) / (TEMP_MAX - TEMP_MIN)) * 100));
+  const tPct =
+    temp == null
+      ? 0
+      : Math.max(0, Math.min(100, ((temp - TEMP_MIN) / (TEMP_MAX - TEMP_MIN)) * 100));
 
   const hum = reading?.humidity ?? null;
   const hBand = humidityBand(hum ?? 45);
@@ -132,7 +154,9 @@ export function SensorReadings({
                     <Info className="h-3.5 w-3.5" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent className="max-w-64 text-xs leading-relaxed">{t("sens.aqiInfo")}</TooltipContent>
+                <TooltipContent className="max-w-64 text-xs leading-relaxed">
+                  {t("sens.aqiInfo")}
+                </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
@@ -140,7 +164,10 @@ export function SensorReadings({
           <div className="mt-5">
             <Ring value={score} color={indexColor(score)}>
               <div key={tick} className="value-pulse">
-                <p className="font-display text-4xl tabular-nums" style={{ color: indexColor(score) }}>
+                <p
+                  className="font-display text-4xl tabular-nums"
+                  style={{ color: indexColor(score) }}
+                >
                   {reading ? score : "—"}
                   <span className="text-xl">%</span>
                 </p>
@@ -149,7 +176,9 @@ export function SensorReadings({
             </Ring>
           </div>
 
-          <p className={cn("mt-5 text-center font-display text-3xl status-transition", theme.text)}>{t(theme.label)}</p>
+          <p className={cn("mt-5 text-center font-display text-3xl status-transition", theme.text)}>
+            {t(theme.label)}
+          </p>
 
           <div className="mt-5 rounded-2xl border bg-card/50">
             <button
@@ -159,7 +188,9 @@ export function SensorReadings({
               className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-[11px] text-muted-foreground transition-colors hover:text-foreground"
             >
               {t("sens.raw")}
-              <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", rawOpen && "rotate-180")} />
+              <ChevronDown
+                className={cn("h-3.5 w-3.5 transition-transform", rawOpen && "rotate-180")}
+              />
             </button>
             {rawOpen && (
               <dl className="space-y-1.5 border-t px-3 py-2.5 text-[11px]">
@@ -172,7 +203,9 @@ export function SensorReadings({
                   <dd className="shrink-0 font-mono tabular-nums">{reading ? `${score}%` : "—"}</dd>
                 </div>
                 <p className="pt-1 font-mono text-[10px] leading-relaxed text-muted-foreground">
-                  {t("sens.rawFormula").replace(/\{clean\}/g, String(ADC_CLEAN)).replace(/\{poor\}/g, String(ADC_POOR))}
+                  {t("sens.rawFormula")
+                    .replace(/\{clean\}/g, String(ADC_CLEAN))
+                    .replace(/\{poor\}/g, String(ADC_POOR))}
                 </p>
               </dl>
             )}
@@ -194,12 +227,17 @@ export function SensorReadings({
               />
             </div>
             <div key={tick} className="value-pulse">
-              <p className="font-display text-4xl tabular-nums">{temp != null ? `${temp}°` : "—"}</p>
+              <p className="font-display text-4xl tabular-nums">
+                {temp != null ? `${temp}°` : "—"}
+              </p>
               <p className="text-xs text-muted-foreground">°C · {t("sens.dht")}</p>
             </div>
           </div>
 
-          <BandStrip active={tBand} labels={[t("sens.temp.low"), t("sens.temp.ok"), t("sens.temp.high")]} />
+          <BandStrip
+            active={tBand}
+            labels={[t("sens.temp.low"), t("sens.temp.ok"), t("sens.temp.high")]}
+          />
         </article>
 
         {/* Humidity — DHT22 */}
@@ -221,7 +259,10 @@ export function SensorReadings({
             </Ring>
           </div>
 
-          <BandStrip active={hBand} labels={[t("sens.hum.low"), t("sens.hum.ok"), t("sens.hum.high")]} />
+          <BandStrip
+            active={hBand}
+            labels={[t("sens.hum.low"), t("sens.hum.ok"), t("sens.hum.high")]}
+          />
         </article>
       </div>
     </section>

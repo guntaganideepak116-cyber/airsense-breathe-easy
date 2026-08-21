@@ -111,7 +111,9 @@ export function exportPdf(points: HistoryPoint[], meta: ReportMeta) {
     (n, p, i) => (p.status === "poor" && points[i - 1]?.status !== "poor" ? n + 1 : n),
     0,
   );
-  const avg = points.length ? Math.round(points.reduce((s, p) => s + p.mq135, 0) / points.length) : 0;
+  const avg = points.length
+    ? Math.round(points.reduce((s, p) => s + p.mq135, 0) / points.length)
+    : 0;
   const peak = points.reduce((m, p) => Math.max(m, p.mq135), 0);
   const today = todaySummary(points, step);
 
@@ -119,7 +121,12 @@ export function exportPdf(points: HistoryPoint[], meta: ReportMeta) {
   line(`Readings in period: ${points.length}`);
   line(`Average MQ135: ${avg} ppm   ·   Peak: ${peak} ppm`);
   line(`Poor episodes: ${episodes}   ·   Time in Poor: ${poorCount * step} min`);
-  line(`Today so far: ${today.poorEpisodes} poor episode(s), ${today.poorMinutes} min in Poor`, 10, false, 24);
+  line(
+    `Today so far: ${today.poorEpisodes} poor episode(s), ${today.poorMinutes} min in Poor`,
+    10,
+    false,
+    24,
+  );
 
   line("Classification changes", 13, true, 20);
   const segments = timelineSegments(points).filter((s, i) => i > 0);
@@ -152,7 +159,12 @@ export function exportPdf(points: HistoryPoint[], meta: ReportMeta) {
       doc.setFont("helvetica", "normal");
     }
     const row = [
-      new Date(p.t).toLocaleString("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }),
+      new Date(p.t).toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
       String(p.mq135),
       String(p.temperature),
       String(p.humidity),

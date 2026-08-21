@@ -26,7 +26,10 @@ export const Route = createFileRoute("/dashboard/rooms")({
   head: () => ({
     meta: [
       { title: "Sensor Locations & Floor Plan — AirSense" },
-      { name: "description", content: "Interactive floor plan pins and sensor hardware diagnostics." },
+      {
+        name: "description",
+        content: "Interactive floor plan pins and sensor hardware diagnostics.",
+      },
     ],
   }),
   component: RoomsPage,
@@ -59,7 +62,9 @@ function RoomsPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl text-ink sm:text-3xl">{t("dash.rooms")}</h1>
-          <p className="text-sm text-muted-foreground">Interactive room locations and sensor hardware status.</p>
+          <p className="text-sm text-muted-foreground">
+            Interactive room locations and sensor hardware status.
+          </p>
         </div>
 
         <Dialog open={open} onOpenChange={setOpen}>
@@ -105,16 +110,38 @@ function RoomsPage() {
           <div className="relative mt-4 grid h-80 w-full place-items-center rounded-2xl border bg-secondary/20 p-4 grain-panel">
             {/* SVG Floorplan Graphic */}
             <svg viewBox="0 0 500 320" className="h-full w-full opacity-60" role="img">
-              <rect x="20" y="20" width="460" height="280" rx="16" fill="none" stroke="var(--border)" strokeWidth="2" strokeDasharray="4 4" />
+              <rect
+                x="20"
+                y="20"
+                width="460"
+                height="280"
+                rx="16"
+                fill="none"
+                stroke="var(--border)"
+                strokeWidth="2"
+                strokeDasharray="4 4"
+              />
               <line x1="180" y1="20" x2="180" y2="300" stroke="var(--border)" strokeWidth="2" />
               <line x1="340" y1="20" x2="340" y2="300" stroke="var(--border)" strokeWidth="2" />
               <line x1="20" y1="160" x2="480" y2="160" stroke="var(--border)" strokeWidth="2" />
-              <text x="70" y="100" fill="var(--muted-foreground)" fontSize="14">Classroom A</text>
-              <text x="230" y="100" fill="var(--muted-foreground)" fontSize="14">Classroom B</text>
-              <text x="390" y="100" fill="var(--muted-foreground)" fontSize="14">Hostel Hall</text>
-              <text x="70" y="240" fill="var(--muted-foreground)" fontSize="14">Bedroom 1</text>
-              <text x="230" y="240" fill="var(--muted-foreground)" fontSize="14">Common Area</text>
-              <text x="390" y="240" fill="var(--muted-foreground)" fontSize="14">Staff Room</text>
+              <text x="70" y="100" fill="var(--muted-foreground)" fontSize="14">
+                Classroom A
+              </text>
+              <text x="230" y="100" fill="var(--muted-foreground)" fontSize="14">
+                Classroom B
+              </text>
+              <text x="390" y="100" fill="var(--muted-foreground)" fontSize="14">
+                Hostel Hall
+              </text>
+              <text x="70" y="240" fill="var(--muted-foreground)" fontSize="14">
+                Bedroom 1
+              </text>
+              <text x="230" y="240" fill="var(--muted-foreground)" fontSize="14">
+                Common Area
+              </text>
+              <text x="390" y="240" fill="var(--muted-foreground)" fontSize="14">
+                Staff Room
+              </text>
             </svg>
 
             {/* Pinned Room Map Buttons */}
@@ -184,7 +211,9 @@ function RoomsPage() {
 
           <div className="mt-5 grid gap-6 md:grid-cols-2">
             <div className="rounded-2xl border bg-secondary/30 p-4">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Basic Information</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Basic Information
+              </h4>
               <ul className="mt-3 space-y-2 text-sm">
                 <li className="flex justify-between border-b pb-1.5">
                   <span className="text-muted-foreground">Device ID</span>
@@ -202,7 +231,9 @@ function RoomsPage() {
             </div>
 
             <div className="rounded-2xl border bg-secondary/30 p-4">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Current Hardware Status</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Current Hardware Status
+              </h4>
               <ul className="mt-3 space-y-2 text-sm">
                 <li className="flex justify-between border-b pb-1.5">
                   <span className="text-muted-foreground">Connection State</span>
@@ -233,7 +264,15 @@ function RoomsPage() {
   );
 }
 
-function RoomCard({ device, isSelected, onSelect }: { device: Device; isSelected: boolean; onSelect: () => void }) {
+function RoomCard({
+  device,
+  isSelected,
+  onSelect,
+}: {
+  device: Device;
+  isSelected: boolean;
+  onSelect: () => void;
+}) {
   const { t, lang } = useI18n();
   const navigate = useNavigate();
   const { reading, status: streamStatus, tick } = useDeviceStream(device.id);
@@ -281,7 +320,13 @@ function RoomCard({ device, isSelected, onSelect }: { device: Device; isSelected
       <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
         <span className="flex items-center gap-1">
           <Radio className={cn("h-3 w-3", live && "text-good")} />
-          {t(live ? "rooms.live" : streamStatus === "reconnecting" ? "rooms.reconnecting" : "rooms.connecting")}
+          {t(
+            live
+              ? "rooms.live"
+              : streamStatus === "reconnecting"
+                ? "rooms.reconnecting"
+                : "rooms.connecting",
+          )}
         </span>
         <button
           onClick={(e) => {

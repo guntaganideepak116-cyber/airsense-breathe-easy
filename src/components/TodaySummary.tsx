@@ -10,7 +10,13 @@ import { cn } from "@/lib/utils";
  * Compact strip of today's numbers, computed from the readings already loaded
  * for the selected room plus the live status of every other room.
  */
-export function TodaySummary({ deviceId, devices }: { deviceId: string | null; devices: Device[] }) {
+export function TodaySummary({
+  deviceId,
+  devices,
+}: {
+  deviceId: string | null;
+  devices: Device[];
+}) {
   const { t } = useI18n();
   const { data } = useHistory(deviceId, "24h");
   const summary = todaySummary(data, stepMinutesFor("24h"));
@@ -37,7 +43,9 @@ export function TodaySummary({ deviceId, devices }: { deviceId: string | null; d
       ) : (
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Stat label={t("today.typical")}>
-            <span className={cn("flex items-center gap-2 font-display text-xl", typicalTheme?.text)}>
+            <span
+              className={cn("flex items-center gap-2 font-display text-xl", typicalTheme?.text)}
+            >
               <span className={cn("h-2.5 w-2.5 rounded-full", typicalTheme?.dot)} />
               {typicalTheme ? t(typicalTheme.label) : "—"}
             </span>
@@ -50,7 +58,8 @@ export function TodaySummary({ deviceId, devices }: { deviceId: string | null; d
           <Stat label={t("today.duration")}>
             <span className="flex items-center gap-1.5 font-display text-xl tabular-nums">
               <Timer className="h-4 w-4 text-muted-foreground" />
-              {summary.poorMinutes} <span className="text-sm font-normal">{t("today.minutes")}</span>
+              {summary.poorMinutes}{" "}
+              <span className="text-sm font-normal">{t("today.minutes")}</span>
             </span>
           </Stat>
 

@@ -67,7 +67,9 @@ export async function enablePush(): Promise<PushState> {
   const registration = await getRegistration();
   if (registration && "pushManager" in registration) {
     try {
-      const { publicKey } = (await fetch("/api/push/vapid").then((r) => r.json())) as { publicKey: string };
+      const { publicKey } = (await fetch("/api/push/vapid").then((r) => r.json())) as {
+        publicKey: string;
+      };
       const subscription =
         (await registration.pushManager.getSubscription()) ??
         (await registration.pushManager.subscribe({
@@ -109,7 +111,12 @@ export async function disablePush() {
  * Shows an alert for a locally detected poor-air event.
  * Uses the service worker when one is active so the click opens the right room.
  */
-export async function showAirAlert(opts: { title: string; body: string; deviceId: string; lang: string }) {
+export async function showAirAlert(opts: {
+  title: string;
+  body: string;
+  deviceId: string;
+  lang: string;
+}) {
   if (!pushSupported() || Notification.permission !== "granted" || !pushPreference()) return;
   const url = `/dashboard/rooms?room=${encodeURIComponent(opts.deviceId)}`;
   const registration = await getRegistration();

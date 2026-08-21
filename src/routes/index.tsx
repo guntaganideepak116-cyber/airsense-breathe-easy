@@ -32,7 +32,8 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "AirSense — Indoor air quality monitoring, Telugu-first" },
       {
         property: "og:description",
-        content: "Live room-level air quality, instant local alerts and remote dashboards for families and schools.",
+        content:
+          "Live room-level air quality, instant local alerts and remote dashboards for families and schools.",
       },
     ],
   }),
@@ -82,7 +83,9 @@ function SiteHeader() {
           </span>
           <span className="min-w-0">
             <span className="block truncate font-display text-lg leading-tight">AirSense</span>
-            <span className="hidden text-xs text-muted-foreground sm:block">{t("brand.tagline")}</span>
+            <span className="hidden text-xs text-muted-foreground sm:block">
+              {t("brand.tagline")}
+            </span>
           </span>
         </Link>
         <div className="flex items-center gap-1 sm:gap-2">
@@ -124,7 +127,9 @@ function Hero() {
           <h1 className="mt-5 font-display text-4xl leading-[1.12] text-ink sm:text-5xl lg:text-6xl">
             {t("hero.title")}
           </h1>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">{t("hero.sub")}</p>
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+            {t("hero.sub")}
+          </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Button asChild size="lg" className="rounded-full">
               <Link to="/auth">
@@ -145,7 +150,9 @@ function Hero() {
         </div>
         <div className="grid place-items-center">
           <BreathingOrb status="good">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">{t("hero.orb.label")}</p>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground">
+              {t("hero.orb.label")}
+            </p>
             <p className="mt-1 font-display text-4xl text-good sm:text-5xl">{t("status.good")}</p>
             <p className="mt-1 text-sm tabular-nums text-muted-foreground">MQ135 · 318 ppm</p>
           </BreathingOrb>
@@ -180,7 +187,10 @@ function Problem() {
           <p className="mt-5 max-w-xl leading-relaxed text-muted-foreground">{t("problem.body")}</p>
           <div className="mt-8 grid gap-4">
             {cards.map((c) => (
-              <div key={c.t} className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-4 rounded-2xl border p-4">
+              <div
+                key={c.t}
+                className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-4 rounded-2xl border p-4"
+              >
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-sky-soft text-primary">
                   {c.icon}
                 </span>
@@ -205,14 +215,50 @@ function RoomIllustration() {
   const { t } = useI18n();
   return (
     <div className="relative w-full max-w-md">
-      <svg viewBox="0 0 400 300" className="w-full" role="img" aria-label="A room with invisible particles in the air">
+      <svg
+        viewBox="0 0 400 300"
+        className="w-full"
+        role="img"
+        aria-label="A room with invisible particles in the air"
+      >
         <rect x="20" y="30" width="360" height="230" rx="18" fill="var(--sky-soft)" />
-        <rect x="48" y="70" width="120" height="90" rx="8" fill="var(--background)" stroke="var(--border)" />
+        <rect
+          x="48"
+          y="70"
+          width="120"
+          height="90"
+          rx="8"
+          fill="var(--background)"
+          stroke="var(--border)"
+        />
         <line x1="108" y1="70" x2="108" y2="160" stroke="var(--border)" />
         <line x1="48" y1="115" x2="168" y2="115" stroke="var(--border)" />
-        <rect x="230" y="150" width="110" height="60" rx="10" fill="var(--background)" stroke="var(--border)" />
-        <rect x="252" y="120" width="66" height="30" rx="6" fill="var(--card)" stroke="var(--border)" />
-        <rect x="20" y="240" width="360" height="20" rx="6" fill="color-mix(in oklab, var(--primary) 12%, transparent)" />
+        <rect
+          x="230"
+          y="150"
+          width="110"
+          height="60"
+          rx="10"
+          fill="var(--background)"
+          stroke="var(--border)"
+        />
+        <rect
+          x="252"
+          y="120"
+          width="66"
+          height="30"
+          rx="6"
+          fill="var(--card)"
+          stroke="var(--border)"
+        />
+        <rect
+          x="20"
+          y="240"
+          width="360"
+          height="20"
+          rx="6"
+          fill="color-mix(in oklab, var(--primary) 12%, transparent)"
+        />
         {Array.from({ length: 34 }).map((_, i) => {
           const x = 40 + ((i * 61) % 330);
           const y = 55 + ((i * 97) % 180);
@@ -251,7 +297,9 @@ function HowItWorks() {
       <ol className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {steps.map((s, i) => (
           <li key={s.t} className="relative rounded-3xl border bg-card p-6">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-sky-soft text-primary">{s.icon}</span>
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-sky-soft text-primary">
+              {s.icon}
+            </span>
             <p className="mt-4 text-xs font-semibold tabular-nums text-primary">0{i + 1}</p>
             <p className="mt-1 font-semibold">{t(s.t)}</p>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(s.d)}</p>
@@ -280,7 +328,10 @@ function Preview() {
 function Compare() {
   const { t } = useI18n();
   const rows: { label: TKey; cells: (TKey | boolean | "partial")[] }[] = [
-    { label: "compare.r1", cells: ["compare.r1c1", "compare.r1c2", "compare.r1c3", "compare.r1c4"] },
+    {
+      label: "compare.r1",
+      cells: ["compare.r1c1", "compare.r1c2", "compare.r1c3", "compare.r1c4"],
+    },
     { label: "compare.r2", cells: [false, true, false, true] },
     { label: "compare.r3", cells: [false, "partial", false, true] },
     { label: "compare.r4", cells: [false, "partial", true, true] },
@@ -291,7 +342,8 @@ function Compare() {
   const cell = (v: TKey | boolean | "partial") => {
     if (v === true) return <Check className="mx-auto h-5 w-5 text-good" />;
     if (v === false) return <Minus className="mx-auto h-5 w-5 text-muted-foreground/60" />;
-    if (v === "partial") return <span className="text-xs text-moderate">{t("compare.partial")}</span>;
+    if (v === "partial")
+      return <span className="text-xs text-moderate">{t("compare.partial")}</span>;
     return <span className="text-xs">{t(v)}</span>;
   };
 
@@ -348,7 +400,9 @@ function Features() {
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((f) => (
             <div key={f.t} className="rounded-3xl border bg-background p-6">
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-good-soft text-good">{f.icon}</span>
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-good-soft text-good">
+                {f.icon}
+              </span>
               <p className="mt-4 font-semibold">{t(f.t)}</p>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(f.d)}</p>
             </div>

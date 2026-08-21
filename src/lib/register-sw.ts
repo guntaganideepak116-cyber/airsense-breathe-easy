@@ -11,7 +11,8 @@ function isBlockedContext() {
   if (window.top !== window.self) return true;
 
   const { hostname, search } = window.location;
-  if (new URLSearchParams(search).has("sw") && new URLSearchParams(search).get("sw") === "off") return true;
+  if (new URLSearchParams(search).has("sw") && new URLSearchParams(search).get("sw") === "off")
+    return true;
   if (hostname.startsWith("id-preview--") || hostname.startsWith("preview--")) return true;
   const blockedHosts = ["lovableproject.com", "lovableproject-dev.com", "beta.lovable.dev"];
   return blockedHosts.some((h) => hostname === h || hostname.endsWith(`.${h}`));

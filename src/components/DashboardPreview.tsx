@@ -29,7 +29,9 @@ export function DashboardPreview({ status = "moderate" as AirStatus }) {
           <div className="mt-2 flex items-center gap-4">
             <BreathingOrb status={status} size="sm" className="shrink-0 !h-28 !w-28" />
             <div className="min-w-0">
-              <p className={cn("font-display text-4xl leading-tight", theme.text)}>{t(theme.label)}</p>
+              <p className={cn("font-display text-4xl leading-tight", theme.text)}>
+                {t(theme.label)}
+              </p>
               <p className="mt-1 text-sm text-foreground/60">
                 {t("dash.sensorReading")}: <span className="tabular-nums">612</span> ppm
               </p>
@@ -40,8 +42,16 @@ export function DashboardPreview({ status = "moderate" as AirStatus }) {
 
         <div className="grid gap-4">
           <div className="grid grid-cols-2 gap-4">
-            <MiniStat icon={<Thermometer className="h-4 w-4" />} label={t("dash.temp")} value="31.4°C" />
-            <MiniStat icon={<Droplets className="h-4 w-4" />} label={t("dash.humidity")} value="58%" />
+            <MiniStat
+              icon={<Thermometer className="h-4 w-4" />}
+              label={t("dash.temp")}
+              value="31.4°C"
+            />
+            <MiniStat
+              icon={<Droplets className="h-4 w-4" />}
+              label={t("dash.humidity")}
+              value="58%"
+            />
           </div>
           <div className="rounded-2xl border p-4">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -57,7 +67,13 @@ export function DashboardPreview({ status = "moderate" as AirStatus }) {
                     </linearGradient>
                   </defs>
                   <YAxis hide domain={[200, 900]} />
-                  <Area type="monotone" dataKey="v" stroke={theme.hex} strokeWidth={2} fill="url(#prev)" />
+                  <Area
+                    type="monotone"
+                    dataKey="v"
+                    stroke={theme.hex}
+                    strokeWidth={2}
+                    fill="url(#prev)"
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             </div>

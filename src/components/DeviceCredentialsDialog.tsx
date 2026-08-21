@@ -61,7 +61,9 @@ function CopyField({ label, value, secret }: { label: string; value: string; sec
     <div className="rounded-2xl border p-3">
       <p className="text-xs text-muted-foreground">{label}</p>
       <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
-        <code className={`truncate font-mono text-sm ${secret ? "text-primary" : ""}`}>{value}</code>
+        <code className={`truncate font-mono text-sm ${secret ? "text-primary" : ""}`}>
+          {value}
+        </code>
         <Button
           variant="outline"
           size="sm"

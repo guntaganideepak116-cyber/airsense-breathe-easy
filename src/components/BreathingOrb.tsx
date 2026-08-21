@@ -23,9 +23,17 @@ export function BreathingOrb({
   return (
     <div className={cn("relative grid place-items-center", dim, className)}>
       <div
-        className={cn("absolute inset-0 rounded-full opacity-40 blur-2xl breathe-slow status-transition", theme.soft)}
+        className={cn(
+          "absolute inset-0 rounded-full opacity-40 blur-2xl breathe-slow status-transition",
+          theme.soft,
+        )}
       />
-      <div className={cn("absolute inset-[12%] rounded-full opacity-60 breathe status-transition", theme.soft)} />
+      <div
+        className={cn(
+          "absolute inset-[12%] rounded-full opacity-60 breathe status-transition",
+          theme.soft,
+        )}
+      />
       <div
         className="absolute inset-[24%] rounded-full border status-transition"
         style={{ borderColor: theme.hex, opacity: 0.35 }}

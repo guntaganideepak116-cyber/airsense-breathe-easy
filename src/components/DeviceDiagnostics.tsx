@@ -16,7 +16,13 @@ function formatUptime(seconds: number | undefined, lang: string) {
 }
 
 /** Secondary technical detail, collapsed by default so it never crowds the status. */
-export function DeviceDiagnostics({ reading, className }: { reading: Reading | null | undefined; className?: string }) {
+export function DeviceDiagnostics({
+  reading,
+  className,
+}: {
+  reading: Reading | null | undefined;
+  className?: string;
+}) {
   const { t, lang } = useI18n();
   const [open, setOpen] = useState(false);
   const na = t("diag.na");

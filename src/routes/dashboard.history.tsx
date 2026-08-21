@@ -23,9 +23,15 @@ export const Route = createFileRoute("/dashboard/history")({
   head: () => ({
     meta: [
       { title: "History & trends — AirSense" },
-      { name: "description", content: "Air quality, temperature and humidity trends with a log of every poor-air event." },
+      {
+        name: "description",
+        content: "Air quality, temperature and humidity trends with a log of every poor-air event.",
+      },
       { property: "og:title", content: "History & trends — AirSense" },
-      { property: "og:description", content: "24-hour, 7-day and 30-day indoor air quality trends." },
+      {
+        property: "og:description",
+        content: "24-hour, 7-day and 30-day indoor air quality trends.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -58,7 +64,8 @@ function HistoryPage() {
     const out: { t: string; mq135: number }[] = [];
     (data ?? []).forEach((p, i) => {
       const prev = data?.[i - 1];
-      if (p.status === "poor" && prev && prev.status !== "poor") out.push({ t: p.t, mq135: p.mq135 });
+      if (p.status === "poor" && prev && prev.status !== "poor")
+        out.push({ t: p.t, mq135: p.mq135 });
     });
     return out.reverse();
   }, [data]);
@@ -100,7 +107,9 @@ function HistoryPage() {
               onClick={() => setRange(r)}
               className={cn(
                 "rounded-full px-3 py-1.5 text-xs transition-colors",
-                range === r ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
+                range === r
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               {t(`hist.${r}` as "hist.24h")}
@@ -134,7 +143,12 @@ function HistoryPage() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid stroke="var(--border)" vertical={false} />
-                <XAxis dataKey="label" tick={{ fontSize: 11 }} minTickGap={24} stroke="var(--muted-foreground)" />
+                <XAxis
+                  dataKey="label"
+                  tick={{ fontSize: 11 }}
+                  minTickGap={24}
+                  stroke="var(--muted-foreground)"
+                />
                 <YAxis tick={{ fontSize: 11 }} stroke="var(--muted-foreground)" width={40} />
                 <Tooltip
                   contentStyle={{
@@ -144,7 +158,13 @@ function HistoryPage() {
                     fontSize: 12,
                   }}
                 />
-                <Area type="monotone" dataKey="mq135" stroke="var(--primary)" strokeWidth={2} fill="url(#aq)" />
+                <Area
+                  type="monotone"
+                  dataKey="mq135"
+                  stroke="var(--primary)"
+                  strokeWidth={2}
+                  fill="url(#aq)"
+                />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -160,7 +180,12 @@ function HistoryPage() {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
                 <CartesianGrid stroke="var(--border)" vertical={false} />
-                <XAxis dataKey="label" tick={{ fontSize: 11 }} minTickGap={24} stroke="var(--muted-foreground)" />
+                <XAxis
+                  dataKey="label"
+                  tick={{ fontSize: 11 }}
+                  minTickGap={24}
+                  stroke="var(--muted-foreground)"
+                />
                 <YAxis tick={{ fontSize: 11 }} stroke="var(--muted-foreground)" width={40} />
                 <Tooltip
                   contentStyle={{
@@ -170,8 +195,20 @@ function HistoryPage() {
                     fontSize: 12,
                   }}
                 />
-                <Line type="monotone" dataKey="temperature" stroke="var(--moderate)" strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="humidity" stroke="var(--good)" strokeWidth={2} dot={false} />
+                <Line
+                  type="monotone"
+                  dataKey="temperature"
+                  stroke="var(--moderate)"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="humidity"
+                  stroke="var(--good)"
+                  strokeWidth={2}
+                  dot={false}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -193,7 +230,10 @@ function HistoryPage() {
         ) : (
           <ul className="mt-4 divide-y">
             {events.map((e) => (
-              <li key={e.t} className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 py-3 sm:grid-cols-[auto_minmax(0,1fr)_auto]">
+              <li
+                key={e.t}
+                className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 py-3 sm:grid-cols-[auto_minmax(0,1fr)_auto]"
+              >
                 <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-poor-soft text-poor">
                   <AlertTriangle className="h-4 w-4" />
                 </span>

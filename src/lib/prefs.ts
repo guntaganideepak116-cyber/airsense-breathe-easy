@@ -8,12 +8,22 @@ export type City = { id: string; name: { te: string; en: string }; lat: number; 
 
 export const CITIES: City[] = [
   { id: "vijayawada", name: { te: "విజయవాడ", en: "Vijayawada" }, lat: 16.5062, lon: 80.648 },
-  { id: "visakhapatnam", name: { te: "విశాఖపట్నం", en: "Visakhapatnam" }, lat: 17.6868, lon: 83.2185 },
+  {
+    id: "visakhapatnam",
+    name: { te: "విశాఖపట్నం", en: "Visakhapatnam" },
+    lat: 17.6868,
+    lon: 83.2185,
+  },
   { id: "guntur", name: { te: "గుంటూరు", en: "Guntur" }, lat: 16.3067, lon: 80.4365 },
   { id: "tirupati", name: { te: "తిరుపతి", en: "Tirupati" }, lat: 13.6288, lon: 79.4192 },
   { id: "nellore", name: { te: "నెల్లూరు", en: "Nellore" }, lat: 14.4426, lon: 79.9865 },
   { id: "kakinada", name: { te: "కాకినాడ", en: "Kakinada" }, lat: 16.9891, lon: 82.2475 },
-  { id: "rajahmundry", name: { te: "రాజమహేంద్రవరం", en: "Rajahmundry" }, lat: 17.0005, lon: 81.804 },
+  {
+    id: "rajahmundry",
+    name: { te: "రాజమహేంద్రవరం", en: "Rajahmundry" },
+    lat: 17.0005,
+    lon: 81.804,
+  },
   { id: "kurnool", name: { te: "కర్నూలు", en: "Kurnool" }, lat: 15.8281, lon: 78.0373 },
   { id: "hyderabad", name: { te: "హైదరాబాద్", en: "Hyderabad" }, lat: 17.385, lon: 78.4867 },
   { id: "warangal", name: { te: "వరంగల్", en: "Warangal" }, lat: 17.9689, lon: 79.5941 },
@@ -72,7 +82,12 @@ export type QuietHours = {
   allowCritical: boolean;
 };
 
-export const DEFAULT_QUIET: QuietHours = { enabled: false, start: "22:00", end: "06:00", allowCritical: true };
+export const DEFAULT_QUIET: QuietHours = {
+  enabled: false,
+  start: "22:00",
+  end: "06:00",
+  allowCritical: true,
+};
 
 export function getQuietHours(): QuietHours {
   try {

@@ -16,7 +16,14 @@ import {
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { statusTheme, formatTime } from "@/lib/status";
-import { useDeviceMutations, useDeviceStream, useLatest, useSelectedDevice, useTrend, useHistory } from "@/lib/queries";
+import {
+  useDeviceMutations,
+  useDeviceStream,
+  useLatest,
+  useSelectedDevice,
+  useTrend,
+  useHistory,
+} from "@/lib/queries";
 import { useAirAlert } from "@/lib/use-air-alert";
 import { BreathingOrb } from "@/components/BreathingOrb";
 import { PushOptIn } from "@/components/PushOptIn";
@@ -36,7 +43,10 @@ export const Route = createFileRoute("/dashboard/")({
   head: () => ({
     meta: [
       { title: "Live Air Quality Overview — AirSense" },
-      { name: "description", content: "Live room air quality status, top stats summary, and data export." },
+      {
+        name: "description",
+        content: "Live room air quality status, top stats summary, and data export.",
+      },
     ],
   }),
   component: Overview,
@@ -71,7 +81,14 @@ function Overview() {
       return;
     }
 
-    const headers = ["Timestamp", "Device Name", "MQ135 (ppm)", "Temperature (C)", "Humidity (%)", "Status"];
+    const headers = [
+      "Timestamp",
+      "Device Name",
+      "MQ135 (ppm)",
+      "Temperature (C)",
+      "Humidity (%)",
+      "Status",
+    ];
     const rows = historyData.map((h) => [
       `"${h.t}"`,
       `"${device?.name || "Room"}"`,
@@ -81,7 +98,9 @@ function Overview() {
       `"${h.status}"`,
     ]);
 
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -96,14 +115,31 @@ function Overview() {
   // Live Data Table Rows
   const tableRows = useMemo(() => {
     const base = [
-      { name: device?.name || "Room", type: "Air Quality (MQ135)", val: `${reading?.mq135 ?? 320} ppm`, time: reading?.timestamp },
-      { name: device?.name || "Room", type: "Temperature (DHT22)", val: `${reading?.temperature ?? 28.5} °C`, time: reading?.timestamp },
-      { name: device?.name || "Room", type: "Humidity (DHT22)", val: `${reading?.humidity ?? 52} %`, time: reading?.timestamp },
+      {
+        name: device?.name || "Room",
+        type: "Air Quality (MQ135)",
+        val: `${reading?.mq135 ?? 320} ppm`,
+        time: reading?.timestamp,
+      },
+      {
+        name: device?.name || "Room",
+        type: "Temperature (DHT22)",
+        val: `${reading?.temperature ?? 28.5} °C`,
+        time: reading?.timestamp,
+      },
+      {
+        name: device?.name || "Room",
+        type: "Humidity (DHT22)",
+        val: `${reading?.humidity ?? 52} %`,
+        time: reading?.timestamp,
+      },
     ];
 
     return base.sort((a, b) => {
-      if (sortField === "name") return sortDir === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
-      if (sortField === "type") return sortDir === "asc" ? a.type.localeCompare(b.type) : b.type.localeCompare(a.type);
+      if (sortField === "name")
+        return sortDir === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+      if (sortField === "type")
+        return sortDir === "asc" ? a.type.localeCompare(b.type) : b.type.localeCompare(a.type);
       return sortDir === "asc" ? a.val.localeCompare(b.val) : b.val.localeCompare(a.val);
     });
   }, [device?.name, reading, sortField, sortDir]);
@@ -126,7 +162,9 @@ function Overview() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Stat 1: Monitored Rooms */}
         <div className="rounded-3xl border bg-card p-5 text-center shadow-sm">
-          <p className="font-display text-3xl font-bold tabular-nums text-primary">{devices.length}</p>
+          <p className="font-display text-3xl font-bold tabular-nums text-primary">
+            {devices.length}
+          </p>
           <p className="mt-1 text-xs text-muted-foreground">{t("dash.monitoredRooms")}</p>
         </div>
 
@@ -190,7 +228,13 @@ function Overview() {
                 {t("dash.airquality")} ·{" "}
                 <span className="inline-flex items-center gap-1">
                   <Radio className={cn("h-3.5 w-3.5", live && "text-good")} />
-                  {t(live ? "dash.live" : streamStatus === "reconnecting" ? "rooms.reconnecting" : "rooms.connecting")}
+                  {t(
+                    live
+                      ? "dash.live"
+                      : streamStatus === "reconnecting"
+                        ? "rooms.reconnecting"
+                        : "rooms.connecting",
+                  )}
                 </span>
               </div>
               <p className={cn("mt-2 font-display text-5xl font-bold leading-tight", theme.text)}>
@@ -205,7 +249,9 @@ function Overview() {
               </p>
               <p className="mt-1 text-xs text-foreground/60">
                 {t("dash.updated")}:{" "}
-                <span className="tabular-nums">{reading ? formatTime(reading.timestamp, lang) : "—"}</span>
+                <span className="tabular-nums">
+                  {reading ? formatTime(reading.timestamp, lang) : "—"}
+                </span>
               </p>
 
               <IndoorOutdoor indoor={reading?.status} className="mt-4" />
@@ -296,7 +342,11 @@ function Overview() {
 
           {editing ? (
             <div className="mt-4 flex gap-2">
-              <Input value={name} onChange={(e) => setName(e.target.value)} className="rounded-xl" />
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="rounded-xl"
+              />
               <Button
                 className="rounded-xl"
                 onClick={() => {

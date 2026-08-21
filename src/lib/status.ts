@@ -3,7 +3,16 @@ import type { TKey } from "@/lib/i18n";
 
 export const statusTheme: Record<
   AirStatus,
-  { bg: string; soft: string; text: string; ring: string; dot: string; hex: string; label: TKey; advice: TKey }
+  {
+    bg: string;
+    soft: string;
+    text: string;
+    ring: string;
+    dot: string;
+    hex: string;
+    label: TKey;
+    advice: TKey;
+  }
 > = {
   good: {
     bg: "bg-good",
