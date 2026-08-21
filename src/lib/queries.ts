@@ -176,3 +176,21 @@ export function useTrend(deviceId: string | null): Trend {
   const { data } = useHistory(deviceId, "24h");
   return trendOf(data);
 }
+
+export function useUserPreferences() {
+  return useQuery({
+    queryKey: ["user-preferences"],
+    queryFn: () => api.getAlertPreferences(),
+  });
+}
+
+export function useUpdateUserPreferences() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (patch: Parameters<typeof api.updateAlertPreferences>[0]) =>
+      api.updateAlertPreferences(patch),
+    onSuccess: (data) => {
+      qc.setQueryData(["user-preferences"], data);
+    },
+  });
+}

@@ -45,6 +45,17 @@ export type HistoryPoint = {
   status: AirStatus;
 };
 
+export type UserAlertPreferences = {
+  phoneNumber?: string;
+  whatsappNumber?: string;
+  email?: string;
+  alertChannels: {
+    sms: boolean;
+    whatsapp: boolean;
+    email: boolean;
+  };
+};
+
 const USE_MOCK = false;
 const STORE_KEY = "airsense-devices";
 
@@ -227,6 +238,35 @@ export const api = {
   },
   async unsubscribePush() {
     await tryFetch("/api/push/unsubscribe", { method: "POST" });
+  },
+  async getAlertPreferences(): Promise<UserAlertPreferences> {
+    return (
+      (await tryFetch<UserAlertPreferences>("/api/user/alert-preferences")) ?? {
+        phoneNumber: "9876543210",
+        whatsappNumber: "919876543210",
+        email: "alerts@example.com",
+        alertChannels: { sms: true, whatsapp: true, email: true },
+      }
+    );
+  },
+  async updateAlertPreferences(
+    patch: Partial<UserAlertPreferences>,
+  ): Promise<UserAlertPreferences> {
+    return (
+      (await tryFetch<UserAlertPreferences>("/api/user/alert-preferences", {
+        method: "PATCH",
+        body: JSON.stringify(patch),
+      })) ?? {
+        phoneNumber: patch.phoneNumber ?? "9876543210",
+        whatsappNumber: patch.whatsappNumber ?? "919876543210",
+        email: patch.email ?? "alerts@example.com",
+        alertChannels: {
+          sms: patch.alertChannels?.sms ?? true,
+          whatsapp: patch.alertChannels?.whatsapp ?? true,
+          email: patch.alertChannels?.email ?? true,
+        },
+      }
+    );
   },
 };
 
