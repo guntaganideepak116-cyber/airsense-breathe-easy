@@ -1,8 +1,7 @@
 import { SignIn, SignUp } from "@clerk/clerk-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import type React from "react";
 import { Thermometer, Droplets, Wind, Activity, CheckCircle2, Wifi } from "lucide-react";
-import { useI18n } from "@/lib/i18n";
 import { LangToggle } from "@/components/LangToggle";
 import { cn } from "@/lib/utils";
 
@@ -87,7 +86,7 @@ function MonitoringPreview() {
       <div className="auth-glass relative overflow-hidden rounded-3xl p-6 shadow-2xl">
         {/* Cyan glow bleed inside card */}
         <div className="pointer-events-none absolute -top-6 right-4 h-20 w-20 rounded-full bg-cyan-400/20 blur-2xl" />
-        <div className="pointer-events-none absolute bottom-0 left-8 h-16 w-16 rounded-full bg-emerald-400/15 blur-xl" />
+        <div className="pointer-events-none absolute bottom-0 left-8 h-16 w-16 rounded-full bg-emerald-400/[0.15] blur-xl" />
 
         {/* Card header */}
         <div className="flex items-center justify-between">
@@ -156,7 +155,7 @@ function MonitoringPreview() {
 }
 
 function AuthPage() {
-  const [mode] = useState<"signin" | "signup">("signin");
+  const mode = "signin" as const;
 
   return (
     <div className="auth-root">
@@ -219,7 +218,7 @@ function AuthPage() {
         <div className="auth-right">
           <div className="auth-card">
             {/* Card inner glow */}
-            <div className="pointer-events-none absolute -top-8 left-1/2 h-24 w-40 -translate-x-1/2 rounded-full bg-cyan-500/15 blur-2xl" />
+            <div className="pointer-events-none absolute -top-8 left-1/2 h-24 w-40 -translate-x-1/2 rounded-full bg-cyan-500/[0.15] blur-2xl" />
 
             {/* Auth header */}
             <div className="auth-card-header">
@@ -262,7 +261,7 @@ function AuthPage() {
                       dividerLine: "bg-white/10",
                       formFieldLabel: "text-xs font-medium text-white/60 mb-1.5",
                       formFieldInput:
-                        "bg-white/6 border border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/40 transition-all",
+                        "bg-white/[0.06] border border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/40 transition-all",
                       formButtonPrimary:
                         "bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-[#071218] font-bold rounded-xl h-12 transition-all duration-200 shadow-lg shadow-cyan-500/20",
                       footerAction: "mt-2",
@@ -303,7 +302,7 @@ function AuthPage() {
                         "border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all duration-200 rounded-xl h-12 font-medium",
                       formFieldLabel: "text-xs font-medium text-white/60 mb-1.5",
                       formFieldInput:
-                        "bg-white/6 border border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4 focus:border-cyan-400",
+                        "bg-white/[0.06] border border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4 focus:border-cyan-400",
                       formButtonPrimary:
                         "bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-[#071218] font-bold rounded-xl h-12",
                       footerActionText: "text-white/40 text-sm",

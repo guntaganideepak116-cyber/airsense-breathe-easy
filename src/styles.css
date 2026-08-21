@@ -318,7 +318,7 @@
   z-index: 50;
 }
 
-/* 2-column desktop layout */
+/* 2-column desktop layout — mobile-first base */
 @utility auth-layout {
   position: relative;
   z-index: 10;
@@ -328,30 +328,14 @@
   align-items: center;
   padding: 1.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
   gap: 2.5rem;
-
-  @media (min-width: 1024px) {
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 4rem;
-    gap: 4rem;
-    max-width: 1440px;
-    margin: 0 auto;
-  }
 }
 
-/* LEFT column */
+/* LEFT column — mobile-first base */
 @utility auth-left {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   width: 100%;
-
-  @media (min-width: 1024px) {
-    flex: 0 0 58%;
-    max-width: 680px;
-    gap: 2rem;
-  }
 }
 
 /* Logo row */
@@ -431,16 +415,11 @@
   font-weight: 500;
 }
 
-/* Monitoring preview container */
+/* Monitoring preview container — mobile-first base */
 @utility auth-preview {
   width: 100%;
   display: flex;
   justify-content: center;
-
-  @media (min-width: 1024px) {
-    justify-content: flex-start;
-    padding-left: 0.5rem;
-  }
 }
 
 /* ── Glass card styles ── */
@@ -456,19 +435,14 @@
   border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-/* RIGHT column */
+/* RIGHT column — mobile-first base */
 @utility auth-right {
   width: 100%;
   max-width: 440px;
   flex-shrink: 0;
-
-  @media (min-width: 1024px) {
-    flex: 0 0 40%;
-    max-width: 460px;
-  }
 }
 
-/* Auth card */
+/* Auth card — mobile-first base */
 @utility auth-card {
   position: relative;
   background: rgba(14, 22, 30, 0.9);
@@ -483,10 +457,6 @@
     0 1px 0 rgba(255, 255, 255, 0.06) inset;
   overflow: hidden;
   animation: auth-slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-
-  @media (min-width: 640px) {
-    padding: 2.5rem;
-  }
 }
 
 /* Auth card header */
@@ -541,6 +511,48 @@
   line-height: 1.5;
 }
 
+@utility animate-auth-float {
+  animation: auth-float 6s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════
+   AUTH RESPONSIVE OVERRIDES (flat @media — IDE safe)
+═══════════════════════════════════════════════════════ */
+
+@media (min-width: 640px) {
+  .auth-card {
+    padding: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .auth-layout {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 4rem;
+    gap: 4rem;
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+
+  .auth-left {
+    flex: 0 0 58%;
+    max-width: 680px;
+    gap: 2rem;
+  }
+
+  .auth-preview {
+    justify-content: flex-start;
+    padding-left: 0.5rem;
+  }
+
+  .auth-right {
+    flex: 0 0 40%;
+    max-width: 460px;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════
    AUTH PAGE KEYFRAMES
 ═══════════════════════════════════════════════════════ */
@@ -579,10 +591,6 @@
   }
 }
 
-@utility animate-auth-float {
-  animation: auth-float 6s ease-in-out infinite;
-}
-
 @keyframes radar-pulse {
   0%,
   100% {
@@ -599,10 +607,7 @@
 @media (prefers-reduced-motion: reduce) {
   .auth-glow-1,
   .auth-glow-2,
-  .auth-glow-3 {
-    animation: none;
-  }
-
+  .auth-glow-3,
   .animate-auth-float {
     animation: none;
   }
@@ -611,3 +616,4 @@
     animation: none;
   }
 }
+

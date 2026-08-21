@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   CloudSun,
@@ -33,7 +33,7 @@ type DashboardRoutePath =
 const navItems: {
   to: DashboardRoutePath;
   label: TKey;
-  icon: React.ReactNode;
+  icon: ReactNode;
 }[] = [
   { to: "/dashboard", label: "dash.overview", icon: <Gauge className="h-4 w-4" /> },
   { to: "/dashboard/history", label: "dash.history", icon: <History className="h-4 w-4" /> },
@@ -50,7 +50,7 @@ const navItems: {
 const mobileNavItems: {
   to: DashboardRoutePath;
   label: TKey;
-  icon: React.ReactNode;
+  icon: ReactNode;
 }[] = [
   { to: "/dashboard", label: "nav.mob.overview", icon: <Gauge className="h-5 w-5" /> },
   { to: "/dashboard/history", label: "nav.mob.history", icon: <History className="h-5 w-5" /> },
