@@ -43,23 +43,23 @@ const clerkAppearance = {
     headerTitle: "hidden",
     headerSubtitle: "hidden",
     socialButtonsBlockButton:
-      "border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all duration-200 rounded-xl h-11 text-sm font-medium",
-    socialButtonsBlockButtonText: "text-xs sm:text-sm font-medium",
-    dividerRow: "my-3",
-    dividerText: "text-white/30 text-xs",
+      "border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all duration-200 rounded-xl h-9.5 text-xs font-medium",
+    socialButtonsBlockButtonText: "text-xs font-medium",
+    dividerRow: "my-2.5",
+    dividerText: "text-white/30 text-[11px]",
     dividerLine: "bg-white/10",
-    formFieldLabel: "text-xs font-medium text-white/60 mb-1",
+    formFieldLabel: "text-[11px] font-medium text-white/60 mb-0.5",
     formFieldInput:
-      "bg-white/5 border border-white/10 text-white placeholder:text-white/30 rounded-xl h-11 px-3.5 text-xs sm:text-sm focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/40 transition-all",
+      "bg-white/5 border border-white/10 text-white placeholder:text-white/30 rounded-xl h-9.5 px-3 text-xs focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/40 transition-all",
     formButtonPrimary:
-      "bg-linear-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-slate-950 font-bold rounded-xl h-11 text-xs sm:text-sm transition-all duration-200 shadow-lg shadow-cyan-500/20 mt-1",
-    footerAction: "mt-3 flex justify-center",
-    footerActionText: "text-white/40 text-xs",
-    footerActionLink: "text-cyan-400 hover:text-cyan-300 font-semibold text-xs ml-1",
+      "bg-linear-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-slate-950 font-bold rounded-xl h-9.5 text-xs transition-all duration-200 shadow-lg shadow-cyan-500/20 mt-1",
+    footerAction: "mt-2 flex justify-center",
+    footerActionText: "text-white/40 text-[11px]",
+    footerActionLink: "text-cyan-400 hover:text-cyan-300 font-semibold text-[11px] ml-1",
     identityPreviewText: "text-white/70 text-xs",
     identityPreviewEditButton: "text-cyan-400 text-xs",
     formResendCodeLink: "text-cyan-400 text-xs",
-    alert: "rounded-xl border border-red-500/20 bg-red-500/10 p-2.5 my-2",
+    alert: "rounded-xl border border-red-500/20 bg-red-500/10 p-2 my-1.5",
     alertText: "text-red-400 text-xs",
   },
 };
@@ -98,32 +98,30 @@ function SensorTile({
   color?: string;
 }) {
   return (
-    <div className="bg-white/5 border border-white/10 flex items-center gap-2.5 rounded-xl px-3 py-2">
-      <span className={cn("shrink-0", color)}>{icon}</span>
-      <div className="min-w-0">
-        <p className="text-[9px] font-medium uppercase tracking-widest text-white/40">{label}</p>
-        <p
-          className={cn("font-mono text-xs sm:text-sm font-bold leading-tight tabular-nums", color)}
-        >
+    <div className="flex items-center gap-2 rounded-xl bg-white/5 p-2 border border-white/5">
+      <span className={color}>{icon}</span>
+      <div>
+        <p className="text-[9px] text-white/40">{label}</p>
+        <p className="text-xs font-semibold text-white">
           {value}
-          {unit && <span className="ml-0.5 text-[10px] font-normal text-white/50">{unit}</span>}
+          {unit && <span className="text-[9px] text-white/50 ml-0.5">{unit}</span>}
         </p>
       </div>
     </div>
   );
 }
 
-/** Floating live monitoring preview card */
+/** Interactive Air Quality Live Preview widget */
 function MonitoringPreview() {
   return (
-    <div className="relative mx-auto w-full max-w-70 sm:max-w-75">
+    <div className="relative w-full max-w-sm mx-auto lg:mx-0">
       {/* Background radar rings */}
       <div className="absolute -inset-10 pointer-events-none">
         <RadarRings />
       </div>
 
       {/* Main floating card */}
-      <div className="bg-slate-900/75 border border-cyan-400/15 backdrop-blur-xl relative overflow-hidden rounded-2xl p-4 sm:p-5 shadow-2xl">
+      <div className="bg-slate-900/75 border border-cyan-400/15 backdrop-blur-xl relative overflow-hidden rounded-2xl p-3.5 sm:p-4 shadow-2xl">
         {/* Cyan glow bleed inside card */}
         <div className="pointer-events-none absolute -top-6 right-4 h-16 w-16 rounded-full bg-cyan-400/20 blur-xl" />
         <div className="pointer-events-none absolute bottom-0 left-6 h-14 w-14 rounded-full bg-emerald-400/15 blur-lg" />
@@ -134,7 +132,7 @@ function MonitoringPreview() {
             <p className="text-[9px] font-semibold uppercase tracking-widest text-white/40">
               Air Quality
             </p>
-            <p className="mt-0.5 text-xl font-bold text-emerald-400">Good</p>
+            <p className="mt-0.5 text-lg font-bold text-emerald-400">Good</p>
           </div>
           <span className="flex items-center gap-1 rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-400">
             <Wifi className="h-3 w-3" />
@@ -143,16 +141,16 @@ function MonitoringPreview() {
         </div>
 
         {/* AQI Big number */}
-        <div className="mt-3.5 flex items-end gap-2">
-          <p className="font-mono text-4xl sm:text-5xl font-black leading-none text-white">92</p>
+        <div className="mt-2.5 flex items-end gap-2">
+          <p className="font-mono text-3xl sm:text-4xl font-black leading-none text-white">92</p>
           <div className="mb-0.5">
-            <p className="text-[11px] font-medium text-white/40">AQI Score</p>
+            <p className="text-[10px] font-medium text-white/40">AQI Score</p>
             <p className="text-[9px] text-emerald-400">MQ-135 Sensor</p>
           </div>
         </div>
 
         {/* Mini AQI bar */}
-        <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+        <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
           <div
             className="h-full rounded-full bg-linear-to-r from-emerald-400 to-cyan-400"
             style={{ width: "30%" }}
@@ -165,7 +163,7 @@ function MonitoringPreview() {
         </div>
 
         {/* Sensor tiles */}
-        <div className="mt-3 grid grid-cols-2 gap-2">
+        <div className="mt-2.5 grid grid-cols-2 gap-2">
           <SensorTile
             icon={<Thermometer className="h-3.5 w-3.5" />}
             label="Temperature"
@@ -183,7 +181,7 @@ function MonitoringPreview() {
         </div>
 
         {/* Room label */}
-        <div className="mt-3 flex items-center gap-1.5 border-t border-white/5 pt-2.5">
+        <div className="mt-2.5 flex items-center gap-1.5 border-t border-white/5 pt-2">
           <Activity className="h-3 w-3 text-white/30" />
           <p className="text-[10px] text-white/40">Classroom 4B · Live stream</p>
         </div>
@@ -193,10 +191,13 @@ function MonitoringPreview() {
 }
 
 function AuthPage() {
+  const search = useSearch({ from: "/auth" });
   const [mode, setMode] = useState<"signin" | "signup">("signin");
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.location.hash.includes("signup")) {
+      setMode("signup");
+    } else if (search.mode === "signup") {
       setMode("signup");
     }
 
@@ -208,7 +209,7 @@ function AuthPage() {
 
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
-  }, []);
+  }, [search.mode]);
 
   const toggleMode = (newMode: "signin" | "signup") => {
     setMode(newMode);
@@ -218,19 +219,19 @@ function AuthPage() {
   };
 
   return (
-    <div className="bg-slate-950 min-h-dvh lg:h-dvh lg:max-h-dvh lg:overflow-hidden flex flex-col relative overflow-x-hidden">
+    <div className="bg-slate-950 min-h-dvh flex flex-col relative overflow-x-hidden">
       {/* Ambient background glows */}
       <div className="pointer-events-none absolute -top-20 -left-10 w-96 h-96 sm:w-125 sm:h-125 rounded-full bg-cyan-500/10 blur-3xl" />
       <div className="pointer-events-none absolute bottom-5 right-1/4 w-80 h-80 sm:w-100 sm:h-100 rounded-full bg-emerald-500/10 blur-3xl" />
       <div className="pointer-events-none absolute top-1/3 -right-10 w-72 h-72 sm:w-80 sm:h-80 rounded-full bg-cyan-400/10 blur-3xl" />
 
       {/* Top Header bar with Logo & LangToggle */}
-      <header className="w-full max-w-7xl mx-auto px-5 sm:px-8 pt-4 sm:pt-6 flex items-center justify-between z-20 shrink-0">
+      <header className="w-full max-w-7xl mx-auto px-5 sm:px-8 pt-3 sm:pt-5 flex items-center justify-between z-20 shrink-0">
         <Link to="/" className="inline-flex items-center gap-2.5 text-decoration-none group">
-          <span className="grid place-items-center w-9 h-9 rounded-xl bg-linear-to-br from-cyan-400 to-cyan-600 text-slate-950 shadow-lg shadow-cyan-400/30">
+          <span className="grid place-items-center w-8 sm:w-9 h-8 sm:h-9 rounded-xl bg-linear-to-br from-cyan-400 to-cyan-600 text-slate-950 shadow-lg shadow-cyan-400/30">
             <Wind className="h-4 sm:h-5 w-4 sm:w-5" />
           </span>
-          <span className="font-display text-xl font-bold text-slate-100 tracking-tight">
+          <span className="font-display text-lg sm:text-xl font-bold text-slate-100 tracking-tight">
             AirSense
           </span>
         </Link>
@@ -241,12 +242,12 @@ function AuthPage() {
       </header>
 
       {/* Main 2-column content container */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-5 sm:px-8 py-4 sm:py-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 lg:gap-12 min-h-0 z-10 overflow-y-auto lg:overflow-hidden">
+      <main className="flex-1 w-full max-w-7xl mx-auto px-5 sm:px-8 py-3 sm:py-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 lg:gap-10 z-10">
         {/* ── LEFT: Brand & monitoring preview ── */}
-        <div className="flex-1 flex flex-col justify-center space-y-4 lg:space-y-5 max-w-xl mx-auto lg:mx-0 text-left">
+        <div className="flex-1 flex flex-col justify-center space-y-3 lg:space-y-4 max-w-xl mx-auto lg:mx-0 text-left">
           {/* Headline */}
-          <div className="space-y-2">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+          <div className="space-y-1.5">
+            <h1 className="text-3xl sm:text-4xl lg:text-4xl xl:text-5xl font-extrabold text-white tracking-tight leading-tight">
               Know Your Air.
               <br />
               <span className="bg-linear-to-r from-cyan-300 to-emerald-300 bg-clip-text text-transparent">
@@ -260,7 +261,7 @@ function AuthPage() {
           </div>
 
           {/* Feature bullets */}
-          <ul className="space-y-2 pt-1">
+          <ul className="space-y-1.5 pt-0.5">
             {[
               "Real-time MQ-135 & DHT22 monitoring",
               "Temperature & humidity analytics",
@@ -277,23 +278,23 @@ function AuthPage() {
           </ul>
 
           {/* Monitoring preview */}
-          <div className="pt-2">
+          <div className="pt-1">
             <MonitoringPreview />
           </div>
         </div>
 
         {/* ── RIGHT: Auth card ── */}
-        <div className="w-full max-w-96 sm:max-w-md shrink-0 mx-auto lg:mx-0 flex flex-col justify-center py-2">
-          <div className="relative bg-slate-900/90 border border-cyan-400/15 rounded-2xl p-5 sm:p-6 shadow-2xl backdrop-blur-2xl overflow-hidden w-full">
+        <div className="w-full max-w-96 sm:max-w-md shrink-0 mx-auto lg:mx-0 flex flex-col justify-center py-1 sm:py-2">
+          <div className="relative bg-slate-900/90 border border-cyan-400/15 rounded-2xl p-4 sm:p-5 shadow-2xl backdrop-blur-2xl overflow-hidden w-full">
             {/* Card inner glow */}
             <div className="pointer-events-none absolute -top-8 left-1/2 h-24 w-40 -translate-x-1/2 rounded-full bg-cyan-500/15 blur-2xl" />
 
             {/* Auth header */}
-            <div className="flex flex-col items-center text-center space-y-1.5 mb-4">
-              <span className="grid place-items-center w-10 h-10 rounded-xl bg-linear-to-br from-cyan-400/20 to-emerald-400/10 border border-cyan-400/20">
+            <div className="flex flex-col items-center text-center space-y-1 mb-3">
+              <span className="grid place-items-center w-8.5 h-8.5 rounded-xl bg-linear-to-br from-cyan-400/20 to-emerald-400/10 border border-cyan-400/20">
                 <Wind className="h-4 w-4 text-cyan-400" />
               </span>
-              <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">
                 {mode === "signin" ? "Welcome back" : "Create your account"}
               </h2>
               <p className="text-xs text-white/60 max-w-65">
@@ -323,7 +324,7 @@ function AuthPage() {
             </div>
 
             {/* Direct toggle link fallback */}
-            <div className="mt-3 pt-2 text-center text-xs text-white/50 border-t border-white/5">
+            <div className="mt-2.5 pt-2 text-center text-xs text-white/50 border-t border-white/5">
               {mode === "signin" ? (
                 <p>
                   Don&apos;t have an account?{" "}
@@ -350,7 +351,7 @@ function AuthPage() {
             </div>
 
             {/* Security note */}
-            <p className="text-[11px] text-white/40 text-center mt-2.5">
+            <p className="text-[10px] text-white/40 text-center mt-2">
               🔒 Your account and device data are securely protected.
             </p>
           </div>
