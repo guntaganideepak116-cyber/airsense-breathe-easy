@@ -261,7 +261,6 @@
 
 @utility auth-root {
   position: relative;
-  min-height: 100dvh;
   overflow-x: hidden;
   background-color: #071218;
   background-image:
@@ -310,34 +309,6 @@
   will-change: transform;
 }
 
-/* Language toggle — top right */
-@utility auth-lang-btn {
-  position: fixed;
-  top: calc(1rem + env(safe-area-inset-top, 0px));
-  right: calc(1rem + env(safe-area-inset-right, 0px));
-  z-index: 50;
-}
-
-/* 2-column desktop layout — mobile-first base */
-@utility auth-layout {
-  position: relative;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  min-height: 100dvh;
-  align-items: center;
-  padding: 1.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
-  gap: 2.5rem;
-}
-
-/* LEFT column — mobile-first base */
-@utility auth-left {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  width: 100%;
-}
-
 /* Logo row */
 @utility auth-logo {
   display: inline-flex;
@@ -350,36 +321,20 @@
 @utility auth-logo-icon {
   display: grid;
   place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.875rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.75rem;
   background: linear-gradient(135deg, oklch(0.79 0.13 226), oklch(0.65 0.14 210));
   color: #071218;
-  box-shadow: 0 8px 24px -6px oklch(0.79 0.13 226 / 0.5);
+  box-shadow: 0 6px 20px -4px oklch(0.79 0.13 226 / 0.5);
 }
 
 @utility auth-logo-text {
   font-family: var(--font-display);
-  font-size: 1.375rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: oklch(0.94 0.008 250);
   letter-spacing: -0.01em;
-}
-
-/* Headline block */
-@utility auth-headline {
-  display: flex;
-  flex-direction: column;
-  gap: 0.875rem;
-}
-
-@utility auth-h1 {
-  font-family: var(--font-sans);
-  font-size: clamp(2rem, 5.5vw, 3.5rem);
-  font-weight: 800;
-  line-height: 1.08;
-  color: oklch(0.96 0.006 240);
-  letter-spacing: -0.03em;
 }
 
 @utility auth-h1-accent {
@@ -387,39 +342,6 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-}
-
-@utility auth-sub {
-  font-size: clamp(0.875rem, 1.8vw, 1.0625rem);
-  color: oklch(0.72 0.015 255);
-  max-width: 50ch;
-  line-height: 1.65;
-}
-
-/* Feature bullet list */
-@utility auth-features {
-  display: flex;
-  flex-direction: column;
-  gap: 0.625rem;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-@utility auth-feature-item {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  font-size: 0.875rem;
-  color: oklch(0.8 0.012 250);
-  font-weight: 500;
-}
-
-/* Monitoring preview container — mobile-first base */
-@utility auth-preview {
-  width: 100%;
-  display: flex;
-  justify-content: center;
 }
 
 /* ── Glass card styles ── */
@@ -435,64 +357,15 @@
   border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-/* RIGHT column — mobile-first base */
-@utility auth-right {
-  width: 100%;
-  max-width: 440px;
-  flex-shrink: 0;
-}
-
-/* Auth card — mobile-first base */
-@utility auth-card {
-  position: relative;
-  background: rgba(14, 22, 30, 0.9);
-  border: 1px solid rgba(103, 232, 249, 0.14);
-  border-radius: 1.5rem;
-  padding: 2rem;
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  box-shadow:
-    0 32px 64px -16px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
-    0 1px 0 rgba(255, 255, 255, 0.06) inset;
-  overflow: hidden;
-  animation: auth-slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-/* Auth card header */
-@utility auth-card-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0.625rem;
-  margin-bottom: 1.75rem;
-}
-
+/* Auth card icon header */
 @utility auth-card-icon {
   display: grid;
   place-items: center;
-  width: 3rem;
-  height: 3rem;
-  border-radius: 1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.875rem;
   background: linear-gradient(135deg, rgba(103, 232, 249, 0.15), rgba(52, 211, 153, 0.08));
   border: 1px solid rgba(103, 232, 249, 0.2);
-  margin-bottom: 0.25rem;
-}
-
-@utility auth-card-title {
-  font-size: 1.625rem;
-  font-weight: 700;
-  color: oklch(0.96 0.006 240);
-  letter-spacing: -0.02em;
-  font-family: var(--font-sans);
-}
-
-@utility auth-card-sub {
-  font-size: 0.875rem;
-  color: oklch(0.68 0.015 255);
-  line-height: 1.5;
-  max-width: 28ch;
 }
 
 /* Clerk component wrapper — ensures Clerk fills the card width */
@@ -502,55 +375,8 @@
   justify-content: center;
 }
 
-/* Security footer note */
-@utility auth-security-note {
-  margin-top: 1.25rem;
-  text-align: center;
-  font-size: 0.75rem;
-  color: oklch(0.55 0.012 255);
-  line-height: 1.5;
-}
-
 @utility animate-auth-float {
   animation: auth-float 6s ease-in-out infinite;
-}
-
-/* ═══════════════════════════════════════════════════════
-   AUTH RESPONSIVE OVERRIDES (flat @media — IDE safe)
-═══════════════════════════════════════════════════════ */
-
-@media (min-width: 640px) {
-  .auth-card {
-    padding: 2.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .auth-layout {
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 4rem;
-    gap: 4rem;
-    max-width: 1440px;
-    margin: 0 auto;
-  }
-
-  .auth-left {
-    flex: 0 0 58%;
-    max-width: 680px;
-    gap: 2rem;
-  }
-
-  .auth-preview {
-    justify-content: flex-start;
-    padding-left: 0.5rem;
-  }
-
-  .auth-right {
-    flex: 0 0 40%;
-    max-width: 460px;
-  }
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -570,24 +396,13 @@
   }
 }
 
-@keyframes auth-slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @keyframes auth-float {
   0%,
   100% {
     transform: translateY(0px);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-8px);
   }
 }
 
@@ -611,9 +426,4 @@
   .animate-auth-float {
     animation: none;
   }
-
-  .auth-card {
-    animation: none;
-  }
 }
-
