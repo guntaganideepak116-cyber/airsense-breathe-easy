@@ -61,11 +61,19 @@ function HistoryPage() {
   );
 
   const events = useMemo(() => {
-    const out: { t: string; mq135: number }[] = [];
+    const out: {
+      t: string;
+      mq135: number;
+      label?: string | undefined;
+      isTest?: boolean | undefined;
+    }[] = [];
     (data ?? []).forEach((p, i) => {
       const prev = data?.[i - 1];
-      if (p.status === "poor" && prev && prev.status !== "poor")
-        out.push({ t: p.t, mq135: p.mq135 });
+      if (p.isTest || p.label === "TEST ALERT") {
+        out.push({ t: p.t, mq135: p.mq135, label: "TEST ALERT", isTest: true });
+      } else if (p.status === "poor" && (!prev || prev.status !== "poor")) {
+        out.push({ t: p.t, mq135: p.mq135, label: p.label, isTest: p.isTest });
+      }
     });
     return out.reverse();
   }, [data]);
@@ -237,7 +245,18 @@ function HistoryPage() {
                 <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-poor-soft text-poor">
                   <AlertTriangle className="h-4 w-4" />
                 </span>
-                <span className="min-w-0 text-sm">{t("hist.eventPoor")}</span>
+                <div className="min-w-0 flex items-center gap-2">
+                  <span className="text-sm">
+                    {e.isTest || e.label === "TEST ALERT"
+                      ? "Simulated Critical Sensor Reading (MQ-135: 850, Temp: 32°C, Hum: 72%)"
+                      : t("hist.eventPoor")}
+                  </span>
+                  {(e.isTest || e.label === "TEST ALERT") && (
+                    <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-rose-700 dark:bg-rose-950 dark:text-rose-300">
+                      TEST ALERT
+                    </span>
+                  )}
+                </div>
                 <span className="col-start-2 shrink-0 text-xs tabular-nums text-muted-foreground sm:col-start-auto">
                   {formatTime(e.t, lang)} · {e.mq135} ppm
                 </span>

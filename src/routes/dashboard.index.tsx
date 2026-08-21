@@ -34,6 +34,7 @@ import { EmptyRooms } from "@/components/EmptyRooms";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { MockAlertCard } from "@/components/MockAlertCard";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -208,7 +209,7 @@ function Overview() {
             key={d.id}
             onClick={() => select(d.id)}
             className={cn(
-              "shrink-0 whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200 min-h-[36px]",
+              "shrink-0 whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200 min-h-9",
               d.id === deviceId
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground",
@@ -404,6 +405,8 @@ function Overview() {
           )}
         </section>
       </div>
+
+      <MockAlertCard />
     </div>
   );
 }

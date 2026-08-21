@@ -43,6 +43,8 @@ export type HistoryPoint = {
   temperature: number;
   humidity: number;
   status: AirStatus;
+  isTest?: boolean | undefined;
+  label?: string | undefined;
 };
 
 export type UserAlertPreferences = {
@@ -268,6 +270,36 @@ export const api = {
       }
     );
   },
+  async sendMockAlert(): Promise<MockAlertResult> {
+    const res = await tryFetch<MockAlertResult>("/api/mock-alert", {
+      method: "POST",
+    });
+    if (res) return res;
+    return {
+      success: false,
+      whatsapp: { sent: false, reason: "Backend server unreachable" },
+      email: { sent: false, reason: "Backend server unreachable" },
+      reading: {
+        deviceId: "dev-4b",
+        status: "poor",
+        mq135: 850,
+        temperature: 32,
+        humidity: 72,
+        timestamp: new Date().toISOString(),
+        buzzerActive: true,
+        lastPoorAt: new Date().toISOString(),
+        isTest: true,
+        label: "TEST ALERT",
+      },
+    };
+  },
+};
+
+export type MockAlertResult = {
+  success: boolean;
+  whatsapp: { sent: boolean; reason: string; provider?: string };
+  email: { sent: boolean; reason: string };
+  reading: Reading & { isTest?: boolean; label?: string };
 };
 
 export const CACHE_KEY = "airsense-last-reading";

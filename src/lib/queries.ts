@@ -194,3 +194,14 @@ export function useUpdateUserPreferences() {
     },
   });
 }
+
+export function useSendMockAlert() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.sendMockAlert(),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["history"] });
+      qc.invalidateQueries({ queryKey: ["latest"] });
+    },
+  });
+}

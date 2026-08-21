@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useClerk } from "@clerk/clerk-react";
 import {
   BellRing,
   LogOut,
@@ -25,6 +26,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+
+import { MockAlertCard } from "@/components/MockAlertCard";
 
 export const Route = createFileRoute("/dashboard/settings")({
   head: () => ({
@@ -76,6 +79,8 @@ function SettingsPage() {
       <h1 className="font-display text-2xl text-ink sm:text-3xl">{t("set.title")}</h1>
 
       <MultiChannelAlertsSection />
+
+      <MockAlertCard />
 
       <section className="rounded-3xl border bg-card p-6">
         <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3">
@@ -191,15 +196,7 @@ function SettingsPage() {
         </div>
       </section>
 
-      <section className="rounded-3xl border bg-card p-6">
-        <p className="font-semibold">{t("set.account")}</p>
-        <Button asChild variant="outline" className="mt-4 rounded-full">
-          <Link to="/auth">
-            <LogOut className="mr-1 h-4 w-4" />
-            {t("set.signout")}
-          </Link>
-        </Button>
-      </section>
+      <AccountSection />
     </div>
   );
 }
@@ -385,6 +382,52 @@ function MultiChannelAlertsSection() {
           </Button>
         </div>
       </form>
+    </section>
+  );
+}
+
+function AccountSection() {
+  const { t } = useI18n();
+  const clerk = useClerk();
+
+  const handleLogout = async () => {
+    try {
+      await clerk.signOut();
+    } catch (err) {
+      console.error("Sign out error:", err);
+    }
+    window.location.href = "/";
+  };
+
+  return (
+    <section className="rounded-3xl border bg-card p-6">
+      <div className="flex items-center gap-3">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-destructive/10 text-destructive">
+          <LogOut className="h-5 w-5" />
+        </span>
+        <div>
+          <h2 className="font-semibold text-foreground">{t("set.account")}</h2>
+          <p className="text-xs text-muted-foreground">{t("nav.logoutDesc")}</p>
+        </div>
+      </div>
+
+      <div className="mt-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border bg-background/50 p-4">
+        <div>
+          <p className="text-sm font-medium text-foreground">Sign out of your session</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Safely end your AirSense session on this device.
+          </p>
+        </div>
+        <Button
+          type="button"
+          variant="destructive"
+          onClick={handleLogout}
+          className="rounded-full gap-2 px-5"
+        >
+          <LogOut className="h-4 w-4" />
+          {t("nav.logout")}
+        </Button>
+      </div>
     </section>
   );
 }
