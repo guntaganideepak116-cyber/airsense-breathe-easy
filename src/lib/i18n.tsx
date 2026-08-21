@@ -536,16 +536,16 @@ const LangContext = createContext<{
   setLang: (l: Lang) => void;
   t: (k: TKey | (string & {})) => string;
 }>({
-  lang: "te",
+  lang: "en",
   setLang: () => {},
   t: (k) => {
     const item = dict[k as TKey];
-    return item ? item.te : String(k);
+    return item ? item.en : String(k);
   },
 });
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Lang>("te");
+  const [lang, setLangState] = useState<Lang>("en");
 
   useEffect(() => {
     const saved =
@@ -570,7 +570,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     (k: TKey | (string & {})) => {
       const item = dict[k as TKey];
       if (!item) return String(k);
-      return item[lang] ?? item.te;
+      return item[lang] ?? item.en;
     },
     [lang],
   );
