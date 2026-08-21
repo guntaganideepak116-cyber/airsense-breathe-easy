@@ -12,6 +12,11 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as HistoryRouteImport } from './routes/history'
+import { Route as RecommendationsRouteImport } from './routes/recommendations'
+import { Route as RoomsRouteImport } from './routes/rooms'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as WeatherRouteImport } from './routes/weather'
 import { Route as ApiDevicesRouteImport } from './routes/api/devices'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as DashboardHistoryRouteImport } from './routes/dashboard.history'
@@ -36,6 +41,31 @@ const AuthRoute = AuthRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HistoryRoute = HistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecommendationsRoute = RecommendationsRouteImport.update({
+  id: '/recommendations',
+  path: '/recommendations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoomsRoute = RoomsRouteImport.update({
+  id: '/rooms',
+  path: '/rooms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WeatherRoute = WeatherRouteImport.update({
+  id: '/weather',
+  path: '/weather',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiDevicesRoute = ApiDevicesRouteImport.update({
@@ -94,6 +124,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/history': typeof HistoryRoute
+  '/recommendations': typeof RecommendationsRoute
+  '/rooms': typeof RoomsRoute
+  '/settings': typeof SettingsRoute
+  '/weather': typeof WeatherRoute
   '/api/devices': typeof ApiDevicesRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/recommendations': typeof DashboardRecommendationsRoute
@@ -108,6 +143,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/history': typeof HistoryRoute
+  '/recommendations': typeof RecommendationsRoute
+  '/rooms': typeof RoomsRoute
+  '/settings': typeof SettingsRoute
+  '/weather': typeof WeatherRoute
   '/api/devices': typeof ApiDevicesRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/recommendations': typeof DashboardRecommendationsRoute
@@ -124,6 +164,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/history': typeof HistoryRoute
+  '/recommendations': typeof RecommendationsRoute
+  '/rooms': typeof RoomsRoute
+  '/settings': typeof SettingsRoute
+  '/weather': typeof WeatherRoute
   '/api/devices': typeof ApiDevicesRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/recommendations': typeof DashboardRecommendationsRoute
@@ -141,6 +186,11 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/history'
+    | '/recommendations'
+    | '/rooms'
+    | '/settings'
+    | '/weather'
     | '/api/devices'
     | '/dashboard/history'
     | '/dashboard/recommendations'
@@ -155,6 +205,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/history'
+    | '/recommendations'
+    | '/rooms'
+    | '/settings'
+    | '/weather'
     | '/api/devices'
     | '/dashboard/history'
     | '/dashboard/recommendations'
@@ -170,6 +225,11 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/history'
+    | '/recommendations'
+    | '/rooms'
+    | '/settings'
+    | '/weather'
     | '/api/devices'
     | '/dashboard/history'
     | '/dashboard/recommendations'
@@ -186,6 +246,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  HistoryRoute: typeof HistoryRoute
+  RecommendationsRoute: typeof RecommendationsRoute
+  RoomsRoute: typeof RoomsRoute
+  SettingsRoute: typeof SettingsRoute
+  WeatherRoute: typeof WeatherRoute
   ApiDevicesRoute: typeof ApiDevicesRoute
   ApiPushSubscribeRoute: typeof ApiPushSubscribeRoute
   ApiPushVapidRoute: typeof ApiPushVapidRoute
@@ -213,6 +278,41 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/history': {
+      id: '/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recommendations': {
+      id: '/recommendations'
+      path: '/recommendations'
+      fullPath: '/recommendations'
+      preLoaderRoute: typeof RecommendationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rooms': {
+      id: '/rooms'
+      path: '/rooms'
+      fullPath: '/rooms'
+      preLoaderRoute: typeof RoomsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/weather': {
+      id: '/weather'
+      path: '/weather'
+      fullPath: '/weather'
+      preLoaderRoute: typeof WeatherRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/devices': {
@@ -314,6 +414,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  HistoryRoute: HistoryRoute,
+  RecommendationsRoute: RecommendationsRoute,
+  RoomsRoute: RoomsRoute,
+  SettingsRoute: SettingsRoute,
+  WeatherRoute: WeatherRoute,
   ApiDevicesRoute: ApiDevicesRoute,
   ApiPushSubscribeRoute: ApiPushSubscribeRoute,
   ApiPushVapidRoute: ApiPushVapidRoute,
