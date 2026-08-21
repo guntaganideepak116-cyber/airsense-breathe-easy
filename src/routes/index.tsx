@@ -121,9 +121,6 @@ function Hero() {
       <div className="pointer-events-none absolute -left-24 top-56 h-72 w-72 rounded-full bg-good-soft opacity-60 blur-3xl" />
       <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 py-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:py-24">
         <div>
-          <p className="inline-flex rounded-full border bg-card px-3 py-1 text-xs text-muted-foreground">
-            {t("hero.eyebrow")}
-          </p>
           <h1 className="mt-5 font-display text-4xl leading-[1.12] text-ink sm:text-5xl lg:text-6xl">
             {t("hero.title")}
           </h1>
