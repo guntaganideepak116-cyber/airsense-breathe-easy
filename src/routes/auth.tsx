@@ -41,7 +41,7 @@ const clerkAppearance = {
     colorTextSecondary: "#94a3b8",
     colorInputBackground: "rgba(255,255,255,0.06)",
     colorInputText: "#f1f5f9",
-    borderRadius: "10px",
+    borderRadius: "8px",
     colorNeutral: "#64748b",
   },
   elements: {
@@ -51,23 +51,25 @@ const clerkAppearance = {
     headerTitle: "hidden",
     headerSubtitle: "hidden",
     socialButtonsBlockButton:
-      "border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all duration-200 rounded-xl h-9.5 text-xs font-medium",
+      "border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all duration-200 rounded-lg h-8.5 text-xs font-medium",
     socialButtonsBlockButtonText: "text-xs font-medium",
-    dividerRow: "my-2.5",
-    dividerText: "text-white/30 text-[11px]",
+    dividerRow: "my-1.5",
+    dividerText: "text-white/30 text-[10px]",
     dividerLine: "bg-white/10",
+    formFieldRow: "mb-1.5",
     formFieldLabel: "text-[11px] font-medium text-white/60 mb-0.5",
     formFieldInput:
-      "bg-white/5 border border-white/10 text-white placeholder:text-white/30 rounded-xl h-9.5 px-3 text-xs focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/40 transition-all",
+      "bg-white/5 border border-white/10 text-white placeholder:text-white/30 rounded-lg h-8.5 px-3 text-xs focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/40 transition-all",
     formButtonPrimary:
-      "bg-linear-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-slate-950 font-bold rounded-xl h-9.5 text-xs transition-all duration-200 shadow-lg shadow-cyan-500/20 mt-1",
-    footerAction: "mt-2 flex justify-center",
-    footerActionText: "text-white/40 text-[11px]",
-    footerActionLink: "text-cyan-400 hover:text-cyan-300 font-semibold text-[11px] ml-1",
+      "bg-linear-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-slate-950 font-bold rounded-lg h-8.5 text-xs transition-all duration-200 shadow-lg shadow-cyan-500/20 mt-1",
+    footerAction: "mt-1.5 flex justify-center",
+    footerActionText: "text-white/50 text-xs",
+    footerActionLink: "text-cyan-400 hover:text-cyan-300 font-semibold text-xs ml-1 cursor-pointer",
+    footer: "mt-1",
     identityPreviewText: "text-white/70 text-xs",
     identityPreviewEditButton: "text-cyan-400 text-xs",
     formResendCodeLink: "text-cyan-400 text-xs",
-    alert: "rounded-xl border border-red-500/20 bg-red-500/10 p-2 my-1.5",
+    alert: "rounded-lg border border-red-500/20 bg-red-500/10 p-1.5 my-1",
     alertText: "text-red-400 text-xs",
   },
 };
@@ -106,7 +108,7 @@ function SensorTile({
   color?: string;
 }) {
   return (
-    <div className="flex items-center gap-2 rounded-xl bg-white/5 p-2 border border-white/5">
+    <div className="flex items-center gap-2 rounded-lg bg-white/5 p-1.5 sm:p-2 border border-white/5">
       <span className={color}>{icon}</span>
       <div>
         <p className="text-[9px] text-white/40">{label}</p>
@@ -124,15 +126,15 @@ function MonitoringPreview() {
   return (
     <div className="relative w-full max-w-sm">
       {/* Background radar rings */}
-      <div className="absolute -inset-10 pointer-events-none">
+      <div className="absolute -inset-6 pointer-events-none">
         <RadarRings />
       </div>
 
       {/* Main floating card */}
-      <div className="bg-slate-900/75 border border-cyan-400/15 backdrop-blur-xl relative overflow-hidden rounded-2xl p-3.5 sm:p-4 shadow-2xl">
+      <div className="bg-slate-900/80 border border-cyan-400/20 backdrop-blur-xl relative overflow-hidden rounded-xl p-3 sm:p-3.5 shadow-2xl">
         {/* Cyan glow bleed inside card */}
-        <div className="pointer-events-none absolute -top-6 right-4 h-16 w-16 rounded-full bg-cyan-400/20 blur-xl" />
-        <div className="pointer-events-none absolute bottom-0 left-6 h-14 w-14 rounded-full bg-emerald-400/15 blur-lg" />
+        <div className="pointer-events-none absolute -top-6 right-4 h-14 w-14 rounded-full bg-cyan-400/20 blur-xl" />
+        <div className="pointer-events-none absolute bottom-0 left-6 h-12 w-12 rounded-full bg-emerald-400/15 blur-lg" />
 
         {/* Card header */}
         <div className="flex items-center justify-between">
@@ -140,47 +142,47 @@ function MonitoringPreview() {
             <p className="text-[9px] font-semibold uppercase tracking-widest text-white/40">
               Air Quality
             </p>
-            <p className="mt-0.5 text-lg font-bold text-emerald-400">Good</p>
+            <p className="text-base font-bold text-emerald-400">Good</p>
           </div>
-          <span className="flex items-center gap-1 rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-400">
-            <Wifi className="h-3 w-3" />
+          <span className="flex items-center gap-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-semibold text-emerald-400">
+            <Wifi className="h-2.5 w-2.5" />
             Live
           </span>
         </div>
 
         {/* AQI Big number */}
-        <div className="mt-2.5 flex items-end gap-2">
-          <p className="font-mono text-3xl sm:text-4xl font-black leading-none text-white">92</p>
+        <div className="mt-1.5 flex items-end gap-2">
+          <p className="font-mono text-2xl sm:text-3xl font-black leading-none text-white">92</p>
           <div className="mb-0.5">
-            <p className="text-[10px] font-medium text-white/40">AQI Score</p>
+            <p className="text-[9px] font-medium text-white/40">AQI Score</p>
             <p className="text-[9px] text-emerald-400">MQ-135 Sensor</p>
           </div>
         </div>
 
         {/* Mini AQI bar */}
-        <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+        <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
           <div
             className="h-full rounded-full bg-linear-to-r from-emerald-400 to-cyan-400"
             style={{ width: "30%" }}
           />
         </div>
-        <div className="mt-1 flex justify-between text-[9px] text-white/30">
+        <div className="mt-0.5 flex justify-between text-[8px] text-white/30">
           <span>Good</span>
           <span>Moderate</span>
           <span>Poor</span>
         </div>
 
         {/* Sensor tiles */}
-        <div className="mt-2.5 grid grid-cols-2 gap-2">
+        <div className="mt-2 grid grid-cols-2 gap-1.5">
           <SensorTile
-            icon={<Thermometer className="h-3.5 w-3.5" />}
+            icon={<Thermometer className="h-3 w-3" />}
             label="Temperature"
             value="28"
             unit="°C"
             color="text-orange-400"
           />
           <SensorTile
-            icon={<Droplets className="h-3.5 w-3.5" />}
+            icon={<Droplets className="h-3 w-3" />}
             label="Humidity"
             value="61"
             unit="%"
@@ -189,9 +191,9 @@ function MonitoringPreview() {
         </div>
 
         {/* Room label */}
-        <div className="mt-2.5 flex items-center gap-1.5 border-t border-white/5 pt-2">
-          <Activity className="h-3 w-3 text-white/30" />
-          <p className="text-[10px] text-white/40">Classroom 4B · Live stream</p>
+        <div className="mt-2 flex items-center gap-1.5 border-t border-white/5 pt-1.5">
+          <Activity className="h-2.5 w-2.5 text-white/30" />
+          <p className="text-[9px] text-white/40">Classroom 4B · Live stream</p>
         </div>
       </div>
     </div>
@@ -219,25 +221,18 @@ function AuthPage() {
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, [search.mode]);
 
-  const toggleMode = (newMode: "signin" | "signup") => {
-    setMode(newMode);
-    if (typeof window !== "undefined") {
-      window.location.hash = newMode === "signup" ? "#signup" : "#signin";
-    }
-  };
-
   return (
-    <div className="bg-slate-950 min-h-dvh flex flex-col relative overflow-x-hidden">
+    <div className="bg-slate-950 min-h-screen lg:h-screen flex flex-col justify-between relative overflow-auto">
       {/* Ambient background glows */}
       <div className="pointer-events-none absolute -top-20 -left-10 w-96 h-96 sm:w-125 sm:h-125 rounded-full bg-cyan-500/10 blur-3xl" />
       <div className="pointer-events-none absolute bottom-5 right-1/4 w-80 h-80 sm:w-100 sm:h-100 rounded-full bg-emerald-500/10 blur-3xl" />
       <div className="pointer-events-none absolute top-1/3 -right-10 w-72 h-72 sm:w-80 sm:h-80 rounded-full bg-cyan-400/10 blur-3xl" />
 
       {/* Top Header bar with Logo & LangToggle */}
-      <header className="w-full max-w-7xl mx-auto px-5 sm:px-8 pt-3 sm:pt-5 flex items-center justify-between z-20 shrink-0">
+      <header className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 flex items-center justify-between z-20 shrink-0">
         <Link to="/" className="inline-flex items-center gap-2.5 text-decoration-none group">
-          <span className="grid place-items-center w-8 sm:w-9 h-8 sm:h-9 rounded-xl bg-linear-to-br from-cyan-400 to-cyan-600 text-slate-950 shadow-lg shadow-cyan-400/30">
-            <Wind className="h-4 sm:h-5 w-4 sm:w-5" />
+          <span className="grid place-items-center w-8 h-8 rounded-xl bg-linear-to-br from-cyan-400 to-cyan-600 text-slate-950 shadow-md shadow-cyan-400/30">
+            <Wind className="h-4 w-4" />
           </span>
           <span className="font-display text-lg sm:text-xl font-bold text-slate-100 tracking-tight">
             AirSense
@@ -249,27 +244,45 @@ function AuthPage() {
         </div>
       </header>
 
-      {/* Main 2-column content container */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-5 sm:px-8 py-3 sm:py-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 lg:gap-10 z-10">
-        {/* ── LEFT: Brand & monitoring preview ── */}
-        <div className="flex-1 flex flex-col justify-center space-y-3 lg:space-y-4 max-w-xl mx-auto lg:mx-0 text-left">
+      {/* Main content container */}
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-3 flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-4 lg:gap-10 z-10 min-h-0">
+        {/* ── MOBILE-ONLY compact header strip ── */}
+        <div className="lg:hidden w-full max-w-md mx-auto text-center space-y-1.5 mb-1 shrink-0">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+            Know Your Air.{" "}
+            <span className="bg-linear-to-r from-cyan-300 to-emerald-300 bg-clip-text text-transparent">
+              Breathe Better.
+            </span>
+          </h1>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-400 font-medium shadow-xs">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>
+              Classroom 4B: <strong>92 AQI</strong> (Good)
+            </span>
+            <span className="text-white/30">·</span>
+            <span>28°C · 61%</span>
+          </div>
+        </div>
+
+        {/* ── DESKTOP-ONLY LEFT: Brand & monitoring preview ── */}
+        <div className="hidden lg:flex flex-1 flex-col justify-center space-y-3 xl:space-y-4 max-w-lg text-left">
           {/* Headline */}
           <div className="space-y-1.5">
-            <h1 className="text-3xl sm:text-4xl lg:text-4xl xl:text-5xl font-extrabold text-white tracking-tight leading-tight">
+            <h1 className="text-3xl xl:text-4xl font-extrabold text-white tracking-tight leading-tight">
               Know Your Air.
               <br />
               <span className="bg-linear-to-r from-cyan-300 to-emerald-300 bg-clip-text text-transparent">
                 Breathe Better.
               </span>
             </h1>
-            <p className="text-xs sm:text-sm text-white/70 leading-relaxed max-w-lg">
+            <p className="text-xs sm:text-sm text-white/70 leading-relaxed max-w-md">
               Real-time indoor air quality monitoring for healthier homes, classrooms, offices, and
               smart spaces.
             </p>
           </div>
 
           {/* Feature bullets */}
-          <ul className="space-y-1.5 pt-0.5">
+          <ul className="space-y-1 pt-0.5">
             {[
               "Real-time MQ-135 & DHT22 monitoring",
               "Temperature & humidity analytics",
@@ -277,7 +290,7 @@ function AuthPage() {
             ].map((f) => (
               <li
                 key={f}
-                className="flex items-center gap-2.5 text-xs sm:text-sm text-white/80 font-medium"
+                className="flex items-center gap-2 text-xs sm:text-sm text-white/80 font-medium"
               >
                 <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
                 <span>{f}</span>
@@ -291,21 +304,24 @@ function AuthPage() {
           </div>
         </div>
 
-        {/* ── RIGHT: Auth card ── */}
-        <div className="w-full max-w-96 sm:max-w-md shrink-0 mx-auto lg:mx-0 flex flex-col justify-center py-1 sm:py-2">
-          <div className="relative bg-slate-900/90 border border-cyan-400/15 rounded-2xl p-4 sm:p-5 shadow-2xl backdrop-blur-2xl overflow-hidden w-full">
+        {/* ── RIGHT: Auth card (Desktop & Mobile) ── */}
+        <div className="w-full max-w-sm sm:max-w-md shrink-0 mx-auto lg:mx-0 flex flex-col justify-center my-auto">
+          <div className="relative bg-slate-900/90 border border-cyan-400/15 rounded-2xl p-3 sm:p-4 shadow-2xl backdrop-blur-2xl w-full max-h-[calc(100vh-4rem)] overflow-y-auto overflow-x-hidden scrollbar-thin [scrollbar-color:rgba(255,255,255,0.15)_transparent]">
             {/* Card inner glow */}
             <div className="pointer-events-none absolute -top-8 left-1/2 h-24 w-40 -translate-x-1/2 rounded-full bg-cyan-500/15 blur-2xl" />
 
             {/* Auth header */}
-            <div className="flex flex-col items-center text-center space-y-1 mb-3">
-              <span className="grid place-items-center w-8.5 h-8.5 rounded-xl bg-linear-to-br from-cyan-400/20 to-emerald-400/10 border border-cyan-400/20">
-                <Wind className="h-4 w-4 text-cyan-400" />
-              </span>
-              <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">
+            <div className="flex flex-col items-center text-center mb-2">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-400/10 border border-cyan-400/20 mb-1">
+                <Wind className="h-3 w-3 text-cyan-400" />
+                <span className="text-[10px] font-semibold text-cyan-300 tracking-wider uppercase">
+                  {mode === "signin" ? "Sign In" : "Register"}
+                </span>
+              </div>
+              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
                 {mode === "signin" ? "Welcome back" : "Create your account"}
               </h2>
-              <p className="text-xs text-white/60 max-w-65">
+              <p className="text-[11px] text-white/60">
                 {mode === "signin"
                   ? "Sign in to continue monitoring your indoor air."
                   : "Start monitoring indoor air quality in real time."}
@@ -330,41 +346,24 @@ function AuthPage() {
                 />
               )}
             </div>
-
-            {/* Direct toggle link fallback */}
-            <div className="mt-2.5 pt-2 text-center text-xs text-white/50 border-t border-white/5">
-              {mode === "signin" ? (
-                <p>
-                  Don&apos;t have an account?{" "}
-                  <button
-                    type="button"
-                    onClick={() => toggleMode("signup")}
-                    className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors ml-0.5"
-                  >
-                    Create an account
-                  </button>
-                </p>
-              ) : (
-                <p>
-                  Already have an account?{" "}
-                  <button
-                    type="button"
-                    onClick={() => toggleMode("signin")}
-                    className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors ml-0.5"
-                  >
-                    Sign in
-                  </button>
-                </p>
-              )}
-            </div>
-
-            {/* Security note */}
-            <p className="text-[10px] text-white/40 text-center mt-2">
-              🔒 Your account and device data are securely protected.
-            </p>
           </div>
         </div>
       </main>
+
+      {/* Bottom subtle footer */}
+      <footer className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-between text-[11px] text-white/40 z-20 shrink-0">
+        <span>© {new Date().getFullYear()} AirSense</span>
+        <div className="flex items-center gap-3">
+          <Link to="/" className="hover:text-cyan-400 transition-colors">
+            Home
+          </Link>
+          <span>·</span>
+          <span className="text-emerald-400/90 flex items-center gap-1 font-medium">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            Sensors Online
+          </span>
+        </div>
+      </footer>
     </div>
   );
 }

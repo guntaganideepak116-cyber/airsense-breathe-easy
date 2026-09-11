@@ -64,7 +64,20 @@
 
 /* Dark is the default theme. `.light` on <html> opts back into the light theme. */
 :root {
+  /* Radius variables */
   --radius: 1rem;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  /* Font variables */
+  --font-sans: "Inter", "Noto Sans Telugu", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", "Noto Sans Telugu", ui-serif, Georgia, serif;
+  --font-telugu: "Noto Sans Telugu", "Inter", sans-serif;
+  /* Color variables */
   --background: oklch(0.19 0.018 238);
   --foreground: oklch(0.92 0.008 250);
   --ink: oklch(0.96 0.008 240);
@@ -426,4 +439,93 @@
   .animate-auth-float {
     animation: none;
   }
+}
+
+/* ═══════════════════════════════════════════════════════
+   AUTH PAGE & CLERK SCREEN-FIT COMPACT STYLES
+   ═══════════════════════════════════════════════════════ */
+
+.cl-rootBox {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.cl-card {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.cl-header,
+.cl-headerTitle,
+.cl-headerSubtitle {
+  display: none !important;
+}
+
+.cl-socialButtonsBlockButton {
+  height: 34px !important;
+  font-size: 11.5px !important;
+  border-radius: 8px !important;
+}
+
+.cl-dividerRow {
+  margin: 6px 0 !important;
+}
+
+.cl-dividerText {
+  font-size: 10px !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.cl-formFieldRow {
+  margin-bottom: 6px !important;
+}
+
+.cl-formFieldLabel {
+  font-size: 11px !important;
+  margin-bottom: 2px !important;
+  color: rgba(255, 255, 255, 0.65) !important;
+  line-height: 1.2 !important;
+}
+
+.cl-formFieldInput {
+  height: 32px !important;
+  padding: 4px 10px !important;
+  font-size: 12px !important;
+  border-radius: 8px !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+}
+
+.cl-formButtonPrimary {
+  height: 34px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  margin-top: 6px !important;
+}
+
+.cl-footerAction {
+  margin-top: 6px !important;
+  padding: 0 !important;
+}
+
+.cl-footerActionText,
+.cl-footerActionLink {
+  font-size: 11.5px !important;
+}
+
+.cl-footer {
+  padding-top: 4px !important;
+  padding-bottom: 0 !important;
+}
+
+.cl-internal-1dauvpw,
+.cl-developmentBadge {
+  margin-top: 4px !important;
 }
