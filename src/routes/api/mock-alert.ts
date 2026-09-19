@@ -9,11 +9,11 @@ export const Route = createFileRoute("/api/mock-alert")({
         let whatsappStatus = { sent: false, reason: "Not configured", provider: "Twilio" };
         let emailStatus = { sent: false, reason: "Not configured" };
 
-        const twilioSid = process.env.TWILIO_ACCOUNT_SID;
-        const twilioAuth = process.env.TWILIO_AUTH_TOKEN;
-        const resendKey = process.env.RESEND_API_KEY;
-        const toWhatsapp = process.env.ALERT_TO_WHATSAPP;
-        const toEmail = process.env.ALERT_TO_EMAIL;
+        const twilioSid = process.env["TWILIO_ACCOUNT_SID"];
+        const twilioAuth = process.env["TWILIO_AUTH_TOKEN"];
+        const resendKey = process.env["RESEND_API_KEY"];
+        const toWhatsapp = process.env["ALERT_TO_WHATSAPP"];
+        const toEmail = process.env["ALERT_TO_EMAIL"];
 
         // Dispatch WhatsApp via Twilio Sandbox
         if (twilioSid && twilioAuth && toWhatsapp && toWhatsapp !== "whatsapp:+910000000000") {
