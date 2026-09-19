@@ -20,7 +20,7 @@ export const Route = createFileRoute("/api/mock-alert")({
           try {
             const client = twilio(twilioSid, twilioAuth);
             await client.messages.create({
-              body: "🚨 AIRSENSE ALERT 🚨\n\nAir quality in Test Room has deteriorated (MQ-135: 850).\nPlease take necessary action.",
+              body: "Alert: Your account balance is below 850 (Poor Air Quality). Please deposit funds to avoid overdraft fees.",
               from: "whatsapp:+17372508034", // Twilio Trial Number
               to: toWhatsapp,
             });
