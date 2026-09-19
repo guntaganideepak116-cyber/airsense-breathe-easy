@@ -21,7 +21,7 @@ export const Route = createFileRoute("/api/mock-alert")({
             const client = twilio(twilioSid, twilioAuth);
             await client.messages.create({
               body: "🚨 AIRSENSE ALERT 🚨\n\nAir quality in Test Room has deteriorated (MQ-135: 850).\nPlease take necessary action.",
-              from: "whatsapp:+14155238886", // Twilio Sandbox Number
+              from: "whatsapp:+17372508034", // Twilio Trial Number
               to: toWhatsapp,
             });
             whatsappStatus = { sent: true, reason: "Message dispatched via Twilio", provider: "Twilio" };
