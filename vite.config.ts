@@ -10,6 +10,17 @@ import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig({
   nitro: {
     preset: process.env["VERCEL"] ? "vercel" : "node-server",
+    // @ts-ignore: routeRules is a valid Nitro config but not fully typed in the lovable wrapper
+    routeRules: {
+      "/api/**": {
+        cors: true,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        },
+      },
+    },
   },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
