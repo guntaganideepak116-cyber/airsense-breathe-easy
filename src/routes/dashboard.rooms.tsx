@@ -2,14 +2,14 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { BatteryCharging, MapPin, Plus, Radio, Signal, Wifi, WifiOff, X } from "lucide-react";
 import { toast } from "sonner";
-import { useI18n } from "@/lib/i18n";
-import { statusTheme, formatTime } from "@/lib/status";
-import { useDeviceMutations, useDeviceStream, useSelectedDevice } from "@/lib/queries";
-import { useAirAlert } from "@/lib/use-air-alert";
-import { classify, type Device } from "@/lib/airsense";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useI18n } from "@/client/lib/i18n";
+import { statusTheme, formatTime } from "@/shared/lib/status";
+import { useDeviceMutations, useDeviceStream, useSelectedDevice } from "@/client/lib/queries";
+import { useAirAlert } from "@/shared/lib/use-air-alert";
+import { classify, type Device } from "@/client/lib/airsense";
+import { Button } from "@/client/components/ui/button";
+import { Input } from "@/client/components/ui/input";
+import { Label } from "@/client/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -18,9 +18,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { DeviceCredentialsDialog, type Credentials } from "@/components/DeviceCredentialsDialog";
-import { cn } from "@/lib/utils";
+} from "@/client/components/ui/dialog";
+import { DeviceCredentialsDialog, type Credentials } from "@/client/components/DeviceCredentialsDialog";
+import { cn } from "@/client/lib/utils";
 
 export const Route = createFileRoute("/dashboard/rooms")({
   head: () => ({

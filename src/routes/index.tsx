@@ -14,11 +14,11 @@ import {
   Smartphone,
   Wind,
 } from "lucide-react";
-import { useI18n, type TKey } from "@/lib/i18n";
-import { BreathingOrb } from "@/components/BreathingOrb";
-import { DashboardPreview } from "@/components/DashboardPreview";
-import { LangToggle } from "@/components/LangToggle";
-import { Button } from "@/components/ui/button";
+import { useI18n, type TKey } from "@/client/lib/i18n";
+import { BreathingOrb } from "@/client/components/BreathingOrb";
+import { DashboardPreview } from "@/client/components/DashboardPreview";
+import { LangToggle } from "@/client/components/LangToggle";
+import { Button } from "@/client/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({

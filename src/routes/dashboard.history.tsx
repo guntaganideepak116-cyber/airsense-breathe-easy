@@ -12,12 +12,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { useI18n } from "@/lib/i18n";
-import { formatTime } from "@/lib/status";
-import { useHistory, useSelectedDevice } from "@/lib/queries";
-import { Skeleton } from "@/components/ui/skeleton";
-import type { Range } from "@/lib/airsense";
-import { cn } from "@/lib/utils";
+import { useI18n } from "@/client/lib/i18n";
+import { formatTime } from "@/shared/lib/status";
+import { useHistory, useSelectedDevice } from "@/client/lib/queries";
+import { Skeleton } from "@/client/components/ui/skeleton";
+import type { Range } from "@/client/lib/airsense";
+import { cn } from "@/client/lib/utils";
 
 export const Route = createFileRoute("/dashboard/history")({
   head: () => ({

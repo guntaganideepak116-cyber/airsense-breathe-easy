@@ -10,12 +10,12 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
-import { LanguageProvider } from "@/lib/i18n";
-import { ThemeProvider, themeBootScript } from "@/lib/theme";
-import { Toaster } from "@/components/ui/sonner";
-import { InstallPrompt } from "@/components/InstallPrompt";
-import { registerServiceWorker } from "@/lib/register-sw";
+import { reportLovableError } from "@/client/lib/lovable-error-reporting";
+import { LanguageProvider } from "@/client/lib/i18n";
+import { ThemeProvider, themeBootScript } from "@/client/lib/theme";
+import { Toaster } from "@/client/components/ui/sonner";
+import { InstallPrompt } from "@/client/components/InstallPrompt";
+import { registerServiceWorker } from "@/client/lib/register-sw";
 
 function NotFoundComponent() {
   return (
@@ -39,7 +39,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: { error: unknown; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {

@@ -11,10 +11,10 @@ import {
   Thermometer,
   Droplets,
 } from "lucide-react";
-import { useI18n } from "@/lib/i18n";
-import { useSelectedDevice, useLatest } from "@/lib/queries";
-import { statusTheme } from "@/lib/status";
-import { cn } from "@/lib/utils";
+import { useI18n } from "@/client/lib/i18n";
+import { useSelectedDevice, useLatest } from "@/client/lib/queries";
+import { statusTheme } from "@/shared/lib/status";
+import { cn } from "@/client/lib/utils";
 
 export const Route = createFileRoute("/dashboard/recommendations")({
   head: () => ({

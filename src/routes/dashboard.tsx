@@ -17,12 +17,12 @@ import {
   Wind,
   X,
 } from "lucide-react";
-import { useI18n, type TKey } from "@/lib/i18n";
-import { LangToggle } from "@/components/LangToggle";
-import { useSelectedDevice } from "@/lib/queries";
-import { cachedReading, setAuthTokenGetter } from "@/lib/airsense";
-import { formatTime } from "@/lib/status";
-import { cn } from "@/lib/utils";
+import { useI18n, type TKey } from "@/client/lib/i18n";
+import { LangToggle } from "@/client/components/LangToggle";
+import { useSelectedDevice } from "@/client/lib/queries";
+import { cachedReading, setAuthTokenGetter } from "@/client/lib/airsense";
+import { formatTime } from "@/shared/lib/status";
+import { cn } from "@/client/lib/utils";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardLayout,

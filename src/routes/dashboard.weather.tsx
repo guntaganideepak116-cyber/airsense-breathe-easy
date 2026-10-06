@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CloudSun, Droplets, Gauge, Thermometer, Wind, Radio, AlertCircle } from "lucide-react";
-import { useI18n } from "@/lib/i18n";
-import { useSelectedDevice, useLatest } from "@/lib/queries";
-import { useOutdoorWeather } from "@/lib/outdoor";
-import { statusTheme, formatTime } from "@/lib/status";
-import { BreathingOrb } from "@/components/BreathingOrb";
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import { useI18n } from "@/client/lib/i18n";
+import { useSelectedDevice, useLatest } from "@/client/lib/queries";
+import { useOutdoorWeather } from "@/client/lib/outdoor";
+import { statusTheme, formatTime } from "@/shared/lib/status";
+import { BreathingOrb } from "@/client/components/BreathingOrb";
+import { Skeleton } from "@/client/components/ui/skeleton";
+import { cn } from "@/client/lib/utils";
 
 export const Route = createFileRoute("/dashboard/weather")({
   head: () => ({

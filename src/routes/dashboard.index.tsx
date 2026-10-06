@@ -12,8 +12,8 @@ import {
   Wifi,
   WifiOff,
 } from "lucide-react";
-import { useI18n } from "@/lib/i18n";
-import { statusTheme, formatTime } from "@/lib/status";
+import { useI18n } from "@/client/lib/i18n";
+import { statusTheme, formatTime } from "@/shared/lib/status";
 import {
   useDeviceMutations,
   useDeviceStream,
@@ -21,20 +21,20 @@ import {
   useSelectedDevice,
   useTrend,
   useHistory,
-} from "@/lib/queries";
-import { useAirAlert } from "@/lib/use-air-alert";
-import { BreathingOrb } from "@/components/BreathingOrb";
-import { PushOptIn } from "@/components/PushOptIn";
-import { ActionCard } from "@/components/ActionCard";
-import { IndoorOutdoor } from "@/components/IndoorOutdoor";
-import { DeviceDiagnostics } from "@/components/DeviceDiagnostics";
-import { SensorReadings } from "@/components/SensorReadings";
-import { RoomComparison } from "@/components/RoomComparison";
-import { EmptyRooms } from "@/components/EmptyRooms";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+} from "@/client/lib/queries";
+import { useAirAlert } from "@/shared/lib/use-air-alert";
+import { BreathingOrb } from "@/client/components/BreathingOrb";
+import { PushOptIn } from "@/client/components/PushOptIn";
+import { ActionCard } from "@/client/components/ActionCard";
+import { IndoorOutdoor } from "@/client/components/IndoorOutdoor";
+import { DeviceDiagnostics } from "@/client/components/DeviceDiagnostics";
+import { SensorReadings } from "@/client/components/SensorReadings";
+import { RoomComparison } from "@/client/components/RoomComparison";
+import { EmptyRooms } from "@/client/components/EmptyRooms";
+import { Button } from "@/client/components/ui/button";
+import { Input } from "@/client/components/ui/input";
+import { Skeleton } from "@/client/components/ui/skeleton";
+import { cn } from "@/client/lib/utils";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/dashboard/")({

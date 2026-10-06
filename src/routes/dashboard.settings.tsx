@@ -12,20 +12,20 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useI18n } from "@/lib/i18n";
+import { useI18n } from "@/client/lib/i18n";
 import {
   useDeviceMutations,
   useDevices,
   useUserPreferences,
   useUpdateUserPreferences,
-} from "@/lib/queries";
-import { formatTime } from "@/lib/status";
-import { disablePush, enablePush, pushPreference, pushState } from "@/lib/push";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
+} from "@/client/lib/queries";
+import { formatTime } from "@/shared/lib/status";
+import { disablePush, enablePush, pushPreference, pushState } from "@/client/lib/push";
+import { Button } from "@/client/components/ui/button";
+import { Input } from "@/client/components/ui/input";
+import { Label } from "@/client/components/ui/label";
+import { Slider } from "@/client/components/ui/slider";
+import { Switch } from "@/client/components/ui/switch";
 
 export const Route = createFileRoute("/dashboard/settings")({
   head: () => ({
