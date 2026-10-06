@@ -1,12 +1,12 @@
 import twilio from "twilio";
 import { Resend } from "resend";
-import { dbService, type SensorReadingDoc, type AlertDoc } from "./db";
+import { config } from "../config/index.js";
+import { dbService } from "./dbService.js";
+import type { SensorReadingDoc, AlertDoc } from "../models/types.js";
 
-// 15-minute alert cooldown per device to prevent notification spam
 const ALERT_COOLDOWN_MS = 15 * 60 * 1000;
 
 export async function processReadingForAlerts(reading: SensorReadingDoc): Promise<AlertDoc | null> {
-  // Only evaluate real readings that have poor/critical contamination
   if (reading.status !== "poor" && reading.mq135 < 700) {
     return null;
   }
@@ -15,11 +15,9 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
   const roomName = device?.name || reading.roomName || "Indoor Room";
   const userId = device?.userId || reading.userId;
 
-  // Check cooldown to avoid notification spam
   const since = new Date(Date.now() - ALERT_COOLDOWN_MS);
   const recentAlert = await dbService.getRecentAlert(reading.deviceId, since);
   if (recentAlert) {
-    // Suppress notification dispatch within cooldown window
     return null;
   }
 
@@ -32,10 +30,9 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
     sms: false,
   };
 
-  // Get user alert preferences if user exists
   const prefs = userId ? await dbService.getUserPreferences(userId) : null;
-  const whatsappTarget = prefs?.whatsappNumber || process.env["ALERT_TO_WHATSAPP"];
-  const emailTarget = prefs?.email || process.env["ALERT_TO_EMAIL"];
+  const whatsappTarget = prefs?.whatsappNumber || config.twilio.to;
+  const emailTarget = prefs?.email || config.resend.toEmail;
 
   const formattedTime = new Date(reading.timestamp).toLocaleString("en-IN", {
     timeZone: "Asia/Kolkata",
@@ -43,20 +40,16 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
     timeStyle: "short",
   });
 
-  // 1. Dispatch WhatsApp Notification
-  const twilioSid = process.env["TWILIO_ACCOUNT_SID"];
-  const twilioAuth = process.env["TWILIO_AUTH_TOKEN"];
-  const twilioFrom = process.env["TWILIO_WHATSAPP_FROM"] || "whatsapp:+14155238886";
-
+  // 1. WhatsApp Alert via Twilio
   if (
     prefs?.alertChannels.whatsapp !== false &&
-    twilioSid &&
-    twilioAuth &&
+    config.twilio.sid &&
+    config.twilio.authToken &&
     whatsappTarget &&
     !whatsappTarget.includes("0000000000")
   ) {
     try {
-      const client = twilio(twilioSid, twilioAuth);
+      const client = twilio(config.twilio.sid, config.twilio.authToken);
       const to = whatsappTarget.startsWith("whatsapp:")
         ? whatsappTarget
         : `whatsapp:${whatsappTarget}`;
@@ -74,10 +67,11 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
 
       await client.messages.create({
         body: whatsappBody,
-        from: twilioFrom,
+        from: config.twilio.from,
         to,
       });
       channelsSent.whatsapp = true;
+      console.log(`[AlertEngine] WhatsApp alert sent to ${to}`);
     } catch (err: unknown) {
       console.warn(
         "[AlertEngine] WhatsApp dispatch failed:",
@@ -86,20 +80,17 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
     }
   }
 
-  // 2. Dispatch Email Notification
-  const resendKey = process.env["RESEND_API_KEY"];
-  const resendFrom = process.env["ALERT_FROM_EMAIL"] || "AirSense Alerts <onboarding@resend.dev>";
-
+  // 2. Email Alert via Resend
   if (
     prefs?.alertChannels.email !== false &&
-    resendKey &&
+    config.resend.apiKey &&
     emailTarget &&
     !emailTarget.includes("example.com")
   ) {
     try {
-      const resend = new Resend(resendKey);
+      const resend = new Resend(config.resend.apiKey);
       await resend.emails.send({
-        from: resendFrom,
+        from: config.resend.fromEmail,
         to: emailTarget,
         subject: `🚨 AirSense Alert: High Air Contamination in ${roomName}`,
         html: `
@@ -131,6 +122,7 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
         `,
       });
       channelsSent.email = true;
+      console.log(`[AlertEngine] Email alert sent to ${emailTarget}`);
     } catch (err: unknown) {
       console.warn(
         "[AlertEngine] Email dispatch failed:",
@@ -139,7 +131,7 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
     }
   }
 
-  // 3. Save Alert to Database
+  // 3. Save Alert to DB
   const alertDoc: AlertDoc = {
     deviceId: reading.deviceId,
     ...(userId && { userId }),

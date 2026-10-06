@@ -1,88 +1,19 @@
-import { MongoClient, Db, Collection, ObjectId } from "mongodb";
-import dotenv from "dotenv";
-
-// Load environment variables
-dotenv.config();
-
-export interface DeviceDoc {
-  _id?: ObjectId;
-  deviceId: string; // e.g. "AIR-8F3D12"
-  name: string; // Room name, e.g. "Classroom 4B"
-  userId: string; // Clerk userId
-  apiKeyHash: string; // SHA-256 hash of API key
-  apiKeyPrefix: string; // e.g. "ask_live_8f..."
-  status: "online" | "offline" | "never_connected";
-  lastSeen: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface SensorReadingDoc {
-  _id?: ObjectId;
-  deviceId: string;
-  userId?: string;
-  roomName?: string;
-  mq135: number;
-  temperature: number;
-  humidity: number;
-  status: "good" | "moderate" | "poor";
-  buzzerActive: boolean;
-  timestamp: Date;
-}
-
-export interface AlertDoc {
-  _id?: ObjectId;
-  deviceId: string;
-  userId?: string;
-  roomName: string;
-  mq135: number;
-  temperature: number;
-  humidity: number;
-  threshold: number;
-  severity: "warning" | "critical";
-  status: "active" | "resolved";
-  channelsSent: {
-    whatsapp: boolean;
-    email: boolean;
-    sms: boolean;
-  };
-  timestamp: Date;
-  resolvedAt?: Date | null;
-}
-
-export interface UserPreferencesDoc {
-  _id?: ObjectId;
-  userId: string;
-  phoneNumber?: string;
-  whatsappNumber?: string;
-  email?: string;
-  alertChannels: {
-    sms: boolean;
-    whatsapp: boolean;
-    email: boolean;
-  };
-  threshold: number;
-  updatedAt: Date;
-}
-
-export interface SystemLogDoc {
-  _id?: ObjectId;
-  event: string;
-  deviceId?: string;
-  userId?: string;
-  level: "info" | "warn" | "error";
-  message: string;
-  metadata?: Record<string, unknown>;
-  timestamp: Date;
-}
+import { MongoClient, Db } from "mongodb";
+import { config } from "../config/index.js";
+import type {
+  DeviceDoc,
+  SensorReadingDoc,
+  AlertDoc,
+  UserPreferencesDoc,
+  SystemLogDoc,
+} from "../models/types.js";
 
 let client: MongoClient | null = null;
 let db: Db | null = null;
 let isConnecting = false;
 let isConnected = false;
 
-// In-memory fallback stores (used only if MongoDB is unreachable or MONGODB_URI not provided)
-// NEVER filled with mock data: only stores real user interactions when DB is connecting or offline
+// Memory buffers for offline/development fallback
 const memDevices = new Map<string, DeviceDoc>();
 const memReadings: SensorReadingDoc[] = [];
 const memAlerts: AlertDoc[] = [];
@@ -90,15 +21,12 @@ const memPreferences = new Map<string, UserPreferencesDoc>();
 const memLogs: SystemLogDoc[] = [];
 
 export async function getDb(): Promise<Db | null> {
-  const uri = process.env["MONGODB_URI"];
-  if (!uri) {
-    return null;
-  }
+  const uri = config.mongodbUri;
+  if (!uri) return null;
 
   if (db && isConnected) return db;
 
   if (isConnecting) {
-    // Wait for in-flight connection attempt
     let waitCount = 0;
     while (isConnecting && waitCount < 30) {
       await new Promise((r) => setTimeout(r, 100));
@@ -120,9 +48,8 @@ export async function getDb(): Promise<Db | null> {
     isConnected = true;
     isConnecting = false;
 
-    // Initialize indexes in the background
-    initIndexes(db).catch((e) => console.warn("Index initialization warning:", e.message));
-
+    initIndexes(db).catch((e) => console.warn("[DB] Index init warning:", e.message));
+    console.log("[DB] Connected to MongoDB Atlas");
     return db;
   } catch (err: unknown) {
     isConnecting = false;
@@ -146,11 +73,10 @@ async function initIndexes(database: Db) {
     await database.collection("userPreferences").createIndex({ userId: 1 }, { unique: true });
     await database.collection("systemLogs").createIndex({ timestamp: -1 });
   } catch (e: unknown) {
-    console.warn("Index creation skipped:", e instanceof Error ? e.message : e);
+    console.warn("[DB] Index creation skipped:", e instanceof Error ? e.message : e);
   }
 }
 
-// ── Database Access Service ──
 export const dbService = {
   async getDevices(userId: string): Promise<DeviceDoc[]> {
     const database = await getDb();
@@ -161,7 +87,7 @@ export const dbService = {
           .find({ userId })
           .toArray()) as DeviceDoc[];
       } catch (err) {
-        console.warn("Error fetching devices from MongoDB:", err);
+        console.warn("[DB] Error fetching devices from MongoDB:", err);
       }
     }
     return Array.from(memDevices.values()).filter((d) => d.userId === userId);
@@ -173,7 +99,7 @@ export const dbService = {
       try {
         return await database.collection<DeviceDoc>("devices").findOne({ deviceId });
       } catch (err) {
-        console.warn("Error finding device in MongoDB:", err);
+        console.warn("[DB] Error finding device in MongoDB:", err);
       }
     }
     return memDevices.get(deviceId) ?? null;
@@ -186,7 +112,7 @@ export const dbService = {
         await database.collection<DeviceDoc>("devices").insertOne(device);
         return device;
       } catch (err) {
-        console.warn("Error creating device in MongoDB:", err);
+        console.warn("[DB] Error creating device in MongoDB:", err);
       }
     }
     memDevices.set(device.deviceId, device);
@@ -206,7 +132,7 @@ export const dbService = {
           .updateOne({ deviceId, userId }, { $set: { ...patch, updatedAt: new Date() } });
         return res.matchedCount > 0;
       } catch (err) {
-        console.warn("Error updating device in MongoDB:", err);
+        console.warn("[DB] Error updating device in MongoDB:", err);
       }
     }
     const existing = memDevices.get(deviceId);
@@ -226,7 +152,7 @@ export const dbService = {
         await database.collection("alerts").deleteMany({ deviceId });
         return res.deletedCount > 0;
       } catch (err) {
-        console.warn("Error deleting device from MongoDB:", err);
+        console.warn("[DB] Error deleting device from MongoDB:", err);
       }
     }
     const existing = memDevices.get(deviceId);
@@ -249,7 +175,7 @@ export const dbService = {
           );
         return;
       } catch (err) {
-        console.warn("Error updating device heartbeat in MongoDB:", err);
+        console.warn("[DB] Error updating device heartbeat in MongoDB:", err);
       }
     }
     const existing = memDevices.get(deviceId);
@@ -267,13 +193,11 @@ export const dbService = {
         await database.collection<SensorReadingDoc>("sensorReadings").insertOne(reading);
         return reading;
       } catch (err) {
-        console.warn("Error saving reading in MongoDB:", err);
+        console.warn("[DB] Error saving reading in MongoDB:", err);
       }
     }
     memReadings.push(reading);
-    if (memReadings.length > 5000) {
-      memReadings.shift(); // keep memory bounded
-    }
+    if (memReadings.length > 5000) memReadings.shift();
     return reading;
   },
 
@@ -285,7 +209,7 @@ export const dbService = {
           .collection<SensorReadingDoc>("sensorReadings")
           .findOne({ deviceId }, { sort: { timestamp: -1 } });
       } catch (err) {
-        console.warn("Error fetching latest reading from MongoDB:", err);
+        console.warn("[DB] Error fetching latest reading from MongoDB:", err);
       }
     }
     const matching = memReadings.filter((r) => r.deviceId === deviceId);
@@ -304,7 +228,7 @@ export const dbService = {
           .limit(500)
           .toArray()) as SensorReadingDoc[];
       } catch (err) {
-        console.warn("Error fetching history from MongoDB:", err);
+        console.warn("[DB] Error fetching history from MongoDB:", err);
       }
     }
     return memReadings
@@ -319,7 +243,7 @@ export const dbService = {
         await database.collection<AlertDoc>("alerts").insertOne(alert);
         return alert;
       } catch (err) {
-        console.warn("Error saving alert to MongoDB:", err);
+        console.warn("[DB] Error saving alert to MongoDB:", err);
       }
     }
     memAlerts.push(alert);
@@ -334,7 +258,7 @@ export const dbService = {
           .collection<AlertDoc>("alerts")
           .findOne({ deviceId, timestamp: { $gte: since } }, { sort: { timestamp: -1 } });
       } catch (err) {
-        console.warn("Error fetching recent alert from MongoDB:", err);
+        console.warn("[DB] Error fetching recent alert from MongoDB:", err);
       }
     }
     const matching = memAlerts.filter(
@@ -355,7 +279,7 @@ export const dbService = {
           .limit(limit)
           .toArray()) as AlertDoc[];
       } catch (err) {
-        console.warn("Error fetching alerts from MongoDB:", err);
+        console.warn("[DB] Error fetching alerts from MongoDB:", err);
       }
     }
     return memAlerts
@@ -373,7 +297,7 @@ export const dbService = {
           .findOne({ userId });
         if (found) return found;
       } catch (err) {
-        console.warn("Error fetching preferences from MongoDB:", err);
+        console.warn("[DB] Error fetching preferences from MongoDB:", err);
       }
     }
     const mem = memPreferences.get(userId);
@@ -393,12 +317,18 @@ export const dbService = {
 
   async updateUserPreferences(
     userId: string,
-    patch: Partial<UserPreferencesDoc>,
+    patch: Partial<Omit<UserPreferencesDoc, "alertChannels">> & {
+      alertChannels?: Partial<UserPreferencesDoc["alertChannels"]>;
+    },
   ): Promise<UserPreferencesDoc> {
     const current = await this.getUserPreferences(userId);
     const updated: UserPreferencesDoc = {
       ...current,
       ...patch,
+      alertChannels: {
+        ...current.alertChannels,
+        ...(patch.alertChannels || {}),
+      },
       userId,
       updatedAt: new Date(),
     };
@@ -411,7 +341,7 @@ export const dbService = {
           .updateOne({ userId }, { $set: updated }, { upsert: true });
         return updated;
       } catch (err) {
-        console.warn("Error saving preferences to MongoDB:", err);
+        console.warn("[DB] Error saving preferences to MongoDB:", err);
       }
     }
     memPreferences.set(userId, updated);
@@ -426,7 +356,7 @@ export const dbService = {
         await database.collection<SystemLogDoc>("systemLogs").insertOne(fullLog);
         return;
       } catch (e) {
-        // ignore log error
+        // ignore
       }
     }
     memLogs.push(fullLog);

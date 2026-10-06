@@ -1,304 +1,202 @@
-# AirSense — IoT Indoor Air Quality Monitoring System
+# 🍃 AirSense — Production IoT Air Quality Monitoring System
 
-A production-grade indoor air quality monitoring platform for classrooms, homes, and hostels in Andhra Pradesh & Telangana. Built with real ESP32 hardware, MongoDB, TanStack Start, Clerk Auth, and real-time SSE streaming.
-
-
----
-
-## Architecture Overview
-
-```
-ESP32 (MQ-135 + DHT22)
-    │  POST /api/devices/data  (deviceId + apiKey in body)
-    ▼
-TanStack Start Server (Node.js / Nitro)
-    │  Validates API key hash → saves to MongoDB → emits SSE
-    ▼
-MongoDB (Atlas or local)
-    │  sensorReadings · devices · alerts · userPreferences
-    ▼
-React Dashboard (SSE stream + React Query polling)
-    │  /api/device/:id/stream  →  live readings
-    ▼
-WhatsApp (Twilio) + Email (Resend) → Alert Notifications
-```
+A full-stack, enterprise-grade IoT Indoor Air Quality (IAQ) monitoring platform featuring real-time MQ-135 telemetry streaming, intelligent AI ventilation advice, WhatsApp & Email alert dispatching, and interactive room diagnostics.
 
 ---
 
-## Quick Start (Local Development)
+## 🏗️ Architecture Overview
 
-### Prerequisites
-- Node.js 20+ (or Bun)
-- MongoDB — local `mongod` **or** free [MongoDB Atlas](https://www.mongodb.com/atlas)
-- [Clerk account](https://clerk.com) (free tier)
+The repository is organized into a clean, two-directory production structure:
 
-### 1. Clone & Install
+```
+AirSense/
+├── frontend/                     # 🌐 Client Application (React 19 + TanStack Router + TailwindCSS)
+│   ├── src/
+│   │   ├── client/               # UI components, Radix primitives, styling & state
+│   │   ├── shared/               # Shared domain calculations (AQI formulas, status mapping)
+│   │   ├── routes/               # Page routes & dashboard layouts
+│   │   ├── router.tsx            # Client routing configuration
+│   │   └── styles.css            # Tailwind CSS design system tokens
+│   ├── public/                   # Static assets, icons, service worker & PWA manifest
+│   ├── package.json              # Frontend dependencies
+│   ├── vite.config.ts            # Vite bundler configuration & dev API proxy
+│   └── tsconfig.json             # TypeScript config with @client/* and @shared/* aliases
+│
+├── backend/                      # ⚡ Production Express API & Telemetry Engine
+│   ├── src/
+│   │   ├── config/               # Environment configuration & credential validation
+│   │   ├── controllers/          # Request handlers (devices, telemetry, weather, user, AI)
+│   │   ├── middleware/           # Clerk authentication & error handling middleware
+│   │   ├── models/               # TypeScript data models & schemas
+│   │   ├── routes/               # Modular Express API routers
+│   │   ├── services/             # Core business services (MongoDB, Twilio, Resend, SSE, AI)
+│   │   └── server.ts             # Express application entrypoint
+│   ├── package.json              # Backend dependencies
+│   └── tsconfig.json             # Backend TypeScript configuration
+│
+├── package.json                  # Root workspace scripts
+├── .gitignore                    # Comprehensive multi-project gitignore
+└── README.md                     # Monorepo documentation
+```
 
-```sh
-git clone <this-repository-url>
-cd airsense-breathe-easy
+---
+
+## 🚀 Quick Start
+
+### 1. Prerequisites
+- **Node.js** >= 20.x
+- **npm** >= 10.x
+- **MongoDB Atlas** database URI
+- **Clerk** account (for authentication)
+- **Twilio** account (optional, for WhatsApp & SMS alerts)
+- **Resend** account (optional, for email alerts)
+
+---
+
+### 2. Installation
+
+Install dependencies for both projects:
+
+```bash
+# Install backend dependencies
+cd backend
 npm install
+
+# Install frontend dependencies
+cd ../frontend
+npm install
+
+# Return to root
+cd ..
 ```
 
-### 2. Configure Environment Variables
+---
 
-```sh
-cp .env.example .env
-```
+### 3. Environment Variables
 
-Edit `.env`:
+#### Backend (`backend/.env`)
+Create a `backend/.env` file (reference `backend/.env.example`):
 
 ```env
-# MongoDB
-MONGODB_URI=mongodb://localhost:27017/airsense
+# Server
+PORT=5000
+NODE_ENV=development
+FRONTEND_URL=http://localhost:3000,http://localhost:5173
 
-# Clerk
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
+# Database (MongoDB Atlas)
+MONGODB_URI=mongodb+srv://<user>:<password>@cluster0.mongodb.net/airsense?retryWrites=true&w=majority
+
+# Clerk Authentication (Secret Key)
 CLERK_SECRET_KEY=sk_test_...
 
-# WhatsApp Alerts — optional
-TWILIO_ACCOUNT_SID=ACxxxx
-TWILIO_AUTH_TOKEN=xxxx
+# Twilio (WhatsApp & SMS Alerts)
+TWILIO_ACCOUNT_SID=AC...
+TWILIO_AUTH_TOKEN=...
 TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
 ALERT_TO_WHATSAPP=whatsapp:+919876543210
 
-# Email Alerts — optional
-RESEND_API_KEY=re_xxxx
-ALERT_FROM_EMAIL=AirSense Alerts <alerts@yourdomain.com>
+# Resend (Email Alerts)
+RESEND_API_KEY=re_...
+ALERT_FROM_EMAIL=AirSense Alerts <onboarding@resend.dev>
 ALERT_TO_EMAIL=you@example.com
+
+# Web Push
+VAPID_PUBLIC_KEY=BC0tP9HcEj-bSuhYwLbgpWisPjznZkaeB2EyCsuYcL1EYpKWNxKdu9woqh6wS50zQmTQ7cazExdySR4Pe9h4aqA
 ```
 
-### 3. Start Development Server
+#### Frontend (`frontend/.env`)
+Create a `frontend/.env` file (reference `frontend/.env.example`):
 
-```sh
-npm run dev
+```env
+# Backend API Base URL (leave blank in local dev to use Vite proxy, or set to your Express URL)
+VITE_API_URL=http://localhost:5000
+
+# Clerk Authentication (Publishable Key for Client UI)
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
 ```
-
-Open [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## ESP32 Firmware
+### 4. Running Locally
 
-### Hardware Required
+You can run both services independently or from root:
 
-| Component | Purpose |
-|-----------|---------|
-| ESP32 DevKit v1 | Microcontroller with Wi-Fi |
-| MQ-135 Gas Sensor | Air quality / contamination detection |
-| DHT22 (AM2302) | Temperature & relative humidity |
-| Active Buzzer | Local audio alert when air is Poor |
-| LED (optional) | Visual alert indicator |
-
-### Wiring Diagram
-
-```
-ESP32 Pin    →   Component
-─────────────────────────────────────────
-GPIO34 (ADC) →   MQ-135  AOUT
-GPIO4        →   DHT22   DATA
-GPIO2        →   Buzzer  (+)
-3.3V         →   MQ-135 VCC, DHT22 VCC
-GND          →   GND (common ground)
+#### Run Backend (Terminal 1)
+```bash
+npm run dev:backend
+# or
+cd backend && npm run dev
+# Server runs on: http://localhost:5000
 ```
 
-### Arduino Sketch
+#### Run Frontend (Terminal 2)
+```bash
+npm run dev:frontend
+# or
+cd frontend && npm run dev
+# Web app runs on: http://localhost:3000 (or http://localhost:5173)
+```
 
-Install via Library Manager:
-- `DHT sensor library` by Adafruit
-- `ArduinoJson` by Benoit Blanchon
-- `HTTPClient` (built-in with ESP32 Arduino core)
+---
 
-```cpp
-#include <WiFi.h>
-#include <HTTPClient.h>
-#include <ArduinoJson.h>
-#include "DHT.h"
+## 📡 ESP32 Hardware Integration
 
-// ── Configuration ──────────────────────────────────────────
-const char* WIFI_SSID     = "YourWiFiSSID";
-const char* WIFI_PASSWORD = "YourWiFiPassword";
-const char* SERVER_URL    = "https://your-airsense-app.vercel.app/api/devices/data";
-const char* DEVICE_ID     = "AIR-XXXXXX";    // from dashboard
-const char* API_KEY       = "ask_live_...";  // from dashboard (saved once)
+ESP32 microcontroller firmware posts readings directly to the backend ingestion endpoint:
 
-// ── Pin Definitions ────────────────────────────────────────
-#define MQ135_PIN    34
-#define DHT_PIN       4
-#define BUZZER_PIN    2
-#define DHT_TYPE    DHT22
-
-DHT dht(DHT_PIN, DHT_TYPE);
-
-#define MQ135_POOR_THRESHOLD  700   // matches server classification
-#define SEND_INTERVAL_MS     5000   // report every 5 seconds
-
-void setup() {
-  Serial.begin(115200);
-  pinMode(BUZZER_PIN, OUTPUT);
-  digitalWrite(BUZZER_PIN, LOW);
-  dht.begin();
-
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  Serial.print("Connecting to Wi-Fi");
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500); Serial.print(".");
+- **Endpoint:** `POST http://<BACKEND_HOST>:5000/api/devices/data` (or `/api/device/data`)
+- **Headers:**
+  - `Content-Type: application/json`
+  - `x-device-id: AIR-8F3D12`
+  - `x-api-key: ask_live_...`
+- **Payload:**
+  ```json
+  {
+    "deviceId": "AIR-8F3D12",
+    "apiKey": "ask_live_...",
+    "mq135": 482,
+    "temperature": 27.4,
+    "humidity": 58
   }
-  Serial.println("\nConnected! IP: " + WiFi.localIP().toString());
-
-  // MQ-135 warm-up (recommended 60 seconds for accuracy)
-  Serial.println("Warming up MQ-135 (60 seconds)...");
-  delay(60000);
-}
-
-void loop() {
-  int mq135Raw        = analogRead(MQ135_PIN);
-  float temperature   = dht.readTemperature();
-  float humidity      = dht.readHumidity();
-
-  if (isnan(temperature) || isnan(humidity)) {
-    Serial.println("DHT read failed, retrying...");
-    delay(2000);
-    return;
+  ```
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "deviceId": "AIR-8F3D12",
+    "receivedAt": "2026-10-06T08:00:00.000Z",
+    "status": "moderate",
+    "buzzerActive": false
   }
-
-  // Local buzzer alert
-  bool poorAir = mq135Raw >= MQ135_POOR_THRESHOLD;
-  digitalWrite(BUZZER_PIN, poorAir ? HIGH : LOW);
-
-  Serial.printf("MQ135: %d | Temp: %.1fC | Hum: %.0f%% | %s\n",
-    mq135Raw, temperature, humidity, poorAir ? "POOR" : "OK");
-
-  // POST reading to AirSense server
-  if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    http.begin(SERVER_URL);
-    http.addHeader("Content-Type", "application/json");
-
-    StaticJsonDocument<256> doc;
-    doc["deviceId"]    = DEVICE_ID;
-    doc["apiKey"]      = API_KEY;
-    doc["mq135"]       = mq135Raw;
-    doc["temperature"] = temperature;
-    doc["humidity"]    = humidity;
-
-    String body;
-    serializeJson(doc, body);
-
-    int httpCode = http.POST(body);
-    Serial.printf("Server response: HTTP %d\n", httpCode);
-    http.end();
-  } else {
-    Serial.println("Wi-Fi lost, reconnecting...");
-    WiFi.reconnect();
-  }
-
-  delay(SEND_INTERVAL_MS);
-}
-```
-
-### Device Registration Steps
-
-1. Sign in to your AirSense dashboard
-2. Go to **Rooms & Devices** → click **Add Room**
-3. Enter a name (e.g. "Classroom 4B")
-4. **Copy and save** the `Device ID` and `API Key` shown — the key is shown **only once**
-5. Paste both values into `DEVICE_ID` and `API_KEY` in the sketch above
-6. Flash the ESP32 — sensor data appears on the dashboard within seconds
+  ```
 
 ---
 
-## API Reference
+## 🧠 AI Recommendation Engine
 
-### `POST /api/devices/data` — Submit a Sensor Reading (ESP32 → Server)
-
-**Request Body:**
-```json
-{
-  "deviceId": "AIR-8F3D12",
-  "apiKey": "ask_live_abc123...",
-  "mq135": 523,
-  "temperature": 28.4,
-  "humidity": 72
-}
-```
-
-**Response 200:**
-```json
-{
-  "success": true,
-  "deviceId": "AIR-8F3D12",
-  "receivedAt": "2025-10-06T07:00:00.000Z",
-  "status": "moderate",
-  "buzzerActive": false
-}
-```
-
-| HTTP Code | Meaning |
-|-----------|---------|
-| 200 | Reading accepted and stored |
-| 400 | Missing/invalid field |
-| 401 | Unknown device ID or wrong API key |
-| 500 | Server error |
-
-### Other Server Endpoints (Dashboard → Server)
-
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| GET | `/api/devices` | Clerk | List all user's devices |
-| POST | `/api/devices` | Clerk | Register new device |
-| PATCH | `/api/devices/:id` | Clerk | Rename device |
-| DELETE | `/api/devices/:id` | Clerk | Remove device |
-| GET | `/api/device/latest?deviceId=` | — | Latest reading from DB |
-| GET | `/api/device/:id/stream` | — | SSE live reading stream |
-| GET | `/api/device/history?deviceId=&range=` | — | Historical data (24h/7d/30d) |
-| GET | `/api/weather?lat=&lon=` | — | Outdoor AQI via Open-Meteo |
-| GET | `/api/user/alert-preferences` | Clerk | Get notification prefs |
-| PATCH | `/api/user/alert-preferences` | Clerk | Update notification prefs |
+The backend includes a dedicated AI analysis engine:
+- `GET /api/ai/recommendations?mq135=720&temperature=29&humidity=65`
+- `POST /api/ai/analyze` with sensor data payload.
+Returns:
+- **Overall Health Score** (0–100)
+- **Ventilation Strategy** (`open_windows`, `keep_closed_run_purifier`, `run_dehumidifier`, or `normal`)
+- **Sensitive Group Guidance** (customized for Children, Asthma patients, Elderly, and Pregnancy)
+- **Smart Actions List** based on real-time contamination levels.
 
 ---
 
-## Air Quality Classification
+## 🚢 Production Deployment
 
-| MQ-135 Raw Value | Status | Telugu | Action |
-|-----------------|--------|--------|--------|
-| 0 – 399 | 🟢 Good | బాగుంది | Normal |
-| 400 – 699 | 🟡 Moderate | మధ్యస్థం | Open windows |
-| 700+ | 🔴 Poor | పేలవం | Buzzer fires, alerts sent |
+### Frontend Deployment (Vercel / Netlify / Cloudflare Pages)
+1. Set the root directory of your project to `frontend`.
+2. Build Command: `npm run build`
+3. Output Directory: `.output/public` or `dist`
+4. Environment Variables:
+   - `VITE_API_URL=https://your-backend-service.railway.app`
+   - `VITE_CLERK_PUBLISHABLE_KEY=pk_live_...`
 
----
-
-## Alert System
-
-| Channel | Provider | Cooldown |
-|---------|----------|---------|
-| WhatsApp | Twilio | 15 min/device |
-| Email | Resend | 15 min/device |
-| Browser Push | Web Push API | 15 min/device |
-| Local Buzzer | ESP32 firmware | Immediate / continuous |
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Framework | TanStack Start (React 19 + Nitro SSR) |
-| Styling | Tailwind CSS v4 |
-| Auth | Clerk |
-| Database | MongoDB (Atlas or local) |
-| Real-time | Server-Sent Events (SSE) |
-| Alerts | Twilio WhatsApp + Resend Email + Web Push |
-| Outdoor AQI | Open-Meteo (free, no API key required) |
-| Hosting | Vercel / Node.js server |
-
----
-
-## Deployment
-
-```sh
-npm run build
-node .output/server/index.mjs
-```
-
-Set all variables from `.env.example` in your hosting platform's environment config. MongoDB Atlas M0 free tier is sufficient for classroom-scale deployments.
+### Backend Deployment (Railway / Render / Fly.io / Docker)
+1. Set the root directory of your service to `backend`.
+2. Build Command: `npm run build`
+3. Start Command: `npm run start`
+4. Environment Variables:
+   - Configure all variables from `backend/.env.example` including `MONGODB_URI`, `CLERK_SECRET_KEY`, `TWILIO_*`, and `RESEND_*`.
