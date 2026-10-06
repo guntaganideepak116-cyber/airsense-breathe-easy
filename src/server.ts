@@ -48,9 +48,9 @@ export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const url = new URL(request.url);
-      const isApi = url.pathname.startsWith('/api/');
+      const isApi = url.pathname.startsWith("/api/");
 
-      if (isApi && request.method === 'OPTIONS') {
+      if (isApi && request.method === "OPTIONS") {
         return new Response(null, {
           status: 204,
           headers: {

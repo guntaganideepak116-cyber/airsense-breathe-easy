@@ -28,7 +28,7 @@ export function DeviceDiagnostics({
   const na = t("diag.na");
 
   const rows: { label: string; value: string }[] = [
-    { label: t("diag.raw"), value: reading ? `${reading.mq135} ppm` : na },
+    { label: t("diag.raw"), value: reading ? `${reading.mq135}` : na },
     { label: t("diag.wifi"), value: reading?.rssi != null ? `${reading.rssi} dBm` : na },
     { label: t("diag.uptime"), value: formatUptime(reading?.uptimeSec, lang) ?? na },
     { label: t("diag.firmware"), value: reading?.firmware ? `v${reading.firmware}` : na },

@@ -41,13 +41,13 @@ export function useSelectedDevice() {
   };
 }
 
-/** Polls the latest reading; the real backend exposes SSE at /api/device/stream. */
+/** Polls the latest real reading from MongoDB. */
 export function useLatest(deviceId: string | null) {
   const query = useQuery({
     queryKey: ["latest", deviceId],
-    queryFn: () => api.latest(deviceId!),
+    queryFn: () => (deviceId ? api.latest(deviceId) : null),
     enabled: !!deviceId,
-    refetchInterval: 8000,
+    refetchInterval: 10000,
     placeholderData: (prev) =>
       prev ?? (deviceId ? (cachedReading(deviceId) ?? undefined) : undefined),
   });
@@ -62,7 +62,7 @@ export function useLatest(deviceId: string | null) {
 export function useHistory(deviceId: string | null, range: Range) {
   return useQuery({
     queryKey: ["history", deviceId, range],
-    queryFn: () => api.history(deviceId!, range),
+    queryFn: () => (deviceId ? api.history(deviceId, range) : []),
     enabled: !!deviceId,
   });
 }
@@ -81,7 +81,10 @@ export function useDeviceStream(deviceId: string | null) {
   const attempts = useRef(0);
 
   useEffect(() => {
-    if (!deviceId || typeof window === "undefined" || typeof EventSource === "undefined") return;
+    if (!deviceId || typeof window === "undefined" || typeof EventSource === "undefined") {
+      setReading(null);
+      return;
+    }
 
     let source: EventSource | null = null;
     let retryTimer: ReturnType<typeof setTimeout> | undefined;
@@ -152,10 +155,6 @@ export function useDeviceMutations() {
   };
 }
 
-/**
- * Latest reading for several devices at once. Shares the ["latest", id] cache
- * keys the SSE stream writes into, so rows stay live wherever a stream is open.
- */
 export function useAllLatest(deviceIds: string[]) {
   const results = useQueries({
     queries: deviceIds.map((id) => ({
@@ -171,10 +170,9 @@ export function useAllLatest(deviceIds: string[]) {
   }));
 }
 
-/** Direction of the last few hours of readings, used to phrase guidance. */
 export function useTrend(deviceId: string | null): Trend {
   const { data } = useHistory(deviceId, "24h");
-  return trendOf(data);
+  return trendOf(data ?? []);
 }
 
 export function useUserPreferences() {
@@ -191,17 +189,6 @@ export function useUpdateUserPreferences() {
       api.updateAlertPreferences(patch),
     onSuccess: (data) => {
       qc.setQueryData(["user-preferences"], data);
-    },
-  });
-}
-
-export function useSendMockAlert() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: () => api.sendMockAlert(),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["history"] });
-      qc.invalidateQueries({ queryKey: ["latest"] });
     },
   });
 }

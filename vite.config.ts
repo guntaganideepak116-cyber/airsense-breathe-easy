@@ -10,7 +10,7 @@ import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig({
   nitro: {
     preset: process.env["VERCEL"] ? "vercel" : "node-server",
-    // @ts-ignore: routeRules is a valid Nitro config but not fully typed in the lovable wrapper
+    // @ts-expect-error: routeRules is a valid Nitro config but not fully typed in the lovable wrapper
     routeRules: {
       "/api/**": {
         cors: true,
@@ -28,14 +28,6 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
-    server: {
-      proxy: {
-        "/api": {
-          target: "http://localhost:5000",
-          changeOrigin: true,
-        },
-      },
-    },
     plugins: [
       VitePWA({
         registerType: "autoUpdate",
@@ -45,7 +37,10 @@ export default defineConfig({
         manifest: false,
         workbox: {
           importScripts: ["/push-sw.js"],
-          globPatterns: ["**/*.{js,css,ico,png,svg,woff2}"],
+          // Nitro outputs to .output/public/, not dist/ — disable static precache
+          // glob to avoid Workbox "no files matched" warning. All assets are
+          // covered by runtimeCaching below.
+          globPatterns: [],
           navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//],
 
           runtimeCaching: [

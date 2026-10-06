@@ -36,7 +36,7 @@ export const Route = createFileRoute("/dashboard/rooms")({
 });
 
 function RoomsPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { devices, select } = useSelectedDevice();
   const { create } = useDeviceMutations();
   const [open, setOpen] = useState(false);
@@ -217,15 +217,17 @@ function RoomsPage() {
               <ul className="mt-3 space-y-2 text-sm">
                 <li className="flex justify-between border-b pb-1.5">
                   <span className="text-muted-foreground">Device ID</span>
-                  <span className="font-mono">{activeRoom.id}</span>
+                  <span className="font-mono text-primary font-bold">{activeRoom.id}</span>
                 </li>
                 <li className="flex justify-between border-b pb-1.5">
                   <span className="text-muted-foreground">Assigned Location</span>
                   <span>{activeRoom.name}</span>
                 </li>
                 <li className="flex justify-between">
-                  <span className="text-muted-foreground">Firmware Version</span>
-                  <span className="font-mono">v1.4.2</span>
+                  <span className="text-muted-foreground">Created At</span>
+                  <span className="font-mono text-xs">
+                    {activeRoom.createdAt ? formatTime(activeRoom.createdAt, lang) : "Registered"}
+                  </span>
                 </li>
               </ul>
             </div>
@@ -237,21 +239,33 @@ function RoomsPage() {
               <ul className="mt-3 space-y-2 text-sm">
                 <li className="flex justify-between border-b pb-1.5">
                   <span className="text-muted-foreground">Connection State</span>
-                  <span className="flex items-center gap-1 text-good">
-                    <Wifi className="h-3.5 w-3.5" /> Online (Live SSE)
+                  <span
+                    className={cn(
+                      "flex items-center gap-1 font-medium",
+                      activeRoom.online ? "text-good" : "text-muted-foreground",
+                    )}
+                  >
+                    {activeRoom.online ? (
+                      <Wifi className="h-3.5 w-3.5" />
+                    ) : (
+                      <WifiOff className="h-3.5 w-3.5" />
+                    )}
+                    {activeRoom.online
+                      ? "Online (Live stream)"
+                      : activeRoom.lastSeen
+                        ? "Offline"
+                        : "Never Connected"}
                   </span>
                 </li>
                 <li className="flex justify-between border-b pb-1.5">
-                  <span className="text-muted-foreground">Signal Strength (RSSI)</span>
-                  <span className="flex items-center gap-1 font-mono">
-                    <Signal className="h-3.5 w-3.5 text-primary" /> -58 dBm
+                  <span className="text-muted-foreground">Last Seen</span>
+                  <span className="font-mono text-xs">
+                    {activeRoom.lastSeen ? formatTime(activeRoom.lastSeen, lang) : "Never"}
                   </span>
                 </li>
                 <li className="flex justify-between">
-                  <span className="text-muted-foreground">Power Source</span>
-                  <span className="flex items-center gap-1 text-good">
-                    <BatteryCharging className="h-3.5 w-3.5" /> 5V DC Plugged
-                  </span>
+                  <span className="text-muted-foreground">API Data Endpoint</span>
+                  <span className="font-mono text-xs text-primary">POST /api/devices/data</span>
                 </li>
               </ul>
             </div>
@@ -278,16 +292,17 @@ function RoomCard({
   const { reading, status: streamStatus, tick } = useDeviceStream(device.id);
   useAirAlert(reading, device.name);
 
-  const status = reading?.status ?? classify(350);
+  const hasReading = Boolean(reading);
+  const status = reading?.status ?? "good";
   const theme = statusTheme[status];
-  const live = streamStatus === "live";
+  const live = (streamStatus === "live" || device.online) && hasReading;
 
   return (
     <div
       onClick={onSelect}
       className={cn(
         "status-transition cursor-pointer rounded-2xl sm:rounded-3xl border p-4 sm:p-5 transition-all hover:shadow-md",
-        theme.soft,
+        hasReading ? theme.soft : "bg-card",
         isSelected && "ring-2 ring-primary shadow-sm",
       )}
     >
@@ -302,16 +317,22 @@ function RoomCard({
           )}
         >
           {live ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
-          {t(live ? "dash.online" : "dash.offline")}
+          {live ? t("dash.online") : device.lastSeen ? t("dash.offline") : "Never Connected"}
         </span>
       </div>
 
       <div className="mt-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span className={cn("h-3 w-3 animate-pulse rounded-full shrink-0", theme.dot)} />
-          <p className={cn("font-display text-lg sm:text-xl font-bold", theme.text)}>
-            {t(theme.label)}
-          </p>
+          {hasReading ? (
+            <>
+              <span className={cn("h-3 w-3 animate-pulse rounded-full shrink-0", theme.dot)} />
+              <p className={cn("font-display text-lg sm:text-xl font-bold", theme.text)}>
+                {t(theme.label)}
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground font-medium">Waiting for sensor data</p>
+          )}
         </div>
         <div className="text-right">
           <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">
@@ -320,8 +341,7 @@ function RoomCard({
           <p className="font-mono text-base font-bold text-foreground tabular-nums">
             <span key={tick} className="value-pulse inline-block">
               {reading?.mq135 ?? "—"}
-            </span>{" "}
-            <span className="text-xs font-normal text-muted-foreground">ppm</span>
+            </span>
           </p>
         </div>
       </div>
@@ -330,13 +350,11 @@ function RoomCard({
         <span className="flex items-center gap-1 truncate text-[11px]">
           <Radio className={cn("h-3 w-3 shrink-0", live && "text-good")} />
           <span className="truncate">
-            {t(
-              live
-                ? "rooms.live"
-                : streamStatus === "reconnecting"
-                  ? "rooms.reconnecting"
-                  : "rooms.connecting",
-            )}
+            {live
+              ? t("rooms.live")
+              : streamStatus === "reconnecting"
+                ? t("rooms.reconnecting")
+                : t("rooms.connecting")}
           </span>
         </span>
         <button

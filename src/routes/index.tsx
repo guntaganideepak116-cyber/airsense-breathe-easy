@@ -151,7 +151,9 @@ function Hero() {
               {t("hero.orb.label")}
             </p>
             <p className="mt-1 font-display text-4xl text-good sm:text-5xl">{t("status.good")}</p>
-            <p className="mt-1 text-sm tabular-nums text-muted-foreground">MQ135 · 318 ppm</p>
+            <p className="mt-1 text-sm tabular-nums text-muted-foreground">
+              MQ-135 Sensor Value · 318
+            </p>
           </BreathingOrb>
         </div>
       </div>

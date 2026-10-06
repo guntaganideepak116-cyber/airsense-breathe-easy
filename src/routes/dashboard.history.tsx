@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { AlertTriangle, Lightbulb } from "lucide-react";
+import { AlertTriangle, Lightbulb, Radio } from "lucide-react";
 import {
   Area,
   AreaChart,
@@ -64,22 +64,18 @@ function HistoryPage() {
     const out: {
       t: string;
       mq135: number;
-      label?: string | undefined;
-      isTest?: boolean | undefined;
     }[] = [];
     (data ?? []).forEach((p, i) => {
       const prev = data?.[i - 1];
-      if (p.isTest || p.label === "TEST ALERT") {
-        out.push({ t: p.t, mq135: p.mq135, label: "TEST ALERT", isTest: true });
-      } else if (p.status === "poor" && (!prev || prev.status !== "poor")) {
-        out.push({ t: p.t, mq135: p.mq135, label: p.label, isTest: p.isTest });
+      if (p.status === "poor" && (!prev || prev.status !== "poor")) {
+        out.push({ t: p.t, mq135: p.mq135 });
       }
     });
     return out.reverse();
   }, [data]);
 
   const insight = useMemo(() => {
-    if (!data?.length) return null;
+    if (!data?.length || data.length < 5) return null;
     const buckets = new Map<number, { sum: number; n: number }>();
     data.forEach((p) => {
       const h = new Date(p.t).getHours();
@@ -136,10 +132,20 @@ function HistoryPage() {
         </div>
       )}
 
+      {/* MQ-135 SENSOR TREND CHART */}
       <section className="rounded-3xl border bg-card p-5">
-        <p className="text-sm font-semibold">{t("hist.aqChart")}</p>
+        <p className="text-sm font-semibold">MQ-135 Sensor Reading Trend</p>
         {isLoading ? (
           <Skeleton className="mt-4 h-56 sm:h-64 rounded-2xl" />
+        ) : chartData.length === 0 ? (
+          <div className="mt-4 flex flex-col items-center justify-center rounded-2xl border border-dashed py-12 text-center">
+            <Radio className="h-8 w-8 animate-pulse text-muted-foreground/60" />
+            <p className="mt-3 text-sm font-semibold text-foreground">No historical readings yet</p>
+            <p className="mt-1 max-w-sm text-xs text-muted-foreground">
+              Historical air contamination trends for this room will appear once your ESP32
+              transmits data.
+            </p>
+          </div>
         ) : (
           <div className="mt-4 h-56 sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -165,6 +171,7 @@ function HistoryPage() {
                     background: "var(--card)",
                     fontSize: 12,
                   }}
+                  formatter={(val: number) => [`${val} (Sensor Value)`, "MQ-135"]}
                 />
                 <Area
                   type="monotone"
@@ -179,10 +186,21 @@ function HistoryPage() {
         )}
       </section>
 
+      {/* TEMPERATURE & HUMIDITY CHART */}
       <section className="rounded-3xl border bg-card p-5">
         <p className="text-sm font-semibold">{t("hist.thChart")}</p>
         {isLoading ? (
           <Skeleton className="mt-4 h-56 rounded-2xl" />
+        ) : chartData.length === 0 ? (
+          <div className="mt-4 flex flex-col items-center justify-center rounded-2xl border border-dashed py-12 text-center">
+            <Radio className="h-8 w-8 animate-pulse text-muted-foreground/60" />
+            <p className="mt-3 text-sm font-semibold text-foreground">
+              No temperature or humidity history yet
+            </p>
+            <p className="mt-1 max-w-sm text-xs text-muted-foreground">
+              DHT22 sensor logs will be automatically plotted here.
+            </p>
+          </div>
         ) : (
           <div className="mt-4 h-56">
             <ResponsiveContainer width="100%" height="100%">
@@ -206,6 +224,7 @@ function HistoryPage() {
                 <Line
                   type="monotone"
                   dataKey="temperature"
+                  name="Temperature (°C)"
                   stroke="var(--moderate)"
                   strokeWidth={2}
                   dot={false}
@@ -213,6 +232,7 @@ function HistoryPage() {
                 <Line
                   type="monotone"
                   dataKey="humidity"
+                  name="Humidity (%)"
                   stroke="var(--good)"
                   strokeWidth={2}
                   dot={false}
@@ -231,6 +251,7 @@ function HistoryPage() {
         </div>
       </section>
 
+      {/* CONTAMINATION EVENTS LOG */}
       <section className="rounded-3xl border bg-card p-5">
         <p className="text-sm font-semibold">{t("hist.events")}</p>
         {events.length === 0 ? (
@@ -246,19 +267,10 @@ function HistoryPage() {
                   <AlertTriangle className="h-4 w-4" />
                 </span>
                 <div className="min-w-0 flex items-center gap-2">
-                  <span className="text-sm">
-                    {e.isTest || e.label === "TEST ALERT"
-                      ? "Simulated Critical Sensor Reading (MQ-135: 850, Temp: 32°C, Hum: 72%)"
-                      : t("hist.eventPoor")}
-                  </span>
-                  {(e.isTest || e.label === "TEST ALERT") && (
-                    <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-rose-700 dark:bg-rose-950 dark:text-rose-300">
-                      TEST ALERT
-                    </span>
-                  )}
+                  <span className="text-sm font-medium">{t("hist.eventPoor")}</span>
                 </div>
                 <span className="col-start-2 shrink-0 text-xs tabular-nums text-muted-foreground sm:col-start-auto">
-                  {formatTime(e.t, lang)} · {e.mq135} ppm
+                  {formatTime(e.t, lang)} · MQ-135: {e.mq135}
                 </span>
               </li>
             ))}

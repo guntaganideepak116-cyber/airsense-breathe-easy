@@ -33,7 +33,7 @@ export function DashboardPreview({ status = "moderate" as AirStatus }) {
                 {t(theme.label)}
               </p>
               <p className="mt-1 text-sm text-foreground/60">
-                {t("dash.sensorReading")}: <span className="tabular-nums">612</span> ppm
+                {t("dash.sensorReading")}: <span className="tabular-nums">612</span> (Sensor Value)
               </p>
             </div>
           </div>

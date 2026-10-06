@@ -34,7 +34,6 @@ import { EmptyRooms } from "@/components/EmptyRooms";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MockAlertCard } from "@/components/MockAlertCard";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -71,7 +70,7 @@ function Overview() {
 
   const status = reading?.status ?? "good";
   const theme = statusTheme[status];
-  const live = streamStatus === "live";
+  const live = streamStatus === "live" && Boolean(reading);
 
   // CSV Data Export Function
   const exportCsv = () => {
@@ -83,7 +82,7 @@ function Overview() {
     const headers = [
       "Timestamp",
       "Device Name",
-      "MQ135 (ppm)",
+      "MQ-135 Sensor Reading",
       "Temperature (C)",
       "Humidity (%)",
       "Status",
@@ -113,24 +112,29 @@ function Overview() {
 
   // Live Data Table Rows
   const tableRows = useMemo(() => {
+    if (!reading) return [];
+
     const base = [
       {
         name: device?.name || "Room",
-        type: "Air Quality (MQ135)",
-        val: `${reading?.mq135 ?? 320} ppm`,
-        time: reading?.timestamp,
+        type: "Air Quality (MQ-135)",
+        val: `${reading.mq135}`,
+        unit: "Sensor Value",
+        time: reading.timestamp,
       },
       {
         name: device?.name || "Room",
         type: "Temperature (DHT22)",
-        val: `${reading?.temperature ?? 28.5} °C`,
-        time: reading?.timestamp,
+        val: `${reading.temperature} °C`,
+        unit: "Celsius",
+        time: reading.timestamp,
       },
       {
         name: device?.name || "Room",
         type: "Humidity (DHT22)",
-        val: `${reading?.humidity ?? 52} %`,
-        time: reading?.timestamp,
+        val: `${reading.humidity} %`,
+        unit: "Relative Humidity",
+        time: reading.timestamp,
       },
     ];
 
@@ -169,10 +173,10 @@ function Overview() {
           </p>
         </div>
 
-        {/* Stat 2: Total Readings */}
+        {/* Stat 2: Total Real Readings */}
         <div className="rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-5 text-center shadow-sm">
           <p className="font-display text-2xl sm:text-3xl font-bold tabular-nums text-foreground">
-            {historyData ? historyData.length * 12 : 1284}
+            {historyData ? historyData.length : reading ? 1 : 0}
           </p>
           <p className="mt-1 text-[11px] sm:text-xs text-muted-foreground">
             {t("dash.totalReadings")}
@@ -182,19 +186,24 @@ function Overview() {
         {/* Stat 3: Data Span */}
         <div className="rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-5 text-center shadow-sm">
           <p className="font-display text-2xl sm:text-3xl font-bold tabular-nums text-good">
-            30 Days
+            {historyData && historyData.length > 0 ? "30 Days" : "Live Active"}
           </p>
           <p className="mt-1 text-[11px] sm:text-xs text-muted-foreground">{t("dash.dataSpan")}</p>
         </div>
 
         {/* Stat 4: Export Data CTA */}
         <div className="col-span-2 sm:col-span-1 flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-5 text-center shadow-sm">
-          <Button onClick={exportCsv} size="sm" className="w-full rounded-2xl">
+          <Button
+            onClick={exportCsv}
+            size="sm"
+            className="w-full rounded-2xl"
+            disabled={!historyData || historyData.length === 0}
+          >
             <Download className="mr-1.5 h-4 w-4 shrink-0" />
             <span className="truncate">{t("dash.exportCsv")}</span>
           </Button>
           <p className="mt-1.5 text-[10px] sm:text-[11px] text-muted-foreground truncate">
-            {reading ? formatTime(reading.timestamp, lang) : "Live"}
+            {reading ? formatTime(reading.timestamp, lang) : "Awaiting sensor data"}
           </p>
         </div>
       </div>
@@ -225,7 +234,7 @@ function Overview() {
       {/* MAIN AIR QUALITY SUMMARY CARD */}
       {isLoading && !reading ? (
         <Skeleton className="h-72 rounded-3xl" />
-      ) : (
+      ) : reading ? (
         <section className={cn("status-transition rounded-3xl border p-6 lg:p-8", theme.soft)}>
           <div className="grid items-center gap-6 sm:grid-cols-[auto_minmax(0,1fr)]">
             <BreathingOrb status={status} size="sm" className="mx-auto h-44! w-44!" />
@@ -235,13 +244,11 @@ function Overview() {
                 {t("dash.airquality")} ·{" "}
                 <span className="inline-flex items-center gap-1">
                   <Radio className={cn("h-3.5 w-3.5", live && "text-good")} />
-                  {t(
-                    live
-                      ? "dash.live"
-                      : streamStatus === "reconnecting"
-                        ? "rooms.reconnecting"
-                        : "rooms.connecting",
-                  )}
+                  {live
+                    ? t("dash.live")
+                    : streamStatus === "reconnecting"
+                      ? t("rooms.reconnecting")
+                      : t("rooms.connecting")}
                 </span>
               </div>
               <p className={cn("mt-2 font-display text-5xl font-bold leading-tight", theme.text)}>
@@ -250,20 +257,33 @@ function Overview() {
               <p className="mt-2 text-sm text-foreground/75">
                 {t("dash.sensorReading")}:{" "}
                 <span key={tick} className="tabular-nums font-bold font-mono inline-block">
-                  {reading?.mq135 ?? "—"}
+                  {reading.mq135}
                 </span>{" "}
-                ppm
+                <span className="text-xs font-normal text-muted-foreground">(Sensor Value)</span>
               </p>
               <p className="mt-1 text-xs text-foreground/60">
                 {t("dash.updated")}:{" "}
-                <span className="tabular-nums">
-                  {reading ? formatTime(reading.timestamp, lang) : "—"}
-                </span>
+                <span className="tabular-nums">{formatTime(reading.timestamp, lang)}</span>
               </p>
 
-              <IndoorOutdoor indoor={reading?.status} className="mt-4" />
+              <IndoorOutdoor indoor={reading.status} className="mt-4" />
             </div>
           </div>
+        </section>
+      ) : (
+        /* Empty State when device exists but no readings received yet */
+        <section className="rounded-3xl border bg-card p-8 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary/80 text-muted-foreground">
+            <Radio className="h-8 w-8 animate-pulse text-primary" />
+          </div>
+          <h2 className="mt-4 font-display text-2xl font-bold text-foreground">
+            Waiting for Sensor Data
+          </h2>
+          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+            No readings have arrived from device{" "}
+            <code className="font-mono text-primary">{device?.name}</code> ({deviceId}) yet. Power
+            on your ESP32 hardware and ensure it connects to Wi-Fi.
+          </p>
         </section>
       )}
 
@@ -276,57 +296,68 @@ function Overview() {
           </div>
           <span className="inline-flex items-center gap-1.5 rounded-full border bg-secondary/80 px-3 py-1 text-xs font-mono text-muted-foreground">
             <Sparkles className="h-3 w-3 text-good" />
-            {t("dash.recordCount")}: {tableRows.length} Active Streams
+            {tableRows.length > 0
+              ? `${tableRows.length} Active Measurements`
+              : "Waiting for hardware stream"}
           </span>
         </div>
 
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b bg-secondary/30 text-xs uppercase tracking-wider text-muted-foreground">
-                <th
-                  className="cursor-pointer p-3.5 font-semibold hover:text-foreground"
-                  onClick={() => {
-                    setSortField("name");
-                    setSortDir(sortDir === "asc" ? "desc" : "asc");
-                  }}
-                >
-                  <div className="flex items-center gap-1">
-                    Room / Device <ArrowDownUp className="h-3 w-3" />
-                  </div>
-                </th>
-                <th
-                  className="cursor-pointer p-3.5 font-semibold hover:text-foreground"
-                  onClick={() => {
-                    setSortField("type");
-                    setSortDir(sortDir === "asc" ? "desc" : "asc");
-                  }}
-                >
-                  <div className="flex items-center gap-1">
-                    Measurement Type <ArrowDownUp className="h-3 w-3" />
-                  </div>
-                </th>
-                <th className="p-3.5 font-semibold">Timestamp</th>
-                <th className="p-3.5 text-right font-semibold">Live Value</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y text-sm">
-              {tableRows.map((r, i) => (
-                <tr key={i} className="transition-colors hover:bg-secondary/40">
-                  <td className="p-3.5 font-medium">{r.name}</td>
-                  <td className="p-3.5 text-muted-foreground">{r.type}</td>
-                  <td className="p-3.5 font-mono text-xs text-muted-foreground">
-                    {r.time ? formatTime(r.time, lang) : "—"}
-                  </td>
-                  <td className="p-3.5 text-right font-mono font-semibold text-primary">{r.val}</td>
+        {tableRows.length === 0 ? (
+          <div className="py-8 text-center text-sm text-muted-foreground">
+            No live sensor readings available yet. Once the ESP32 begins transmitting, readings will
+            display here.
+          </div>
+        ) : (
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b bg-secondary/30 text-xs uppercase tracking-wider text-muted-foreground">
+                  <th
+                    className="cursor-pointer p-3.5 font-semibold hover:text-foreground"
+                    onClick={() => {
+                      setSortField("name");
+                      setSortDir(sortDir === "asc" ? "desc" : "asc");
+                    }}
+                  >
+                    <div className="flex items-center gap-1">
+                      Room / Device <ArrowDownUp className="h-3 w-3" />
+                    </div>
+                  </th>
+                  <th
+                    className="cursor-pointer p-3.5 font-semibold hover:text-foreground"
+                    onClick={() => {
+                      setSortField("type");
+                      setSortDir(sortDir === "asc" ? "desc" : "asc");
+                    }}
+                  >
+                    <div className="flex items-center gap-1">
+                      Measurement Type <ArrowDownUp className="h-3 w-3" />
+                    </div>
+                  </th>
+                  <th className="p-3.5 font-semibold">Timestamp</th>
+                  <th className="p-3.5 text-right font-semibold">Live Value</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y text-sm">
+                {tableRows.map((r, i) => (
+                  <tr key={i} className="transition-colors hover:bg-secondary/40">
+                    <td className="p-3.5 font-medium">{r.name}</td>
+                    <td className="p-3.5 text-muted-foreground">{r.type}</td>
+                    <td className="p-3.5 font-mono text-xs text-muted-foreground">
+                      {r.time ? formatTime(r.time, lang) : "—"}
+                    </td>
+                    <td className="p-3.5 text-right font-mono font-semibold text-primary">
+                      {r.val}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
-      <ActionCard status={status} trend={trend} />
+      {reading && <ActionCard status={status} trend={trend} />}
 
       {devices.length > 1 && <RoomComparison devices={devices} onSelect={select} />}
 
@@ -336,13 +367,14 @@ function Overview() {
         <section className="rounded-3xl border bg-card p-6">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
             <p className="truncate text-sm font-semibold">{t("dash.device")}</p>
-            {live ? (
+            {device?.online || live ? (
               <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-good-soft px-2.5 py-1 text-xs text-good">
                 <Wifi className="h-3.5 w-3.5" /> {t("dash.online")}
               </span>
             ) : (
               <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
-                <WifiOff className="h-3.5 w-3.5" /> {t("dash.offline")}
+                <WifiOff className="h-3.5 w-3.5" />{" "}
+                {device?.lastSeen ? t("dash.offline") : "Never Connected"}
               </span>
             )}
           </div>
@@ -400,13 +432,13 @@ function Overview() {
           ) : (
             <div className="mt-4 flex items-start gap-3 rounded-2xl bg-good-soft p-4">
               <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-good" />
-              <p className="text-sm text-foreground/80">{t("status.good.advice")}</p>
+              <p className="text-sm text-foreground/80">
+                {reading ? t("status.good.advice") : "Awaiting hardware readings"}
+              </p>
             </div>
           )}
         </section>
       </div>
-
-      <MockAlertCard />
     </div>
   );
 }

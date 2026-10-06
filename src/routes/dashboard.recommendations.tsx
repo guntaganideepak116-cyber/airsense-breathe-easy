@@ -7,6 +7,9 @@ import {
   Activity,
   HeartPulse,
   UserCheck,
+  Radio,
+  Thermometer,
+  Droplets,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useSelectedDevice, useLatest } from "@/lib/queries";
@@ -47,123 +50,186 @@ function RecommendationsPage() {
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
         <div>
           <h1 className="font-display text-2xl text-ink sm:text-3xl">{t("rec.title")}</h1>
-          <p className="truncate text-sm text-muted-foreground">{device?.name ?? "All Rooms"}</p>
+          <p className="truncate text-sm text-muted-foreground">
+            {device?.name ?? "Room Sensor Location"}
+          </p>
         </div>
       </div>
 
-      {/* Current Room Air Banner Callout */}
-      <div className={cn("rounded-3xl border p-5 transition-all", theme.soft)}>
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <span
-              className={cn("grid h-10 w-10 place-items-center rounded-2xl text-white", theme.dot)}
-            >
-              <HeartPulse className="h-5 w-5" />
-            </span>
-            <div>
-              <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                {t("dash.airquality")}
-              </p>
-              <p className={cn("font-display text-xl font-bold", theme.text)}>{t(theme.label)}</p>
+      {!reading ? (
+        /* Empty State when insufficient real data exists */
+        <div className="rounded-3xl border bg-card p-10 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary/80 text-muted-foreground">
+            <Radio className="h-8 w-8 animate-pulse text-primary" />
+          </div>
+          <h2 className="mt-4 font-display text-xl font-bold text-foreground">
+            Not enough sensor data to generate recommendations.
+          </h2>
+          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+            Connect your AirSense ESP32 device to this room to receive personalized, real-time
+            health and ventilation recommendations.
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Current Room Air Banner Callout */}
+          <div className={cn("rounded-3xl border p-5 transition-all", theme.soft)}>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span
+                  className={cn(
+                    "grid h-10 w-10 place-items-center rounded-2xl text-white",
+                    theme.dot,
+                  )}
+                >
+                  <HeartPulse className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                    {t("dash.airquality")}
+                  </p>
+                  <p className={cn("font-display text-xl font-bold", theme.text)}>
+                    {t(theme.label)}
+                  </p>
+                </div>
+              </div>
+              <div className="max-w-md text-sm text-foreground/80">
+                {status === "good" && t("status.good.advice")}
+                {status === "moderate" && t("status.moderate.advice")}
+                {status === "poor" && t("status.poor.advice")}
+              </div>
             </div>
           </div>
-          <div className="max-w-md text-sm text-foreground/80">
-            {status === "good" && t("status.good.advice")}
-            {status === "moderate" && t("status.moderate.advice")}
-            {status === "poor" && t("status.poor.advice")}
-          </div>
-        </div>
-      </div>
 
-      {/* 3-Column Recommendations Cards */}
-      <div className="grid gap-5 md:grid-cols-3">
-        {/* Column 1: General Guidance */}
-        <section className="rounded-3xl border bg-card p-6 shadow-sm">
-          <div className="flex items-center gap-2 text-primary">
-            <UserCheck className="h-5 w-5" />
-            <h2 className="font-display text-lg">{t("rec.general")}</h2>
-          </div>
-          <ul className="mt-5 space-y-3.5 text-sm text-muted-foreground">
-            <li className="flex items-start gap-2.5">
-              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-good" />
-              <span>
-                Keep indoor rooms ventilated during morning hours when outdoor AQI is low.
-              </span>
-            </li>
-            <li className="flex items-start gap-2.5">
-              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-good" />
-              <span>
-                Use damp microfiber cloths for dusting rather than dry sweeping to prevent particle
-                recirculation.
-              </span>
-            </li>
-            <li className="flex items-start gap-2.5">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-moderate" />
-              <span>Avoid burning mosquito coils or incense sticks inside closed bedrooms.</span>
-            </li>
-          </ul>
-        </section>
+          {/* DYNAMIC REAL-DATA RECOMMENDATIONS */}
+          <div className="grid gap-5 md:grid-cols-3">
+            {/* Column 1: Air Quality Recommendation */}
+            <section className="rounded-3xl border bg-card p-6 shadow-sm">
+              <div className="flex items-center gap-2 text-primary">
+                <Wind className="h-5 w-5" />
+                <h2 className="font-display text-lg">Ventilation & Airflow</h2>
+              </div>
+              <ul className="mt-5 space-y-3.5 text-sm text-muted-foreground">
+                {reading.mq135 >= 700 ? (
+                  <li className="flex items-start gap-2.5 text-poor">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>
+                      <strong>Immediate action:</strong> High air contamination detected (MQ-135:{" "}
+                      {reading.mq135}). Open windows or activate exhaust fans immediately.
+                    </span>
+                  </li>
+                ) : reading.mq135 >= 400 ? (
+                  <li className="flex items-start gap-2.5 text-moderate">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>
+                      <strong>Ventilation needed:</strong> Moderate air contamination (MQ-135:{" "}
+                      {reading.mq135}). Consider opening a window for fresh air circulation.
+                    </span>
+                  </li>
+                ) : (
+                  <li className="flex items-start gap-2.5 text-good">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>
+                      <strong>Air quality is clean:</strong> MQ-135 reading is low ({reading.mq135}
+                      ). Ideal environment for children, students, and sleeping.
+                    </span>
+                  </li>
+                )}
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-good" />
+                  <span>
+                    Use damp microfiber cloths for dusting to prevent recirculating particles.
+                  </span>
+                </li>
+              </ul>
+            </section>
 
-        {/* Column 2: Sensitive Groups */}
-        <section className="rounded-3xl border bg-card p-6 shadow-sm">
-          <div className="flex items-center gap-2 text-moderate">
-            <ShieldAlert className="h-5 w-5" />
-            <h2 className="font-display text-lg">{t("rec.sensitive")}</h2>
-          </div>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Priority protection groups in AP & Telangana during high dust & smog days:
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {sensitiveGroups.map((g) => (
-              <span
-                key={g.name}
-                className="inline-flex items-center gap-1.5 rounded-full border bg-secondary/60 px-3 py-1.5 text-xs font-medium text-foreground"
-              >
-                <span>{g.icon}</span>
-                <span>{g.name}</span>
-                <span className="rounded-md bg-card px-1.5 py-0.5 text-[10px] text-muted-foreground">
-                  {g.tag}
-                </span>
-              </span>
-            ))}
-          </div>
-        </section>
+            {/* Column 2: Temperature & Humidity Comfort */}
+            <section className="rounded-3xl border bg-card p-6 shadow-sm">
+              <div className="flex items-center gap-2 text-moderate">
+                <Thermometer className="h-5 w-5" />
+                <h2 className="font-display text-lg">Thermal Comfort</h2>
+              </div>
+              <ul className="mt-5 space-y-3.5 text-sm text-muted-foreground">
+                {reading.temperature > 32 ? (
+                  <li className="flex items-start gap-2.5 text-moderate">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>
+                      <strong>High Temperature ({reading.temperature}°C):</strong> Increase room
+                      airflow with fans or air conditioning to reduce heat stress.
+                    </span>
+                  </li>
+                ) : (
+                  <li className="flex items-start gap-2.5 text-good">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>
+                      <strong>Temperature Comfort ({reading.temperature}°C):</strong> Indoor thermal
+                      level is within safe bounds.
+                    </span>
+                  </li>
+                )}
 
-        {/* Column 3: Activity Guidance */}
-        <section className="rounded-3xl border bg-card p-6 shadow-sm">
-          <div className="flex items-center gap-2 text-good">
-            <Activity className="h-5 w-5" />
-            <h2 className="font-display text-lg">{t("rec.activity")}</h2>
+                {reading.humidity > 65 ? (
+                  <li className="flex items-start gap-2.5 text-moderate">
+                    <Droplets className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>
+                      <strong>High Humidity ({reading.humidity}%):</strong> Excessive moisture can
+                      promote mold and allergen accumulation. Keep airflow moving.
+                    </span>
+                  </li>
+                ) : reading.humidity < 35 ? (
+                  <li className="flex items-start gap-2.5 text-moderate">
+                    <Droplets className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>
+                      <strong>Low Humidity ({reading.humidity}%):</strong> Dry indoor air may cause
+                      throat or nasal irritation.
+                    </span>
+                  </li>
+                ) : (
+                  <li className="flex items-start gap-2.5 text-good">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>
+                      <strong>Balanced Humidity ({reading.humidity}%):</strong> Moisture level is
+                      healthy for lungs and skin.
+                    </span>
+                  </li>
+                )}
+              </ul>
+            </section>
+
+            {/* Column 3: Sensitive Groups Guidance */}
+            <section className="rounded-3xl border bg-card p-6 shadow-sm">
+              <div className="flex items-center gap-2 text-primary">
+                <ShieldAlert className="h-5 w-5" />
+                <h2 className="font-display text-lg">{t("rec.sensitive")}</h2>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Active health alerts based on current indoor reading ({reading.status}):
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {sensitiveGroups.map((g) => (
+                  <span
+                    key={g.name}
+                    className="inline-flex items-center gap-1.5 rounded-full border bg-secondary/60 px-3 py-1.5 text-xs font-medium text-foreground"
+                  >
+                    <span>{g.icon}</span>
+                    <span>{g.name}</span>
+                    <span className="rounded-md bg-card px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                      {g.tag}
+                    </span>
+                  </span>
+                ))}
+              </div>
+            </section>
           </div>
-          <ul className="mt-5 space-y-3.5 text-sm text-muted-foreground">
-            <li className="flex items-start gap-2.5">
-              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-good" />
-              <span>
-                <strong>Morning Yoga & Exercise:</strong> Safe outdoors between 6:00 AM – 9:00 AM.
-              </span>
-            </li>
-            <li className="flex items-start gap-2.5">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-moderate" />
-              <span>
-                <strong>Classroom Sports:</strong> Shift sports to covered indoor halls if PM2.5
-                crosses 400.
-              </span>
-            </li>
-            <li className="flex items-start gap-2.5">
-              <Wind className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-              <span>
-                <strong>Ventilation:</strong> Open windows between 10:00 AM and 3:00 PM for airflow.
-              </span>
-            </li>
-          </ul>
-        </section>
-      </div>
+        </>
+      )}
 
       {/* AQI Scale Reference Strip */}
       <section className="rounded-3xl border bg-card p-6">
         <h3 className="font-display text-lg">{t("rec.scale")}</h3>
         <p className="mt-1 text-xs text-muted-foreground">
-          Threshold scale guidelines for MQ135 sensor readings (ppm):
+          Calibrated threshold bands for MQ-135 sensor readings:
         </p>
 
         <div className="mt-5 grid gap-3 md:grid-cols-3">
@@ -171,7 +237,7 @@ function RecommendationsPage() {
             <div className="flex items-center justify-between">
               <span className="font-display text-base font-semibold text-good">Good (బాగుంది)</span>
               <span className="rounded-full bg-good/20 px-2.5 py-0.5 text-xs font-mono text-good">
-                &lt; 400 ppm
+                &lt; 400
               </span>
             </div>
             <p className="mt-2 text-xs text-foreground/70">
@@ -185,7 +251,7 @@ function RecommendationsPage() {
                 Moderate (మధ్యస్థం)
               </span>
               <span className="rounded-full bg-moderate/20 px-2.5 py-0.5 text-xs font-mono text-moderate">
-                400 – 700 ppm
+                400 – 700
               </span>
             </div>
             <p className="mt-2 text-xs text-foreground/70">
@@ -197,11 +263,11 @@ function RecommendationsPage() {
             <div className="flex items-center justify-between">
               <span className="font-display text-base font-semibold text-poor">Poor (పేలవం)</span>
               <span className="rounded-full bg-poor/20 px-2.5 py-0.5 text-xs font-mono text-poor">
-                &gt; 700 ppm
+                &gt; 700
               </span>
             </div>
             <p className="mt-2 text-xs text-foreground/70">
-              Stuffy air with high VOC/dust. Local buzzer sounds. Open windows immediately.
+              Elevated contaminants/VOCs. Local buzzer sounds. Open windows immediately.
             </p>
           </div>
         </div>

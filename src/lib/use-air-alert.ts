@@ -19,7 +19,7 @@ export function useAirAlert(reading: Reading | null | undefined, deviceName: str
 
     void showAirAlert({
       title: `${deviceName ?? t("dash.device")} — ${t("status.poor")}`,
-      body: `${t("dash.sensorReading")}: ${reading.mq135} ppm · ${t("status.poor.advice")}`,
+      body: `${t("dash.sensorReading")}: ${reading.mq135} · ${t("status.poor.advice")}`,
       deviceId: reading.deviceId,
       lang,
     });

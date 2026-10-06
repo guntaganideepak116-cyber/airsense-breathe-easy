@@ -27,8 +27,6 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 
-import { MockAlertCard } from "@/components/MockAlertCard";
-
 export const Route = createFileRoute("/dashboard/settings")({
   head: () => ({
     meta: [
@@ -80,8 +78,6 @@ function SettingsPage() {
 
       <MultiChannelAlertsSection />
 
-      <MockAlertCard />
-
       <section className="rounded-3xl border bg-card p-6">
         <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-sky-soft text-primary">
@@ -115,7 +111,9 @@ function SettingsPage() {
         <div className="mt-4 rounded-2xl border p-4">
           <div className="flex items-center justify-between gap-4">
             <Label>{t("set.threshold")}</Label>
-            <span className="text-sm tabular-nums text-muted-foreground">{threshold} ppm</span>
+            <span className="text-sm tabular-nums text-muted-foreground">
+              {threshold} (Sensor Value)
+            </span>
           </div>
           <Slider
             className="mt-4"

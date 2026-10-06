@@ -49,7 +49,7 @@ function fileStem(meta: ReportMeta) {
 }
 
 export function exportCsv(points: HistoryPoint[], meta: ReportMeta) {
-  const head = ["timestamp", "mq135_ppm", "temperature_c", "humidity_pct", "classification"];
+  const head = ["timestamp", "mq135_reading", "temperature_c", "humidity_pct", "classification"];
   const rows = points.map((p) => [
     new Date(p.t).toISOString(),
     String(p.mq135),
@@ -119,7 +119,7 @@ export function exportPdf(points: HistoryPoint[], meta: ReportMeta) {
 
   line("Summary", 13, true, 20);
   line(`Readings in period: ${points.length}`);
-  line(`Average MQ135: ${avg} ppm   ·   Peak: ${peak} ppm`);
+  line(`Average MQ-135: ${avg}   ·   Peak: ${peak}`);
   line(`Poor episodes: ${episodes}   ·   Time in Poor: ${poorCount * step} min`);
   line(
     `Today so far: ${today.poorEpisodes} poor episode(s), ${today.poorMinutes} min in Poor`,
@@ -145,7 +145,7 @@ export function exportPdf(points: HistoryPoint[], meta: ReportMeta) {
   doc.setFontSize(9);
   doc.setFont("helvetica", "bold");
   const cols = [margin, margin + 170, margin + 250, margin + 330, margin + 420];
-  const header = ["Time", "MQ135 (ppm)", "Temp (C)", "Humidity (%)", "Classification"];
+  const header = ["Time", "MQ-135", "Temp (C)", "Humidity (%)", "Classification"];
   header.forEach((h, i) => doc.text(h, cols[i]!, y));
   y += 14;
   doc.setFont("helvetica", "normal");

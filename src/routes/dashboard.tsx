@@ -1,6 +1,6 @@
-import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { useClerk } from "@clerk/clerk-react";
+import { useAuth, useClerk } from "@clerk/clerk-react";
 import {
   ArrowLeft,
   ChevronRight,
@@ -20,7 +20,7 @@ import {
 import { useI18n, type TKey } from "@/lib/i18n";
 import { LangToggle } from "@/components/LangToggle";
 import { useSelectedDevice } from "@/lib/queries";
-import { cachedReading } from "@/lib/airsense";
+import { cachedReading, setAuthTokenGetter } from "@/lib/airsense";
 import { formatTime } from "@/lib/status";
 import { cn } from "@/lib/utils";
 
@@ -72,6 +72,18 @@ function DashboardLayout() {
   const [lastSeen, setLastSeen] = useState<string | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const clerk = useClerk();
+  const { isLoaded, isSignedIn, getToken } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      void navigate({ to: "/auth" });
+    }
+  }, [isLoaded, isSignedIn, navigate]);
+
+  useEffect(() => {
+    setAuthTokenGetter(getToken);
+  }, [getToken]);
 
   useEffect(() => {
     const update = () => {
@@ -102,6 +114,21 @@ function DashboardLayout() {
     }
     window.location.href = "/";
   };
+
+  if (!isLoaded) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="text-sm text-muted-foreground">Authenticating session...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isSignedIn) {
+    return null;
+  }
 
   const isMoreActive =
     pathname === "/dashboard/recommendations" || pathname === "/dashboard/settings";

@@ -193,7 +193,7 @@ function MonitoringPreview() {
         {/* Room label */}
         <div className="mt-2 flex items-center gap-1.5 border-t border-white/5 pt-1.5">
           <Activity className="h-2.5 w-2.5 text-white/30" />
-          <p className="text-[9px] text-white/40">Classroom 4B · Live stream</p>
+          <p className="text-[9px] text-white/40">AirSense IoT · Live stream</p>
         </div>
       </div>
     </div>
@@ -256,11 +256,7 @@ function AuthPage() {
           </h1>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-400 font-medium shadow-xs">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span>
-              Classroom 4B: <strong>92 AQI</strong> (Good)
-            </span>
-            <span className="text-white/30">·</span>
-            <span>28°C · 61%</span>
+            <span>Real-Time IoT Sensor Dashboard</span>
           </div>
         </div>
 

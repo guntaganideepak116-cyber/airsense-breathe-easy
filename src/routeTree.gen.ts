@@ -19,12 +19,18 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as WeatherRouteImport } from './routes/weather'
 import { Route as ApiDevicesRouteImport } from './routes/api/devices'
 import { Route as ApiMockAlertRouteImport } from './routes/api/mock-alert'
+import { Route as ApiWeatherRouteImport } from './routes/api/weather'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as DashboardHistoryRouteImport } from './routes/dashboard.history'
 import { Route as DashboardRecommendationsRouteImport } from './routes/dashboard.recommendations'
 import { Route as DashboardRoomsRouteImport } from './routes/dashboard.rooms'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
 import { Route as DashboardWeatherRouteImport } from './routes/dashboard.weather'
+import { Route as ApiDeviceDataRouteImport } from './routes/api/device.data'
+import { Route as ApiDeviceHistoryRouteImport } from './routes/api/device.history'
+import { Route as ApiDeviceLatestRouteImport } from './routes/api/device.latest'
+import { Route as ApiDevicesIdRouteImport } from './routes/api/devices.$id'
+import { Route as ApiDevicesDataRouteImport } from './routes/api/devices.data'
 import { Route as ApiPushSubscribeRouteImport } from './routes/api/push.subscribe'
 import { Route as ApiPushVapidRouteImport } from './routes/api/push.vapid'
 import { Route as ApiUserAlertPreferencesRouteImport } from './routes/api/user.alert-preferences'
@@ -80,6 +86,11 @@ const ApiMockAlertRoute = ApiMockAlertRouteImport.update({
   path: '/api/mock-alert',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWeatherRoute = ApiWeatherRouteImport.update({
+  id: '/api/weather',
+  path: '/api/weather',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -111,6 +122,31 @@ const DashboardWeatherRoute = DashboardWeatherRouteImport.update({
   path: '/weather',
   getParentRoute: () => DashboardRoute,
 } as any)
+const ApiDeviceDataRoute = ApiDeviceDataRouteImport.update({
+  id: '/api/device/data',
+  path: '/api/device/data',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDeviceHistoryRoute = ApiDeviceHistoryRouteImport.update({
+  id: '/api/device/history',
+  path: '/api/device/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDeviceLatestRoute = ApiDeviceLatestRouteImport.update({
+  id: '/api/device/latest',
+  path: '/api/device/latest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDevicesIdRoute = ApiDevicesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiDevicesRoute,
+} as any)
+const ApiDevicesDataRoute = ApiDevicesDataRouteImport.update({
+  id: '/data',
+  path: '/data',
+  getParentRoute: () => ApiDevicesRoute,
+} as any)
 const ApiPushSubscribeRoute = ApiPushSubscribeRouteImport.update({
   id: '/api/push/subscribe',
   path: '/api/push/subscribe',
@@ -141,14 +177,20 @@ export interface FileRoutesByFullPath {
   '/rooms': typeof RoomsRoute
   '/settings': typeof SettingsRoute
   '/weather': typeof WeatherRoute
-  '/api/devices': typeof ApiDevicesRoute
+  '/api/devices': typeof ApiDevicesRouteWithChildren
   '/api/mock-alert': typeof ApiMockAlertRoute
+  '/api/weather': typeof ApiWeatherRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/recommendations': typeof DashboardRecommendationsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/weather': typeof DashboardWeatherRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/api/device/data': typeof ApiDeviceDataRoute
+  '/api/device/history': typeof ApiDeviceHistoryRoute
+  '/api/device/latest': typeof ApiDeviceLatestRoute
+  '/api/devices/$id': typeof ApiDevicesIdRoute
+  '/api/devices/data': typeof ApiDevicesDataRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/vapid': typeof ApiPushVapidRoute
   '/api/user/alert-preferences': typeof ApiUserAlertPreferencesRoute
@@ -162,14 +204,20 @@ export interface FileRoutesByTo {
   '/rooms': typeof RoomsRoute
   '/settings': typeof SettingsRoute
   '/weather': typeof WeatherRoute
-  '/api/devices': typeof ApiDevicesRoute
+  '/api/devices': typeof ApiDevicesRouteWithChildren
   '/api/mock-alert': typeof ApiMockAlertRoute
+  '/api/weather': typeof ApiWeatherRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/recommendations': typeof DashboardRecommendationsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/weather': typeof DashboardWeatherRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/api/device/data': typeof ApiDeviceDataRoute
+  '/api/device/history': typeof ApiDeviceHistoryRoute
+  '/api/device/latest': typeof ApiDeviceLatestRoute
+  '/api/devices/$id': typeof ApiDevicesIdRoute
+  '/api/devices/data': typeof ApiDevicesDataRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/vapid': typeof ApiPushVapidRoute
   '/api/user/alert-preferences': typeof ApiUserAlertPreferencesRoute
@@ -185,14 +233,20 @@ export interface FileRoutesById {
   '/rooms': typeof RoomsRoute
   '/settings': typeof SettingsRoute
   '/weather': typeof WeatherRoute
-  '/api/devices': typeof ApiDevicesRoute
+  '/api/devices': typeof ApiDevicesRouteWithChildren
   '/api/mock-alert': typeof ApiMockAlertRoute
+  '/api/weather': typeof ApiWeatherRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/recommendations': typeof DashboardRecommendationsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/weather': typeof DashboardWeatherRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/api/device/data': typeof ApiDeviceDataRoute
+  '/api/device/history': typeof ApiDeviceHistoryRoute
+  '/api/device/latest': typeof ApiDeviceLatestRoute
+  '/api/devices/$id': typeof ApiDevicesIdRoute
+  '/api/devices/data': typeof ApiDevicesDataRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/vapid': typeof ApiPushVapidRoute
   '/api/user/alert-preferences': typeof ApiUserAlertPreferencesRoute
@@ -211,12 +265,18 @@ export interface FileRouteTypes {
     | '/weather'
     | '/api/devices'
     | '/api/mock-alert'
+    | '/api/weather'
     | '/dashboard/history'
     | '/dashboard/recommendations'
     | '/dashboard/rooms'
     | '/dashboard/settings'
     | '/dashboard/weather'
     | '/dashboard/'
+    | '/api/device/data'
+    | '/api/device/history'
+    | '/api/device/latest'
+    | '/api/devices/$id'
+    | '/api/devices/data'
     | '/api/push/subscribe'
     | '/api/push/vapid'
     | '/api/user/alert-preferences'
@@ -232,12 +292,18 @@ export interface FileRouteTypes {
     | '/weather'
     | '/api/devices'
     | '/api/mock-alert'
+    | '/api/weather'
     | '/dashboard/history'
     | '/dashboard/recommendations'
     | '/dashboard/rooms'
     | '/dashboard/settings'
     | '/dashboard/weather'
     | '/dashboard'
+    | '/api/device/data'
+    | '/api/device/history'
+    | '/api/device/latest'
+    | '/api/devices/$id'
+    | '/api/devices/data'
     | '/api/push/subscribe'
     | '/api/push/vapid'
     | '/api/user/alert-preferences'
@@ -254,12 +320,18 @@ export interface FileRouteTypes {
     | '/weather'
     | '/api/devices'
     | '/api/mock-alert'
+    | '/api/weather'
     | '/dashboard/history'
     | '/dashboard/recommendations'
     | '/dashboard/rooms'
     | '/dashboard/settings'
     | '/dashboard/weather'
     | '/dashboard/'
+    | '/api/device/data'
+    | '/api/device/history'
+    | '/api/device/latest'
+    | '/api/devices/$id'
+    | '/api/devices/data'
     | '/api/push/subscribe'
     | '/api/push/vapid'
     | '/api/user/alert-preferences'
@@ -275,8 +347,12 @@ export interface RootRouteChildren {
   RoomsRoute: typeof RoomsRoute
   SettingsRoute: typeof SettingsRoute
   WeatherRoute: typeof WeatherRoute
-  ApiDevicesRoute: typeof ApiDevicesRoute
+  ApiDevicesRoute: typeof ApiDevicesRouteWithChildren
   ApiMockAlertRoute: typeof ApiMockAlertRoute
+  ApiWeatherRoute: typeof ApiWeatherRoute
+  ApiDeviceDataRoute: typeof ApiDeviceDataRoute
+  ApiDeviceHistoryRoute: typeof ApiDeviceHistoryRoute
+  ApiDeviceLatestRoute: typeof ApiDeviceLatestRoute
   ApiPushSubscribeRoute: typeof ApiPushSubscribeRoute
   ApiPushVapidRoute: typeof ApiPushVapidRoute
   ApiUserAlertPreferencesRoute: typeof ApiUserAlertPreferencesRoute
@@ -355,6 +431,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiMockAlertRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/weather': {
+      id: '/api/weather'
+      path: '/api/weather'
+      fullPath: '/api/weather'
+      preLoaderRoute: typeof ApiWeatherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/': {
       id: '/dashboard/'
       path: '/'
@@ -396,6 +479,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/weather'
       preLoaderRoute: typeof DashboardWeatherRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/api/device/data': {
+      id: '/api/device/data'
+      path: '/api/device/data'
+      fullPath: '/api/device/data'
+      preLoaderRoute: typeof ApiDeviceDataRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/device/history': {
+      id: '/api/device/history'
+      path: '/api/device/history'
+      fullPath: '/api/device/history'
+      preLoaderRoute: typeof ApiDeviceHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/device/latest': {
+      id: '/api/device/latest'
+      path: '/api/device/latest'
+      fullPath: '/api/device/latest'
+      preLoaderRoute: typeof ApiDeviceLatestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/devices/$id': {
+      id: '/api/devices/$id'
+      path: '/$id'
+      fullPath: '/api/devices/$id'
+      preLoaderRoute: typeof ApiDevicesIdRouteImport
+      parentRoute: typeof ApiDevicesRoute
+    }
+    '/api/devices/data': {
+      id: '/api/devices/data'
+      path: '/data'
+      fullPath: '/api/devices/data'
+      preLoaderRoute: typeof ApiDevicesDataRouteImport
+      parentRoute: typeof ApiDevicesRoute
     }
     '/api/push/subscribe': {
       id: '/api/push/subscribe'
@@ -450,6 +568,20 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
   DashboardRouteChildren,
 )
 
+interface ApiDevicesRouteChildren {
+  ApiDevicesIdRoute: typeof ApiDevicesIdRoute
+  ApiDevicesDataRoute: typeof ApiDevicesDataRoute
+}
+
+const ApiDevicesRouteChildren: ApiDevicesRouteChildren = {
+  ApiDevicesIdRoute: ApiDevicesIdRoute,
+  ApiDevicesDataRoute: ApiDevicesDataRoute,
+}
+
+const ApiDevicesRouteWithChildren = ApiDevicesRoute._addFileChildren(
+  ApiDevicesRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
@@ -459,8 +591,12 @@ const rootRouteChildren: RootRouteChildren = {
   RoomsRoute: RoomsRoute,
   SettingsRoute: SettingsRoute,
   WeatherRoute: WeatherRoute,
-  ApiDevicesRoute: ApiDevicesRoute,
+  ApiDevicesRoute: ApiDevicesRouteWithChildren,
   ApiMockAlertRoute: ApiMockAlertRoute,
+  ApiWeatherRoute: ApiWeatherRoute,
+  ApiDeviceDataRoute: ApiDeviceDataRoute,
+  ApiDeviceHistoryRoute: ApiDeviceHistoryRoute,
+  ApiDeviceLatestRoute: ApiDeviceLatestRoute,
   ApiPushSubscribeRoute: ApiPushSubscribeRoute,
   ApiPushVapidRoute: ApiPushVapidRoute,
   ApiUserAlertPreferencesRoute: ApiUserAlertPreferencesRoute,
@@ -469,3 +605,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

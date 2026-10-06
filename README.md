@@ -1,156 +1,304 @@
-# AirSense: Breathe Easy
+# AirSense — IoT Indoor Air Quality Monitoring System
 
-You are building a production-grade web application called "AirSense" — an Indoor Air Quality Monitoring & Alert platform for classrooms, homes, and hostels, targeting families and schools in Andhra Pradesh and Telangana. This is a real product, not a demo template. Avoid generic SaaS dashboard aesthetics (no default blue-gradient hero, no stock "empower your business" copy, no cookie-cutter Bootstrap cards). The visual identity should feel calm, clean, and health-focused — think clinical trustworthiness combined with warmth: soft sky blues, clean whites, sage green for "good" states, amber/coral for warning states — avoiding cold, corporate, or alarmist design.
+A production-grade indoor air quality monitoring platform for classrooms, homes, and hostels in Andhra Pradesh & Telangana. Built with real ESP32 hardware, MongoDB, TanStack Start, Clerk Auth, and real-time SSE streaming.
 
-Tech Requirements
 
-Next.js (App Router), TypeScript, Tailwind CSS
+---
 
-TanStack Query for data fetching/caching
+## Architecture Overview
 
-PWA-ready: installable, offline-capable, push notification support (Workbox)
+```
+ESP32 (MQ-135 + DHT22)
+    │  POST /api/devices/data  (deviceId + apiKey in body)
+    ▼
+TanStack Start Server (Node.js / Nitro)
+    │  Validates API key hash → saves to MongoDB → emits SSE
+    ▼
+MongoDB (Atlas or local)
+    │  sensorReadings · devices · alerts · userPreferences
+    ▼
+React Dashboard (SSE stream + React Query polling)
+    │  /api/device/:id/stream  →  live readings
+    ▼
+WhatsApp (Twilio) + Email (Resend) → Alert Notifications
+```
 
-Fully responsive, mobile-first
+---
 
-Auth via Clerk (email/phone login)
+## Quick Start (Local Development)
 
-Default language: Telugu, with an English toggle (see localization section below)
+### Prerequisites
+- Node.js 20+ (or Bun)
+- MongoDB — local `mongod` **or** free [MongoDB Atlas](https://www.mongodb.com/atlas)
+- [Clerk account](https://clerk.com) (free tier)
 
-Pages & Sections Required
-
-1. Landing Page (public, unauthenticated) — Master-level, professional, distinctive
-
-Hero section: headline framed around the real problem — indoor air quality is invisible and unmonitored, directly affecting children's health and focus in AP/Telangana specifically (seasonal crop burning, dust, traffic emissions). Avoid vague "AI-powered platform" language — be concrete and human.
-
-"The Invisible Problem" section: a visually compelling explainer (custom illustration or abstract graphic representing unseen pollutants in a room) — communicate that a room can "feel fine" while air quality is actually poor
-
-"How It Works" section: 3-4 step visual flow — Sensor monitors room air → Instant local alert (buzzer/LED) if air turns poor → Live data streams to dashboard → Parent/teacher can check any room remotely
-
-Live dashboard preview section: a realistic static mockup of the actual dashboard (Good/Moderate/Poor gauge, temperature/humidity, live chart) — builds credibility before signup
-
-Impact/comparison section: a clean visual/table contrasting this solution against existing methods — no monitoring at all (status quo), expensive commercial monitors (₹3,000-15,000+), city-wide government AQI apps that don't reflect indoor reality — positioning this as affordable, hyper-local, and actionable
-
-Features grid: Real-time room monitoring, Instant local alerts, Remote dashboard access, Works via app or website, Historical trend tracking, Telugu-first accessibility
-
-Use-case section: 2-3 realistic scenarios (a classroom during exam season, a child's bedroom, a hostel common room) — clearly framed as illustrative, not real testimonials
-
-Strong footer with clear CTA to sign up
-
-Build a distinctive visual identity — consider a subtle animated "breathing room" motif (e.g., a soft pulsing illustration representing air circulation) rather than generic dashboard screenshots as the hero visual
-
-2. Auth Pages
-
-Clerk-powered sign in/sign up, styled to match the calm, clinical-but-warm brand — not Clerk's default look
-
-3. Main Dashboard (authenticated, /dashboard)
-
-Primary air quality status card: large, prominent Good/Moderate/Poor indicator (color-coded: green/amber/red) with the underlying MQ135 reading shown as supporting detail, not the headline number itself (the classification should be the star, since that's what's actually understandable)
-
-Temperature & Humidity card: live DHT22 readings, each with a comfort-range indicator
-
-Room/Device info: device name (editable, e.g. "Classroom 4B" or "Deepak's Room"), connection status (Online/Offline), last updated timestamp
-
-Alert status: clear indicator if buzzer/alert was recently triggered, with timestamp of last "Poor" air event
-
-Quick action guidance card: contextual advice based on current status — e.g., "Air quality is Moderate — consider opening a window" — dynamic text, not static
-
-4. History/Trends Page (/dashboard/history)
-
-Line/area chart of air quality classification and raw sensor values over time (24h / 7 days / 30 days toggle)
-
-Temperature & humidity trend charts
-
-Event log: timestamped list of every time air crossed into "Poor" status
-
-Simple insight callouts (e.g., "Air quality tends to worsen between 4-6 PM" if the pattern is detectable from data — can be a simple rule-based observation, not require ML)
-
-5. Multi-Room/Multi-Device View (/dashboard/rooms) — if user has more than one device
-
-Card grid showing all monitored rooms/devices at a glance, each with current status color
-
-Click into any room to see its individual dashboard/history
-
-6. Settings Page (/dashboard/settings)
-
-Notification preferences (push alert on/off, threshold customization if desired)
-
-Device management (rename, remove device, add new device)
-
-Language toggle (Telugu/English) — also accessible from main nav
-
-Account settings (via Clerk)
-
-7. PWA Requirements (critical — don't skip)
-
-Full manifest.json: app name "AirSense", theme color matching brand, icons (192/512), display: standalone
-
-Custom install prompt banner (not just relying on browser default)
-
-Push notification permission request flow with clear explanation before asking ("Get notified the moment air quality turns poor in a monitored room")
-
-Offline fallback: dashboard shows last cached reading with a clear "Offline — showing last known data from [time]" banner
-
-Service worker caching: cache-first for static assets, network-first (fallback to cache) for live sensor data
-
-Localization — Telugu Default
-
-Entire app defaults to Telugu (తెలుగు) on first load; English available via toggle in navbar/settings
-
-ALL text must be translated — landing page, dashboard labels, status names ("Good"→"బాగుంది", "Moderate"→"మధ్యస్థం", "Poor"→"పేలవం"), settings, error/confirmation messages
-
-Push notifications always sent in Telugu, regardless of current UI language setting, since these are time-critical alerts (e.g., "గదిలో గాలి నాణ్యత పేలవంగా ఉంది — కిటికీ తెరవండి" = "Air quality in the room is poor — open a window")
-
-Use a font that renders Telugu cleanly (Noto Sans Telugu) alongside your Latin UI font
-
-Keep numeric values (temperature, humidity %, sensor readings) in standard numerals even in Telugu mode — translate labels only, not numerals
-
-API Integration Expectations (backend will expose these — build frontend to consume them)
-
-GET /api/device/latest — current air quality classification, raw sensor values, temp/humidity, status
-
-GET /api/device/stream — SSE endpoint for real-time push updates
-
-GET /api/device/history?range=24h|7d|30d — historical data for charts
-
-GET /api/devices — list of all devices/rooms belonging to the user
-
-POST /api/devices — register a new device/room
-
-PATCH /api/devices/:id — rename/update a device
-
-POST /api/push/subscribe / POST /api/push/unsubscribe
-
-All authenticated routes require Clerk session token in headers
-
-Design System Direction
-
-Typography: clean modern sans-serif (Inter/Geist) for UI; consider a calmer, more humanist display font for the landing page headline
-
-Color palette: sky blue (primary/trust), sage green (good status), amber (moderate status), soft coral/red (poor status — not harsh alarm-red, keep it calm even when warning) — avoid default Tailwind indigo/violet as brand color
-
-Micro-interactions: smooth color transitions when status changes, gentle pulse animation on the primary status card to feel "alive" with real-time data
-
-Iconography: airy, breath/circulation-themed custom icons where possible rather than generic dashboard icon packs
-
-Build this as a complete, cohesive, production-quality application — every page should feel finished, intentional, and trustworthy (this is health-adjacent data, so polish and clarity matter more than flashiness).
-
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/6fb39352-bbf3-479d-99ba-d2f3d5151476).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+### 1. Clone & Install
 
 ```sh
 git clone <this-repository-url>
-cd <repository-name>
-npm i
+cd airsense-breathe-easy
+npm install
+```
+
+### 2. Configure Environment Variables
+
+```sh
+cp .env.example .env
+```
+
+Edit `.env`:
+
+```env
+# MongoDB
+MONGODB_URI=mongodb://localhost:27017/airsense
+
+# Clerk
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+
+# WhatsApp Alerts — optional
+TWILIO_ACCOUNT_SID=ACxxxx
+TWILIO_AUTH_TOKEN=xxxx
+TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
+ALERT_TO_WHATSAPP=whatsapp:+919876543210
+
+# Email Alerts — optional
+RESEND_API_KEY=re_xxxx
+ALERT_FROM_EMAIL=AirSense Alerts <alerts@yourdomain.com>
+ALERT_TO_EMAIL=you@example.com
+```
+
+### 3. Start Development Server
+
+```sh
 npm run dev
 ```
+
+Open [http://localhost:3000](http://localhost:3000)
+
+---
+
+## ESP32 Firmware
+
+### Hardware Required
+
+| Component | Purpose |
+|-----------|---------|
+| ESP32 DevKit v1 | Microcontroller with Wi-Fi |
+| MQ-135 Gas Sensor | Air quality / contamination detection |
+| DHT22 (AM2302) | Temperature & relative humidity |
+| Active Buzzer | Local audio alert when air is Poor |
+| LED (optional) | Visual alert indicator |
+
+### Wiring Diagram
+
+```
+ESP32 Pin    →   Component
+─────────────────────────────────────────
+GPIO34 (ADC) →   MQ-135  AOUT
+GPIO4        →   DHT22   DATA
+GPIO2        →   Buzzer  (+)
+3.3V         →   MQ-135 VCC, DHT22 VCC
+GND          →   GND (common ground)
+```
+
+### Arduino Sketch
+
+Install via Library Manager:
+- `DHT sensor library` by Adafruit
+- `ArduinoJson` by Benoit Blanchon
+- `HTTPClient` (built-in with ESP32 Arduino core)
+
+```cpp
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
+#include "DHT.h"
+
+// ── Configuration ──────────────────────────────────────────
+const char* WIFI_SSID     = "YourWiFiSSID";
+const char* WIFI_PASSWORD = "YourWiFiPassword";
+const char* SERVER_URL    = "https://your-airsense-app.vercel.app/api/devices/data";
+const char* DEVICE_ID     = "AIR-XXXXXX";    // from dashboard
+const char* API_KEY       = "ask_live_...";  // from dashboard (saved once)
+
+// ── Pin Definitions ────────────────────────────────────────
+#define MQ135_PIN    34
+#define DHT_PIN       4
+#define BUZZER_PIN    2
+#define DHT_TYPE    DHT22
+
+DHT dht(DHT_PIN, DHT_TYPE);
+
+#define MQ135_POOR_THRESHOLD  700   // matches server classification
+#define SEND_INTERVAL_MS     5000   // report every 5 seconds
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(BUZZER_PIN, OUTPUT);
+  digitalWrite(BUZZER_PIN, LOW);
+  dht.begin();
+
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("Connecting to Wi-Fi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500); Serial.print(".");
+  }
+  Serial.println("\nConnected! IP: " + WiFi.localIP().toString());
+
+  // MQ-135 warm-up (recommended 60 seconds for accuracy)
+  Serial.println("Warming up MQ-135 (60 seconds)...");
+  delay(60000);
+}
+
+void loop() {
+  int mq135Raw        = analogRead(MQ135_PIN);
+  float temperature   = dht.readTemperature();
+  float humidity      = dht.readHumidity();
+
+  if (isnan(temperature) || isnan(humidity)) {
+    Serial.println("DHT read failed, retrying...");
+    delay(2000);
+    return;
+  }
+
+  // Local buzzer alert
+  bool poorAir = mq135Raw >= MQ135_POOR_THRESHOLD;
+  digitalWrite(BUZZER_PIN, poorAir ? HIGH : LOW);
+
+  Serial.printf("MQ135: %d | Temp: %.1fC | Hum: %.0f%% | %s\n",
+    mq135Raw, temperature, humidity, poorAir ? "POOR" : "OK");
+
+  // POST reading to AirSense server
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    http.begin(SERVER_URL);
+    http.addHeader("Content-Type", "application/json");
+
+    StaticJsonDocument<256> doc;
+    doc["deviceId"]    = DEVICE_ID;
+    doc["apiKey"]      = API_KEY;
+    doc["mq135"]       = mq135Raw;
+    doc["temperature"] = temperature;
+    doc["humidity"]    = humidity;
+
+    String body;
+    serializeJson(doc, body);
+
+    int httpCode = http.POST(body);
+    Serial.printf("Server response: HTTP %d\n", httpCode);
+    http.end();
+  } else {
+    Serial.println("Wi-Fi lost, reconnecting...");
+    WiFi.reconnect();
+  }
+
+  delay(SEND_INTERVAL_MS);
+}
+```
+
+### Device Registration Steps
+
+1. Sign in to your AirSense dashboard
+2. Go to **Rooms & Devices** → click **Add Room**
+3. Enter a name (e.g. "Classroom 4B")
+4. **Copy and save** the `Device ID` and `API Key` shown — the key is shown **only once**
+5. Paste both values into `DEVICE_ID` and `API_KEY` in the sketch above
+6. Flash the ESP32 — sensor data appears on the dashboard within seconds
+
+---
+
+## API Reference
+
+### `POST /api/devices/data` — Submit a Sensor Reading (ESP32 → Server)
+
+**Request Body:**
+```json
+{
+  "deviceId": "AIR-8F3D12",
+  "apiKey": "ask_live_abc123...",
+  "mq135": 523,
+  "temperature": 28.4,
+  "humidity": 72
+}
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "deviceId": "AIR-8F3D12",
+  "receivedAt": "2025-10-06T07:00:00.000Z",
+  "status": "moderate",
+  "buzzerActive": false
+}
+```
+
+| HTTP Code | Meaning |
+|-----------|---------|
+| 200 | Reading accepted and stored |
+| 400 | Missing/invalid field |
+| 401 | Unknown device ID or wrong API key |
+| 500 | Server error |
+
+### Other Server Endpoints (Dashboard → Server)
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/api/devices` | Clerk | List all user's devices |
+| POST | `/api/devices` | Clerk | Register new device |
+| PATCH | `/api/devices/:id` | Clerk | Rename device |
+| DELETE | `/api/devices/:id` | Clerk | Remove device |
+| GET | `/api/device/latest?deviceId=` | — | Latest reading from DB |
+| GET | `/api/device/:id/stream` | — | SSE live reading stream |
+| GET | `/api/device/history?deviceId=&range=` | — | Historical data (24h/7d/30d) |
+| GET | `/api/weather?lat=&lon=` | — | Outdoor AQI via Open-Meteo |
+| GET | `/api/user/alert-preferences` | Clerk | Get notification prefs |
+| PATCH | `/api/user/alert-preferences` | Clerk | Update notification prefs |
+
+---
+
+## Air Quality Classification
+
+| MQ-135 Raw Value | Status | Telugu | Action |
+|-----------------|--------|--------|--------|
+| 0 – 399 | 🟢 Good | బాగుంది | Normal |
+| 400 – 699 | 🟡 Moderate | మధ్యస్థం | Open windows |
+| 700+ | 🔴 Poor | పేలవం | Buzzer fires, alerts sent |
+
+---
+
+## Alert System
+
+| Channel | Provider | Cooldown |
+|---------|----------|---------|
+| WhatsApp | Twilio | 15 min/device |
+| Email | Resend | 15 min/device |
+| Browser Push | Web Push API | 15 min/device |
+| Local Buzzer | ESP32 firmware | Immediate / continuous |
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | TanStack Start (React 19 + Nitro SSR) |
+| Styling | Tailwind CSS v4 |
+| Auth | Clerk |
+| Database | MongoDB (Atlas or local) |
+| Real-time | Server-Sent Events (SSE) |
+| Alerts | Twilio WhatsApp + Resend Email + Web Push |
+| Outdoor AQI | Open-Meteo (free, no API key required) |
+| Hosting | Vercel / Node.js server |
+
+---
+
+## Deployment
+
+```sh
+npm run build
+node .output/server/index.mjs
+```
+
+Set all variables from `.env.example` in your hosting platform's environment config. MongoDB Atlas M0 free tier is sufficient for classroom-scale deployments.

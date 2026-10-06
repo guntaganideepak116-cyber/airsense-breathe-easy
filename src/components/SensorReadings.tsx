@@ -166,19 +166,27 @@ export function SensorReadings({
               <div key={tick} className="value-pulse">
                 <p
                   className="font-display text-4xl tabular-nums"
-                  style={{ color: indexColor(score) }}
+                  style={{ color: reading ? indexColor(score) : "var(--muted-foreground)" }}
                 >
                   {reading ? score : "—"}
-                  <span className="text-xl">%</span>
+                  {reading && <span className="text-xl">%</span>}
                 </p>
                 <p className="text-[11px] text-muted-foreground">{t("sens.mq")}</p>
               </div>
             </Ring>
           </div>
 
-          <p className={cn("mt-5 text-center font-display text-3xl status-transition", theme.text)}>
-            {t(theme.label)}
-          </p>
+          {reading ? (
+            <p
+              className={cn("mt-5 text-center font-display text-3xl status-transition", theme.text)}
+            >
+              {t(theme.label)}
+            </p>
+          ) : (
+            <p className="mt-5 text-center font-display text-lg text-muted-foreground">
+              Waiting for sensor data
+            </p>
+          )}
 
           <div className="mt-5 rounded-2xl border bg-card/50">
             <button
