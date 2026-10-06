@@ -48,7 +48,7 @@ export function RoomComparison({
       </div>
 
       <div className="mt-4 overflow-x-auto">
-        <table className="w-full min-w-[34rem] border-collapse text-sm">
+        <table className="w-full min-w-136 border-collapse text-sm">
           <thead>
             <tr className="text-left text-[11px] uppercase tracking-wide text-muted-foreground">
               <th className="pb-2 font-medium">{t("cmp.room")}</th>
@@ -82,8 +82,8 @@ export function RoomComparison({
                       {theme ? t(theme.label) : "—"}
                     </span>
                   </td>
-                  <td className="py-3 pr-3 tabular-nums">
-                    {reading ? `${reading.mq135} ppm` : "—"}
+                  <td className="py-3 pr-3 tabular-nums font-mono">
+                    {reading ? `${reading.mq135}` : "—"}
                   </td>
                   <td className="py-3 pr-3 tabular-nums text-muted-foreground">
                     {reading ? `${reading.temperature}°C · ${reading.humidity}%` : "—"}
