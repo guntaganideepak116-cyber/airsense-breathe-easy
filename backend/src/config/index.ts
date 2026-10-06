@@ -20,9 +20,17 @@ export const config = {
     fromEmail: process.env["ALERT_FROM_EMAIL"] || "AirSense Alerts <onboarding@resend.dev>",
     toEmail: process.env["ALERT_TO_EMAIL"] || "",
   },
+  metaWhatsapp: {
+    phoneNumberId: process.env["WHATSAPP_PHONE_NUMBER_ID"] || "",
+    accessToken: process.env["WHATSAPP_ACCESS_TOKEN"] || "",
+  },
   vapid: {
     publicKey:
       process.env["VAPID_PUBLIC_KEY"] ||
       "BC0tP9HcEj-bSuhYwLbgpWisPjznZkaeB2EyCsuYcL1EYpKWNxKdu9woqh6wS50zQmTQ7cazExdySR4Pe9h4aqA",
+  },
+  thresholds: {
+    moderate: parseInt(process.env["MODERATE_THRESHOLD"] || "400", 10),
+    poor: parseInt(process.env["POOR_THRESHOLD"] || "700", 10),
   },
 };

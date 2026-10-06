@@ -71,12 +71,61 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
         to,
       });
       channelsSent.whatsapp = true;
-      console.log(`[AlertEngine] WhatsApp alert sent to ${to}`);
+      console.log(`[AlertEngine] WhatsApp alert sent via Twilio to ${to}`);
     } catch (err: unknown) {
       console.warn(
-        "[AlertEngine] WhatsApp dispatch failed:",
+        "[AlertEngine] Twilio WhatsApp dispatch failed:",
         err instanceof Error ? err.message : err,
       );
+    }
+  }
+
+  // 1b. WhatsApp Alert via Meta Cloud API (if configured)
+  if (
+    !channelsSent.whatsapp &&
+    prefs?.alertChannels.whatsapp !== false &&
+    config.metaWhatsapp.phoneNumberId &&
+    config.metaWhatsapp.accessToken &&
+    whatsappTarget
+  ) {
+    try {
+      const cleanPhone = whatsappTarget.replace(/[^0-9]/g, "");
+      const res = await fetch(
+        `https://graph.facebook.com/v18.0/${config.metaWhatsapp.phoneNumberId}/messages`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${config.metaWhatsapp.accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            messaging_product: "whatsapp",
+            to: cleanPhone,
+            type: "text",
+            text: {
+              preview_url: false,
+              body:
+                `🚨 AIRSENSE AIR QUALITY ALERT\n\n` +
+                `Severity: ${severity.toUpperCase()}\n` +
+                `Room: ${roomName}\n` +
+                `Device: ${reading.deviceId}\n` +
+                `MQ-135: ${reading.mq135}\n` +
+                `Temp: ${reading.temperature}°C | Humidity: ${reading.humidity}%\n` +
+                `Time: ${formattedTime} IST\n\n` +
+                `Poor air quality detected. Please ensure ventilation immediately.`,
+            },
+          }),
+        },
+      );
+      if (res.ok) {
+        channelsSent.whatsapp = true;
+        console.log(`[AlertEngine] WhatsApp alert sent via Meta Cloud API to ${cleanPhone}`);
+      } else {
+        const errText = await res.text();
+        console.warn("[AlertEngine] Meta WhatsApp API response error:", errText);
+      }
+    } catch (err) {
+      console.warn("[AlertEngine] Meta WhatsApp dispatch failed:", err instanceof Error ? err.message : err);
     }
   }
 
