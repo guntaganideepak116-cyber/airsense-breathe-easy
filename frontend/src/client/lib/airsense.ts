@@ -87,6 +87,106 @@ export type AiRecommendationResponse =
       lastSeen?: string | null;
     };
 
+// Room Event Detective Types
+export type ActivityCategory =
+  | "cooking"
+  | "cleaning"
+  | "window_opened"
+  | "window_closed"
+  | "door_opened"
+  | "door_closed"
+  | "ventilation_on"
+  | "ventilation_off"
+  | "air_purifier_on"
+  | "air_purifier_off"
+  | "people_entered"
+  | "people_left"
+  | "spray_used"
+  | "candles_incense"
+  | "other"
+  | "custom";
+
+export interface UserActivity {
+  id: string;
+  deviceId: string;
+  userId: string;
+  category: ActivityCategory | string;
+  title: string;
+  notes?: string;
+  startAt: string;
+  endAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type DetectedEventType =
+  | "mq135_spike"
+  | "mq135_drop"
+  | "temp_rise"
+  | "temp_drop"
+  | "humidity_rise"
+  | "humidity_drop"
+  | "sensor_interruption";
+
+export interface DetectedEvent {
+  id: string;
+  deviceId: string;
+  userId?: string;
+  eventType: DetectedEventType;
+  sensorType: "mq135" | "temperature" | "humidity";
+  title: string;
+  description: string;
+  startedAt: string;
+  endedAt?: string | null;
+  baselineValue?: number;
+  observedValue?: number;
+  changeMagnitude?: number;
+  ruleVersion: string;
+  status: "detected" | "user_confirmed" | "dismissed";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ActivityAssociation {
+  id: string;
+  userId: string;
+  deviceId: string;
+  activityId: string;
+  detectedEventId: string;
+  timeRelationship: "overlap" | "preceding" | "following";
+  timeDifferenceSeconds?: number;
+  associationStatus: "candidate" | "confirmed" | "dismissed" | "unlikely";
+  userFeedback?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type EvidenceLevel = "insufficient" | "single_observation" | "repeated_association";
+
+export interface RoomInsight {
+  id: string;
+  userId: string;
+  deviceId: string;
+  insightType: string;
+  title: string;
+  summary: string;
+  analysisWindow: { start: string; end: string };
+  supportingEventIds: string[];
+  supportingActivityIds: string[];
+  evidenceCount: number;
+  evidenceLevel: EvidenceLevel;
+  algorithmVersion: string;
+  generatedAt: string;
+}
+
+export interface EvidenceResponse {
+  success: boolean;
+  deviceId: string;
+  targetTime: string;
+  readingsCount: number;
+  readings: Reading[];
+}
+
 export function classify(mq135: number): AirStatus {
   if (mq135 < 400) return "good";
   if (mq135 < 700) return "moderate";
@@ -273,7 +373,119 @@ export const api = {
     }
     return await tryFetch<AiRecommendationResponse>(`/api/ai/recommendation?${params.toString()}`);
   },
+
+  // --- Room Event Detective Methods ---
+  async getActivities(deviceId?: string): Promise<UserActivity[]> {
+    const params = deviceId ? `?deviceId=${encodeURIComponent(deviceId)}` : "";
+    const res = await tryFetch<{ success: boolean; activities: UserActivity[] }>(
+      `/api/room-events/activities${params}`,
+    );
+    return res?.activities ?? [];
+  },
+
+  async createActivity(payload: {
+    deviceId: string;
+    category: string;
+    title: string;
+    notes?: string;
+    startAt: string;
+    endAt?: string | null;
+  }): Promise<UserActivity | null> {
+    const res = await tryFetch<{ success: boolean; activity: UserActivity }>(
+      `/api/room-events/activities`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+    );
+    return res?.activity ?? null;
+  },
+
+  async updateActivity(
+    id: string,
+    payload: Partial<{
+      category: string;
+      title: string;
+      notes: string;
+      startAt: string;
+      endAt: string | null;
+    }>,
+  ): Promise<UserActivity | null> {
+    const res = await tryFetch<{ success: boolean; activity: UserActivity }>(
+      `/api/room-events/activities/${id}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+      },
+    );
+    return res?.activity ?? null;
+  },
+
+  async deleteActivity(id: string): Promise<boolean> {
+    const res = await tryFetch<{ success: boolean }>(`/api/room-events/activities/${id}`, {
+      method: "DELETE",
+    });
+    return Boolean(res?.success);
+  },
+
+  async getDetectedEvents(deviceId: string): Promise<DetectedEvent[]> {
+    const res = await tryFetch<{ success: boolean; events: DetectedEvent[] }>(
+      `/api/room-events/detected?deviceId=${encodeURIComponent(deviceId)}`,
+    );
+    return res?.events ?? [];
+  },
+
+  async updateDetectedEventStatus(
+    id: string,
+    status: "detected" | "user_confirmed" | "dismissed",
+  ): Promise<boolean> {
+    const res = await tryFetch<{ success: boolean }>(`/api/room-events/detected/${id}/status`, {
+      method: "PATCH",
+      body: JSON.stringify({ status }),
+    });
+    return Boolean(res?.success);
+  },
+
+  async getAssociations(deviceId?: string): Promise<ActivityAssociation[]> {
+    const params = deviceId ? `?deviceId=${encodeURIComponent(deviceId)}` : "";
+    const res = await tryFetch<{ success: boolean; associations: ActivityAssociation[] }>(
+      `/api/room-events/associations${params}`,
+    );
+    return res?.associations ?? [];
+  },
+
+  async updateAssociationFeedback(
+    id: string,
+    payload: {
+      associationStatus: "candidate" | "confirmed" | "dismissed" | "unlikely";
+      userFeedback?: string;
+    },
+  ): Promise<boolean> {
+    const res = await tryFetch<{ success: boolean }>(
+      `/api/room-events/associations/${id}/feedback`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+    );
+    return Boolean(res?.success);
+  },
+
+  async getRoomInsights(deviceId: string, days = 14): Promise<RoomInsight[]> {
+    const res = await tryFetch<{ success: boolean; insights: RoomInsight[] }>(
+      `/api/room-events/insights?deviceId=${encodeURIComponent(deviceId)}&days=${days}`,
+    );
+    return res?.insights ?? [];
+  },
+
+  async getEvidenceData(deviceId: string, timestamp: string): Promise<EvidenceResponse | null> {
+    return await tryFetch<EvidenceResponse>(
+      `/api/room-events/evidence?deviceId=${encodeURIComponent(deviceId)}&timestamp=${encodeURIComponent(timestamp)}`,
+    );
+  },
 };
+
+export const airsenseApi = api;
 
 export const CACHE_KEY = "airsense-last-reading";
 

@@ -14,10 +14,12 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as RecommendationsRouteImport } from './routes/recommendations'
+import { Route as RoomEventDetectiveRouteImport } from './routes/room-event-detective'
 import { Route as RoomsRouteImport } from './routes/rooms'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as WeatherRouteImport } from './routes/weather'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as DashboardDetectiveRouteImport } from './routes/dashboard.detective'
 import { Route as DashboardHistoryRouteImport } from './routes/dashboard.history'
 import { Route as DashboardRecommendationsRouteImport } from './routes/dashboard.recommendations'
 import { Route as DashboardRoomsRouteImport } from './routes/dashboard.rooms'
@@ -49,6 +51,11 @@ const RecommendationsRoute = RecommendationsRouteImport.update({
   path: '/recommendations',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RoomEventDetectiveRoute = RoomEventDetectiveRouteImport.update({
+  id: '/room-event-detective',
+  path: '/room-event-detective',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RoomsRoute = RoomsRouteImport.update({
   id: '/rooms',
   path: '/rooms',
@@ -67,6 +74,11 @@ const WeatherRoute = WeatherRouteImport.update({
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardDetectiveRoute = DashboardDetectiveRouteImport.update({
+  id: '/detective',
+  path: '/detective',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardHistoryRoute = DashboardHistoryRouteImport.update({
@@ -102,9 +114,11 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteWithChildren
   '/history': typeof HistoryRoute
   '/recommendations': typeof RecommendationsRoute
+  '/room-event-detective': typeof RoomEventDetectiveRoute
   '/rooms': typeof RoomsRoute
   '/settings': typeof SettingsRoute
   '/weather': typeof WeatherRoute
+  '/dashboard/detective': typeof DashboardDetectiveRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/recommendations': typeof DashboardRecommendationsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
@@ -117,9 +131,11 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/history': typeof HistoryRoute
   '/recommendations': typeof RecommendationsRoute
+  '/room-event-detective': typeof RoomEventDetectiveRoute
   '/rooms': typeof RoomsRoute
   '/settings': typeof SettingsRoute
   '/weather': typeof WeatherRoute
+  '/dashboard/detective': typeof DashboardDetectiveRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/recommendations': typeof DashboardRecommendationsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
@@ -134,9 +150,11 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteWithChildren
   '/history': typeof HistoryRoute
   '/recommendations': typeof RecommendationsRoute
+  '/room-event-detective': typeof RoomEventDetectiveRoute
   '/rooms': typeof RoomsRoute
   '/settings': typeof SettingsRoute
   '/weather': typeof WeatherRoute
+  '/dashboard/detective': typeof DashboardDetectiveRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/recommendations': typeof DashboardRecommendationsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
@@ -152,9 +170,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/history'
     | '/recommendations'
+    | '/room-event-detective'
     | '/rooms'
     | '/settings'
     | '/weather'
+    | '/dashboard/detective'
     | '/dashboard/history'
     | '/dashboard/recommendations'
     | '/dashboard/rooms'
@@ -167,9 +187,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/history'
     | '/recommendations'
+    | '/room-event-detective'
     | '/rooms'
     | '/settings'
     | '/weather'
+    | '/dashboard/detective'
     | '/dashboard/history'
     | '/dashboard/recommendations'
     | '/dashboard/rooms'
@@ -183,9 +205,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/history'
     | '/recommendations'
+    | '/room-event-detective'
     | '/rooms'
     | '/settings'
     | '/weather'
+    | '/dashboard/detective'
     | '/dashboard/history'
     | '/dashboard/recommendations'
     | '/dashboard/rooms'
@@ -200,6 +224,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRouteWithChildren
   HistoryRoute: typeof HistoryRoute
   RecommendationsRoute: typeof RecommendationsRoute
+  RoomEventDetectiveRoute: typeof RoomEventDetectiveRoute
   RoomsRoute: typeof RoomsRoute
   SettingsRoute: typeof SettingsRoute
   WeatherRoute: typeof WeatherRoute
@@ -242,6 +267,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecommendationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/room-event-detective': {
+      id: '/room-event-detective'
+      path: '/room-event-detective'
+      fullPath: '/room-event-detective'
+      preLoaderRoute: typeof RoomEventDetectiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rooms': {
       id: '/rooms'
       path: '/rooms'
@@ -268,6 +300,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/detective': {
+      id: '/dashboard/detective'
+      path: '/detective'
+      fullPath: '/dashboard/detective'
+      preLoaderRoute: typeof DashboardDetectiveRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/history': {
@@ -309,6 +348,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface DashboardRouteChildren {
+  DashboardDetectiveRoute: typeof DashboardDetectiveRoute
   DashboardHistoryRoute: typeof DashboardHistoryRoute
   DashboardRecommendationsRoute: typeof DashboardRecommendationsRoute
   DashboardRoomsRoute: typeof DashboardRoomsRoute
@@ -318,6 +358,7 @@ interface DashboardRouteChildren {
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardDetectiveRoute: DashboardDetectiveRoute,
   DashboardHistoryRoute: DashboardHistoryRoute,
   DashboardRecommendationsRoute: DashboardRecommendationsRoute,
   DashboardRoomsRoute: DashboardRoomsRoute,
@@ -336,6 +377,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRouteWithChildren,
   HistoryRoute: HistoryRoute,
   RecommendationsRoute: RecommendationsRoute,
+  RoomEventDetectiveRoute: RoomEventDetectiveRoute,
   RoomsRoute: RoomsRoute,
   SettingsRoute: SettingsRoute,
   WeatherRoute: WeatherRoute,

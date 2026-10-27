@@ -118,3 +118,102 @@ export interface AiRecommendationDoc {
   cached?: boolean;
   createdAt: Date;
 }
+
+// Room Event Detective Types
+export type ActivityCategory =
+  | "cooking"
+  | "cleaning"
+  | "window_opened"
+  | "window_closed"
+  | "door_opened"
+  | "door_closed"
+  | "ventilation_on"
+  | "ventilation_off"
+  | "air_purifier_on"
+  | "air_purifier_off"
+  | "people_entered"
+  | "people_left"
+  | "spray_used"
+  | "candles_incense"
+  | "other"
+  | "custom";
+
+export interface UserActivityDoc {
+  _id?: ObjectId;
+  id?: string;
+  deviceId: string;
+  userId: string;
+  category: ActivityCategory | string;
+  title: string;
+  notes?: string;
+  startAt: Date;
+  endAt?: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type DetectedEventType =
+  | "mq135_spike"
+  | "mq135_drop"
+  | "temp_rise"
+  | "temp_drop"
+  | "humidity_rise"
+  | "humidity_drop"
+  | "sensor_interruption";
+
+export type SensorType = "mq135" | "temperature" | "humidity";
+
+export interface DetectedEventDoc {
+  _id?: ObjectId;
+  id?: string;
+  deviceId: string;
+  userId?: string;
+  eventType: DetectedEventType;
+  sensorType: SensorType;
+  title: string;
+  description: string;
+  startedAt: Date;
+  endedAt?: Date | null;
+  baselineValue?: number;
+  observedValue?: number;
+  changeMagnitude?: number;
+  ruleVersion: string;
+  evidenceReadingIds?: string[];
+  status: "detected" | "user_confirmed" | "dismissed";
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ActivityAssociationDoc {
+  _id?: ObjectId;
+  id?: string;
+  userId: string;
+  deviceId: string;
+  activityId: string;
+  detectedEventId: string;
+  timeRelationship: "overlap" | "preceding" | "following";
+  timeDifferenceSeconds?: number;
+  associationStatus: "candidate" | "confirmed" | "dismissed" | "unlikely";
+  userFeedback?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type EvidenceLevel = "insufficient" | "single_observation" | "repeated_association";
+
+export interface RoomInsightDoc {
+  _id?: ObjectId;
+  id?: string;
+  userId: string;
+  deviceId: string;
+  insightType: string;
+  title: string;
+  summary: string;
+  analysisWindow: { start: Date; end: Date };
+  supportingEventIds: string[];
+  supportingActivityIds: string[];
+  evidenceCount: number;
+  evidenceLevel: EvidenceLevel;
+  algorithmVersion: string;
+  generatedAt: Date;
+}

@@ -2,6 +2,7 @@ import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tan
 import { useEffect, useState, type ReactNode } from "react";
 import { useAuth, useClerk } from "@clerk/clerk-react";
 import {
+  Activity,
   ArrowLeft,
   ChevronRight,
   CloudSun,
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/dashboard")({
 
 type DashboardRoutePath =
   | "/dashboard"
+  | "/dashboard/detective"
   | "/dashboard/history"
   | "/dashboard/recommendations"
   | "/dashboard/weather"
@@ -42,6 +44,11 @@ const navItems: {
   icon: ReactNode;
 }[] = [
   { to: "/dashboard", label: "dash.overview", icon: <Gauge className="h-4 w-4" /> },
+  {
+    to: "/dashboard/detective",
+    label: "dash.detective",
+    icon: <Activity className="h-4 w-4" />,
+  },
   { to: "/dashboard/history", label: "dash.history", icon: <History className="h-4 w-4" /> },
   {
     to: "/dashboard/recommendations",
@@ -131,7 +138,9 @@ function DashboardLayout() {
   }
 
   const isMoreActive =
-    pathname === "/dashboard/recommendations" || pathname === "/dashboard/settings";
+    pathname === "/dashboard/recommendations" ||
+    pathname === "/dashboard/settings" ||
+    pathname === "/dashboard/detective";
 
   return (
     <div className="min-h-screen bg-background text-foreground md:flex">

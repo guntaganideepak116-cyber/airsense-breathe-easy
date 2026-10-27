@@ -201,6 +201,8 @@ export const dict = {
   "nav.mob.menu": { te: "నేవిగేషన్ మెనూ", en: "Navigation Menu" },
   "nav.logout": { te: "సైన్ అవుట్", en: "Sign out" },
   "nav.logoutDesc": { te: "మీ ఖాతా నుండి నిష్క్రమించండి", en: "Sign out of your AirSense account" },
+  "dash.detective": { te: "గది ఈవెంట్ డిటెక్టివ్", en: "Room Event Detective" },
+  "nav.mob.detective": { te: "డిటెక్టివ్", en: "Detective" },
   "dash.history": { te: "చరిత్ర & నివేదికలు", en: "History & Reports" },
   "dash.rooms": { te: "గదుల స్థానాలు", en: "Device / Room Locations" },
   "dash.recommendations": { te: "సిఫార్సులు", en: "Recommendations" },

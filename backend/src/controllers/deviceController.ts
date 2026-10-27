@@ -5,6 +5,7 @@ import type { AuthenticatedRequest } from "../middleware/authMiddleware.js";
 import { dbService } from "../services/dbService.js";
 import { deviceEvents } from "../services/eventService.js";
 import { processReadingForAlerts } from "../services/alertService.js";
+import { roomEventService } from "../services/roomEventService.js";
 import type { DeviceDoc, SensorReadingDoc } from "../models/types.js";
 
 const payloadSchema = z.object({
@@ -201,6 +202,10 @@ export const deviceController = {
 
     processReadingForAlerts(reading).catch((e) =>
       console.warn("[AlertEngine] Alert processing error:", e.message),
+    );
+
+    roomEventService.processReadingForEvents(reading).catch((e) =>
+      console.warn("[RoomEventDetective] Event detection error:", e.message),
     );
 
     res.json({
