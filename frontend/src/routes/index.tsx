@@ -95,7 +95,7 @@ function SiteHeader() {
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3">
         {/* Brand */}
         <Link to="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-90">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-slate-950 shadow-md shadow-emerald-500/20">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-linear-to-br from-emerald-500 to-teal-600 text-slate-950 shadow-md shadow-emerald-500/20">
             <Wind className="h-5 w-5 stroke-[2.2]" />
           </span>
           <div className="min-w-0">
@@ -223,7 +223,7 @@ function Hero() {
   const { t } = useI18n();
 
   return (
-    <section className="relative overflow-hidden border-b border-border/60 bg-gradient-to-b from-background via-card/30 to-background py-16 lg:py-24">
+    <section className="relative overflow-hidden border-b border-border/60 bg-linear-to-b from-background via-card/30 to-background py-16 lg:py-24">
       {/* Background ambient light */}
       <div className="pointer-events-none absolute -top-40 right-1/4 h-96 w-96 rounded-full bg-primary/10 blur-[120px]" />
       <div className="pointer-events-none absolute -bottom-32 left-10 h-80 w-80 rounded-full bg-cyan-500/10 blur-[100px]" />
@@ -272,7 +272,7 @@ function Hero() {
             {(["hero.badge1", "hero.badge2", "hero.badge3"] as TKey[]).map((k) => (
               <li key={k} className="flex items-center gap-1.5">
                 <span className="grid h-4 w-4 place-items-center rounded-full bg-good-soft text-good">
-                  <Check className="h-3 w-3 stroke-[3]" />
+                  <Check className="h-3 w-3 stroke-3" />
                 </span>
                 <span>{t(k)}</span>
               </li>
@@ -683,7 +683,7 @@ function FinalCta() {
 
   return (
     <section className="mx-auto max-w-6xl px-5 pb-20">
-      <div className="relative overflow-hidden rounded-3xl border border-primary/30 bg-gradient-to-b from-card via-card to-secondary/60 px-6 py-14 text-center shadow-xl">
+      <div className="relative overflow-hidden rounded-3xl border border-primary/30 bg-linear-to-b from-card via-card to-secondary/60 px-6 py-14 text-center shadow-xl">
         <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-primary/10 text-primary">
           <ShieldCheck className="h-6 w-6" />
         </div>

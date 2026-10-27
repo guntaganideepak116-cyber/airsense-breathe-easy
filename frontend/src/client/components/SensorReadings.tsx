@@ -277,7 +277,7 @@ export function SensorReadings({
             <div className="mt-8 flex items-end justify-center gap-6">
               <div className="relative h-36 w-5 overflow-hidden rounded-full bg-secondary/80 border border-border/60">
                 <div
-                  className="absolute inset-x-0 bottom-0 rounded-full bg-gradient-to-t from-primary via-teal-400 to-amber-400"
+                  className="absolute inset-x-0 bottom-0 rounded-full bg-linear-to-t from-primary via-teal-400 to-amber-400"
                   style={{
                     height: `${tPct}%`,
                     transition: "height 700ms cubic-bezier(.22,1,.36,1)",

@@ -215,7 +215,7 @@ function EmailAlertsSection() {
     );
   };
 
-  const handleSaveEmail = (e: React.FormEvent) => {
+  const handleSaveEmail = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     const cleanEmail = email.trim();
     updatePrefs.mutate(

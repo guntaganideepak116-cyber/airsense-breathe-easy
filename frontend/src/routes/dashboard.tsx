@@ -143,7 +143,7 @@ function DashboardLayout() {
             to="/"
             className="flex items-center gap-3 px-2 py-1 transition-opacity hover:opacity-90"
           >
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-slate-950 shadow-md shadow-emerald-500/20">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-linear-to-br from-emerald-500 to-teal-600 text-slate-950 shadow-md shadow-emerald-500/20">
               <Wind className="h-5 w-5 stroke-[2.2]" />
             </span>
             <div className="min-w-0">
@@ -205,7 +205,7 @@ function DashboardLayout() {
         {/* Compact Mobile Header */}
         <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border/80 bg-background/90 px-4 py-2.5 backdrop-blur-md md:hidden">
           <Link to="/" className="flex items-center gap-2 min-w-0">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-slate-950">
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-linear-to-br from-emerald-500 to-teal-600 text-slate-950">
               <Wind className="h-4 w-4" />
             </span>
             <span className="font-display text-base font-bold text-foreground truncate">
