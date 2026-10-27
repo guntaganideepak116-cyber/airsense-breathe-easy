@@ -151,7 +151,7 @@ function DashboardLayout() {
                 <p className="font-display text-lg font-bold tracking-tight text-foreground">
                   AirSense
                 </p>
-                <span className="rounded-full border border-primary/30 bg-primary/10 px-1.5 py-0.2 text-[9px] font-semibold text-primary uppercase">
+                <span className="rounded-full border border-primary/30 bg-primary/10 px-1.5 py-0.5 text-[9px] font-semibold text-primary uppercase">
                   IoT
                 </span>
               </div>
@@ -292,7 +292,7 @@ function DashboardLayout() {
         <div className="fixed inset-0 z-50 md:hidden">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
             onClick={() => setIsMenuOpen(false)}
             aria-hidden="true"
           />

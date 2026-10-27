@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useClerk } from "@clerk/clerk-react";
-import { BellRing, CheckCircle2, LogOut, Mail, Radio, Save, Trash2 } from "lucide-react";
+import { BellRing, CheckCircle2, LogOut, Mail, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useI18n } from "@/client/lib/i18n";
 import {

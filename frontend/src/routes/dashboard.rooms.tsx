@@ -1,12 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { BatteryCharging, MapPin, Plus, Radio, Signal, Wifi, WifiOff, X } from "lucide-react";
+import { MapPin, Plus, Radio, Wifi, WifiOff, X } from "lucide-react";
 import { toast } from "sonner";
 import { useI18n } from "@/client/lib/i18n";
 import { statusTheme, formatTime } from "@/shared/lib/status";
 import { useDeviceMutations, useDeviceStream, useSelectedDevice } from "@/client/lib/queries";
 import { useAirAlert } from "@/shared/lib/use-air-alert";
-import { classify, type Device } from "@/client/lib/airsense";
+import type { Device } from "@/client/lib/airsense";
 import { Button } from "@/client/components/ui/button";
 import { Input } from "@/client/components/ui/input";
 import { Label } from "@/client/components/ui/label";

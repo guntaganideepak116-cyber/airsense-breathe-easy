@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CloudSun, Droplets, Gauge, Thermometer, Wind, Radio, AlertCircle } from "lucide-react";
+import { Droplets, Gauge, Thermometer, Wind, Radio, AlertCircle } from "lucide-react";
 import { useI18n } from "@/client/lib/i18n";
 import { useSelectedDevice, useLatest } from "@/client/lib/queries";
 import { useOutdoorWeather } from "@/client/lib/outdoor";
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/dashboard/weather")({
 function WeatherPage() {
   const { t, lang } = useI18n();
   const { deviceId, device } = useSelectedDevice();
-  const { data: reading, isLoading: isReadingLoading } = useLatest(deviceId);
+  const { data: reading } = useLatest(deviceId);
   const {
     data: outdoor,
     isLoading: isOutdoorLoading,
@@ -56,7 +56,7 @@ function WeatherPage() {
         )}
       >
         <div className="grid gap-6 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center">
-          <BreathingOrb status={indoorStatus} size="sm" className="mx-auto h-36! w-36! lg:mx-0" />
+          <BreathingOrb status={indoorStatus} size="sm" className="mx-auto h-36 w-36 lg:mx-0" />
           <div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Radio className="h-4 w-4 text-primary animate-pulse" />

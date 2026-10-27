@@ -3,7 +3,6 @@ import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import { useState, useEffect, type ReactNode } from "react";
 import { Thermometer, Droplets, Wind, Activity, CheckCircle2, Wifi } from "lucide-react";
 import { LangToggle } from "@/client/components/LangToggle";
-import { cn } from "@/client/lib/utils";
 
 type AuthSearch = {
   mode?: "signin" | "signup" | undefined;

@@ -5,14 +5,15 @@ import { s as require_jsx_runtime } from "./@radix-ui/react-collection+[...].mjs
 var import_react = /* @__PURE__ */ __toESM(require_react(), 1);
 require_jsx_runtime();
 var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", {
-	value,
-	configurable: true
-});
+var __name = (target, value) =>
+  __defProp(target, "name", {
+    value,
+    configurable: true,
+  });
 var DirectionContext = import_react.createContext(void 0);
 function useDirection(localDir) {
-	const globalDir = import_react.useContext(DirectionContext);
-	return localDir || globalDir || "ltr";
+  const globalDir = import_react.useContext(DirectionContext);
+  return localDir || globalDir || "ltr";
 }
 __name(useDirection, "useDirection");
 //#endregion

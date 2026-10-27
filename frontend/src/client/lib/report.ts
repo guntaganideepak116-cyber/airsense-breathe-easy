@@ -129,7 +129,7 @@ export function exportPdf(points: HistoryPoint[], meta: ReportMeta) {
   );
 
   line("Classification changes", 13, true, 20);
-  const segments = timelineSegments(points).filter((s, i) => i > 0);
+  const segments = timelineSegments(points).filter((_, i) => i > 0);
   if (!segments.length) {
     line("No classification changes recorded in this period.", 10, false, 24);
   } else {

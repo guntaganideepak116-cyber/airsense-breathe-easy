@@ -5,7 +5,6 @@ import {
   ArrowRight,
   BellRing,
   Check,
-  Cpu,
   Droplets,
   Gauge,
   Globe,
@@ -104,7 +103,7 @@ function SiteHeader() {
               <span className="font-display text-lg font-bold tracking-tight text-foreground">
                 AirSense
               </span>
-              <span className="rounded-full border border-primary/30 bg-primary/10 px-1.5 py-0.2 text-[10px] font-semibold text-primary uppercase tracking-wider">
+              <span className="rounded-full border border-primary/30 bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary uppercase tracking-wider">
                 IoT
               </span>
             </div>
@@ -666,7 +665,7 @@ function Cases() {
                 </span>
               </div>
               <div className="my-4 grid place-items-center">
-                <BreathingOrb status={c.status} size="sm" className="h-20! w-20!" />
+                <BreathingOrb status={c.status} size="sm" className="h-20 w-20" />
               </div>
               <p className="font-semibold text-foreground">{t(c.t)}</p>
               <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{t(c.d)}</p>
