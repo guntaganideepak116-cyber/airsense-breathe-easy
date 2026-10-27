@@ -93,16 +93,39 @@ export function classify(mq135: number): AirStatus {
   return "poor";
 }
 
-export const API_BASE_URL =
-  (typeof import.meta !== "undefined" && import.meta.env
-    ? import.meta.env["VITE_API_URL"] || import.meta.env["NEXT_PUBLIC_API_URL"]
-    : undefined) || "";
+export function getApiBaseUrl(): string {
+  const envUrl =
+    (typeof import.meta !== "undefined" && import.meta.env
+      ? import.meta.env["VITE_API_URL"] || import.meta.env["NEXT_PUBLIC_API_URL"]
+      : undefined) || "";
+
+  // Guard against browser Private Network Access (PNA) and Mixed-Content blocks:
+  // When running on a remote HTTPS domain (such as *.vercel.app), never allow an insecure
+  // loopback URL (http://localhost or http://127.0.0.1) as it is blocked by browsers.
+  if (typeof window !== "undefined") {
+    const isLocal =
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1" ||
+      window.location.hostname.endsWith(".local");
+
+    if (
+      !isLocal &&
+      (envUrl.includes("localhost") || envUrl.includes("127.0.0.1") || envUrl.startsWith("http://"))
+    ) {
+      return "";
+    }
+  }
+
+  return envUrl;
+}
+
+export const API_BASE_URL = getApiBaseUrl();
 
 export function resolveUrl(path: string): string {
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
-  const base = API_BASE_URL.replace(/\/$/, "");
+  const base = getApiBaseUrl().replace(/\/$/, "");
   const p = path.startsWith("/") ? path : `/${path}`;
-  return `${base}${p}`;
+  return base ? `${base}${p}` : p;
 }
 
 let tokenGetter: (() => Promise<string | null>) | null = null;

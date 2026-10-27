@@ -59,56 +59,64 @@ async function fetchOutdoor(city: City): Promise<OutdoorReading> {
   };
 }
 
-async function fetchOutdoorWeather(city: City): Promise<OutdoorWeatherReading> {
-  const endpoint = resolveUrl(`/api/weather?lat=${city.lat}&lon=${city.lon}`);
-  const res = await fetch(endpoint);
-  if (!res.ok) {
-    // Direct Open-Meteo fallback if backend API route is unreachable
-    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=Asia%2FKolkata`;
-    const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${city.lat}&longitude=${city.lon}&current=us_aqi,pm2_5,pm10&timezone=Asia%2FKolkata`;
+async function fetchDirectOpenMeteo(city: City): Promise<OutdoorWeatherReading> {
+  const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=Asia%2FKolkata`;
+  const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${city.lat}&longitude=${city.lon}&current=us_aqi,pm2_5,pm10&timezone=Asia%2FKolkata`;
 
-    const [wRes, aRes] = await Promise.all([fetch(weatherUrl), fetch(aqiUrl)]);
-    if (!wRes.ok || !aRes.ok) throw new Error("Weather and AQI services unavailable");
+  const [wRes, aRes] = await Promise.all([fetch(weatherUrl), fetch(aqiUrl)]);
+  if (!wRes.ok || !aRes.ok) throw new Error("Weather and AQI services unavailable");
 
-    const wData = await wRes.json();
-    const aData = await aRes.json();
+  const wData = await wRes.json();
+  const aData = await aRes.json();
 
-    const aqi = aData.current?.us_aqi ?? null;
-    return {
-      temperature:
-        wData.current?.temperature_2m != null
-          ? Math.round(wData.current.temperature_2m * 10) / 10
-          : null,
-      humidity: wData.current?.relative_humidity_2m ?? null,
-      windSpeed:
-        wData.current?.wind_speed_10m != null
-          ? Math.round(wData.current.wind_speed_10m * 10) / 10
-          : null,
-      weatherCode: wData.current?.weather_code ?? 0,
-      aqi,
-      pm25: aData.current?.pm2_5 != null ? Math.round(aData.current.pm2_5 * 10) / 10 : null,
-      pm10: aData.current?.pm10 != null ? Math.round(aData.current.pm10 * 10) / 10 : null,
-      status: aqi != null ? classifyAqi(aqi) : "good",
-      city,
-      station: `${city.name} Regional Station (Open-Meteo)`,
-      fetchedAt: new Date().toISOString(),
-    };
-  }
-
-  const json = await res.json();
+  const aqi = aData.current?.us_aqi ?? null;
   return {
-    temperature: json.weather?.temperature ?? null,
-    humidity: json.weather?.humidity ?? null,
-    windSpeed: json.weather?.windSpeed ?? null,
-    weatherCode: json.weather?.weatherCode ?? 0,
-    aqi: json.airQuality?.aqi ?? null,
-    pm25: json.airQuality?.pm25 ?? null,
-    pm10: json.airQuality?.pm10 ?? null,
-    status: json.airQuality?.status ?? "good",
+    temperature:
+      wData.current?.temperature_2m != null
+        ? Math.round(wData.current.temperature_2m * 10) / 10
+        : null,
+    humidity: wData.current?.relative_humidity_2m ?? null,
+    windSpeed:
+      wData.current?.wind_speed_10m != null
+        ? Math.round(wData.current.wind_speed_10m * 10) / 10
+        : null,
+    weatherCode: wData.current?.weather_code ?? 0,
+    aqi,
+    pm25: aData.current?.pm2_5 != null ? Math.round(aData.current.pm2_5 * 10) / 10 : null,
+    pm10: aData.current?.pm10 != null ? Math.round(aData.current.pm10 * 10) / 10 : null,
+    status: aqi != null ? classifyAqi(aqi) : "good",
     city,
-    station: json.station || `${city.name} Regional Station`,
-    fetchedAt: json.fetchedAt || new Date().toISOString(),
+    station: `${city.name} Regional Station (Open-Meteo)`,
+    fetchedAt: new Date().toISOString(),
   };
+}
+
+async function fetchOutdoorWeather(city: City): Promise<OutdoorWeatherReading> {
+  try {
+    const endpoint = resolveUrl(`/api/weather?lat=${city.lat}&lon=${city.lon}`);
+    const res = await fetch(endpoint);
+    if (!res.ok) {
+      return await fetchDirectOpenMeteo(city);
+    }
+
+    const json = await res.json();
+    return {
+      temperature: json.weather?.temperature ?? null,
+      humidity: json.weather?.humidity ?? null,
+      windSpeed: json.weather?.windSpeed ?? null,
+      weatherCode: json.weather?.weatherCode ?? 0,
+      aqi: json.airQuality?.aqi ?? null,
+      pm25: json.airQuality?.pm25 ?? null,
+      pm10: json.airQuality?.pm10 ?? null,
+      status: json.airQuality?.status ?? "good",
+      city,
+      station: json.station || `${city.name} Regional Station`,
+      fetchedAt: json.fetchedAt || new Date().toISOString(),
+    };
+  } catch {
+    // Direct Open-Meteo fallback if backend API route is unreachable or throws
+    return await fetchDirectOpenMeteo(city);
+  }
 }
 
 /** Outdoor AQI for the saved city, refreshed every 15 minutes. */
