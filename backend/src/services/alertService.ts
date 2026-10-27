@@ -4,27 +4,100 @@ import { dbService } from "./dbService.js";
 import { generateAirQualityRecommendation } from "./aiRecommendationService.js";
 import type { SensorReadingDoc, AlertDoc, AiRecommendationResult } from "../models/types.js";
 
-const ALERT_COOLDOWN_MS = 15 * 60 * 1000;
+// Cooldown per severity so frequent changes don't flood inboxes
+const COOLDOWN_MS: Record<string, number> = {
+  critical: 5 * 60 * 1000,   // 5 minutes
+  warning:  10 * 60 * 1000,  // 10 minutes
+  moderate: 15 * 60 * 1000,  // 15 minutes
+};
+
+/** Determine severity label from mq135 value */
+function getSeverity(mq135: number): "critical" | "warning" | "moderate" | null {
+  if (mq135 >= 1000) return "critical";
+  if (mq135 >= 700)  return "warning";
+  if (mq135 >= 400)  return "moderate";
+  return null; // good air — no alert
+}
+
+/** Build the HTML email body */
+function buildEmailHtml(
+  roomName: string,
+  reading: SensorReadingDoc,
+  severity: string,
+  formattedTime: string,
+  aiRec: AiRecommendationResult | null,
+): string {
+  const colorMap: Record<string, string> = {
+    critical: "#dc2626",
+    warning:  "#f97316",
+    moderate: "#eab308",
+  };
+  const headerColor = colorMap[severity] ?? "#6366f1";
+
+  const aiBlock = aiRec
+    ? `<div style="margin-top:16px;padding:16px;background-color:#fef9ec;border-left:4px solid ${headerColor};border-radius:6px;">
+        <p style="margin:0 0 6px 0;font-size:14px;font-weight:bold;color:#92400e;">
+          🤖 AI AirSense Recommendation (${aiRec.priority.toUpperCase()} Priority)
+        </p>
+        <p style="margin:0 0 10px 0;font-size:13px;color:#1e293b;line-height:1.5;">${aiRec.summary}</p>
+        <p style="margin:0 0 6px 0;font-size:12px;font-weight:bold;color:#475569;">Recommended Actions:</p>
+        <ul style="margin:0;padding-left:20px;font-size:12px;color:#334155;line-height:1.8;">
+          ${aiRec.recommendations.map((r) => `<li>${r}</li>`).join("")}
+        </ul>
+      </div>`
+    : `<div style="margin-top:16px;padding:12px;background-color:#fef9ec;border-left:4px solid ${headerColor};border-radius:4px;">
+        <p style="margin:0;font-size:13px;color:#92400e;">
+          <strong>Recommended Action:</strong> Elevated air contaminants detected.
+          Open windows for ventilation, turn on exhaust fans, and check for indoor pollutant sources.
+        </p>
+      </div>`;
+
+  return `<div style="font-family:Arial,sans-serif;max-width:620px;margin:0 auto;padding:20px;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc;">
+    <div style="background:${headerColor};color:white;padding:16px;border-radius:8px;text-align:center;">
+      <h2 style="margin:0;font-size:20px;">🚨 AirSense Air Quality Alert</h2>
+      <p style="margin:4px 0 0 0;font-size:14px;text-transform:capitalize;">${severity} level detected in ${roomName}</p>
+    </div>
+
+    <div style="background:white;padding:20px;border-radius:8px;margin-top:16px;border:1px solid #e2e8f0;">
+      <table style="width:100%;border-collapse:collapse;font-size:14px;">
+        <tr><td style="padding:6px 0;color:#64748b;width:180px;">Room / Location</td><td style="padding:6px 0;font-weight:bold;">${roomName}</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;">Status</td><td style="padding:6px 0;font-weight:bold;color:${headerColor};text-transform:uppercase;">${severity}</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;">MQ-135 Reading</td><td style="padding:6px 0;font-size:18px;font-weight:bold;color:${headerColor};">${reading.mq135}</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;">Temperature</td><td style="padding:6px 0;">${reading.temperature}°C</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;">Humidity</td><td style="padding:6px 0;">${reading.humidity}%</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;">Device ID</td><td style="padding:6px 0;font-family:monospace;font-size:12px;">${reading.deviceId}</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;">Detected At</td><td style="padding:6px 0;">${formattedTime} IST</td></tr>
+      </table>
+    </div>
+
+    ${aiBlock}
+
+    <p style="margin-top:20px;font-size:11px;color:#94a3b8;text-align:center;">
+      AirSense IoT Indoor Air Quality Monitoring System · Automated Alert
+    </p>
+  </div>`;
+}
 
 export async function processReadingForAlerts(reading: SensorReadingDoc): Promise<AlertDoc | null> {
-  if (reading.status !== "poor" && reading.mq135 < 700) {
-    return null;
-  }
+  const severity = getSeverity(reading.mq135);
+
+  // Only alert for moderate, warning, or critical levels
+  if (!severity) return null;
 
   const device = await dbService.getDeviceById(reading.deviceId);
   const roomName = device?.name || reading.roomName || "Indoor Room";
   const userId = device?.userId || reading.userId;
 
-  const since = new Date(Date.now() - ALERT_COOLDOWN_MS);
+  // Cooldown check per device
+  const cooldownMs = COOLDOWN_MS[severity] ?? COOLDOWN_MS["moderate"]!;
+  const since = new Date(Date.now() - cooldownMs);
   const recentAlert = await dbService.getRecentAlert(reading.deviceId, since);
   if (recentAlert) {
+    console.log(`[AlertEngine] Cooldown active for device ${reading.deviceId} — skipping.`);
     return null;
   }
 
-  const severity: "warning" | "critical" = reading.mq135 >= 1000 ? "critical" : "warning";
-  const threshold = 700;
-
-  // Step: Generate AI Recommendation for warning/critical alert
+  // Generate AI recommendation for this reading
   let aiRecommendation: AiRecommendationResult | null = null;
   try {
     aiRecommendation = await generateAirQualityRecommendation(
@@ -40,17 +113,10 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
     );
   } catch (aiErr) {
     console.warn(
-      "[AlertEngine] AI recommendation generation failed for alert:",
+      "[AlertEngine] AI recommendation generation failed:",
       aiErr instanceof Error ? aiErr.message : aiErr,
     );
   }
-
-  const channelsSent = {
-    email: false,
-  };
-
-  const prefs = userId ? await dbService.getUserPreferences(userId) : null;
-  const emailTarget = prefs?.email || config.resend.toEmail;
 
   const formattedTime = new Date(reading.timestamp).toLocaleString("en-IN", {
     timeZone: "Asia/Kolkata",
@@ -58,71 +124,45 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
     timeStyle: "short",
   });
 
-  // Email Alert via Resend (Single active notification channel)
+  // ── Multi-recipient email dispatch ────────────────────────────────────────
+  const channelsSent = { email: false };
+
+  // Build final recipient list: env-configured group + user's personal pref email
+  const groupRecipients = [...config.resend.toEmails];
+  const prefs = userId ? await dbService.getUserPreferences(userId) : null;
+  if (prefs?.email && !groupRecipients.includes(prefs.email)) {
+    groupRecipients.push(prefs.email);
+  }
+
+  const validRecipients = groupRecipients.filter(
+    (e) => e.length > 0 && !e.includes("example.com"),
+  );
+
   if (
-    prefs?.alertChannels.email !== false &&
     config.resend.apiKey &&
-    emailTarget &&
-    !emailTarget.includes("example.com")
+    validRecipients.length > 0 &&
+    prefs?.alertChannels?.email !== false
   ) {
     try {
       const resend = new Resend(config.resend.apiKey);
+      const subject =
+        severity === "critical"
+          ? `🚨 CRITICAL: Very Poor Air Quality in ${roomName} — Immediate Action Required`
+          : severity === "warning"
+            ? `⚠️ WARNING: Poor Air Quality Detected in ${roomName}`
+            : `📊 NOTICE: Moderate Air Quality Detected in ${roomName}`;
+
       await resend.emails.send({
         from: config.resend.fromEmail,
-        to: emailTarget,
-        subject: `🚨 AirSense Alert: High Air Contamination in ${roomName}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #f8fafc;">
-            <div style="background-color: #ef4444; color: white; padding: 16px; border-radius: 8px; text-align: center;">
-              <h2 style="margin: 0; font-size: 20px;">🚨 Poor Air Quality Alert</h2>
-              <p style="margin: 4px 0 0 0; font-size: 14px;">Elevated pollution detected by AirSense hardware</p>
-            </div>
-            
-            <div style="background-color: white; padding: 20px; border-radius: 8px; margin-top: 16px; border: 1px solid #e2e8f0;">
-              <p style="margin: 0 0 12px 0;"><strong>Room / Location:</strong> ${roomName}</p>
-              <p style="margin: 0 0 12px 0;"><strong>Status:</strong> <span style="color: #ef4444; font-weight: bold; text-transform: uppercase;">${severity}</span></p>
-              <p style="margin: 0 0 12px 0;"><strong>Device ID:</strong> <code>${reading.deviceId}</code></p>
-              <p style="margin: 0 0 12px 0;"><strong>MQ-135 Sensor Reading:</strong> <span style="font-size: 18px; color: #ef4444; font-weight: bold;">${reading.mq135}</span></p>
-              <p style="margin: 0 0 12px 0;"><strong>Temperature:</strong> ${reading.temperature}°C</p>
-              <p style="margin: 0 0 12px 0;"><strong>Relative Humidity:</strong> ${reading.humidity}%</p>
-              <p style="margin: 0 0 12px 0;"><strong>Time of Detection:</strong> ${formattedTime} IST</p>
-            </div>
-
-            ${
-              aiRecommendation
-                ? `
-            <div style="margin-top: 16px; padding: 16px; background-color: #fef2f2; border-left: 4px solid #ef4444; border-radius: 6px;">
-              <p style="margin: 0 0 6px 0; font-size: 14px; font-weight: bold; color: #991b1b;">
-                🤖 AI AirSense Recommendation (${aiRecommendation.priority.toUpperCase()} Priority)
-              </p>
-              <p style="margin: 0 0 10px 0; font-size: 13px; color: #1e293b; line-height: 1.5;">
-                ${aiRecommendation.summary}
-              </p>
-              <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: bold; color: #475569;">
-                Recommended Actions:
-              </p>
-              <ul style="margin: 0; padding-left: 20px; font-size: 12px; color: #334155; line-height: 1.6;">
-                ${aiRecommendation.recommendations.map((r) => `<li>${r}</li>`).join("")}
-              </ul>
-            </div>
-            `
-                : `
-            <div style="margin-top: 16px; padding: 12px; background-color: #fef2f2; border-left: 4px solid #ef4444; border-radius: 4px;">
-              <p style="margin: 0; font-size: 13px; color: #991b1b;">
-                <strong>Recommended Action:</strong> Stuffy or contaminated air detected. Open windows for air circulation, turn on exhaust fans, or inspect potential indoor pollutant sources.
-              </p>
-            </div>
-            `
-            }
-
-            <p style="margin-top: 20px; font-size: 11px; color: #94a3b8; text-align: center;">
-              AirSense IoT Indoor Air Quality Monitoring System · Automated Alert
-            </p>
-          </div>
-        `,
+        to: validRecipients,          // ← sends to ALL 5 emails at once
+        subject,
+        html: buildEmailHtml(roomName, reading, severity, formattedTime, aiRecommendation),
       });
+
       channelsSent.email = true;
-      console.log(`[AlertEngine] Email alert sent to ${emailTarget}`);
+      console.log(
+        `[AlertEngine] Email alert (${severity}) sent to ${validRecipients.length} recipient(s): ${validRecipients.join(", ")}`,
+      );
     } catch (err: unknown) {
       console.warn(
         "[AlertEngine] Email dispatch failed:",
@@ -131,7 +171,8 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
     }
   }
 
-  // 3. Save Alert to DB
+  // Save alert record to DB
+  const threshold = severity === "moderate" ? config.thresholds.moderate : config.thresholds.poor;
   const alertDoc: AlertDoc = {
     deviceId: reading.deviceId,
     ...(userId && { userId }),
@@ -140,7 +181,7 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
     temperature: reading.temperature,
     humidity: reading.humidity,
     threshold,
-    severity,
+    severity: severity === "moderate" ? "warning" : severity,
     status: "active",
     channelsSent,
     timestamp: new Date(reading.timestamp),
@@ -153,8 +194,8 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
     deviceId: reading.deviceId,
     ...(userId && { userId }),
     level: "warn",
-    message: `Alert triggered for ${roomName} (MQ-135: ${reading.mq135})`,
-    metadata: { channelsSent, severity },
+    message: `Alert (${severity}) triggered for ${roomName} — MQ-135: ${reading.mq135} | Recipients: ${validRecipients.length}`,
+    metadata: { channelsSent, severity, recipientCount: validRecipients.length },
   });
 
   return alertDoc;

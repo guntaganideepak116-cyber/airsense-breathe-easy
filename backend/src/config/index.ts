@@ -30,7 +30,11 @@ export const config = {
   resend: {
     apiKey: process.env["RESEND_API_KEY"] || "",
     fromEmail: process.env["ALERT_FROM_EMAIL"] || "AirSense Alerts <onboarding@resend.dev>",
-    toEmail: process.env["ALERT_TO_EMAIL"] || "",
+    // Comma-separated list of alert recipient emails
+    toEmails: (process.env["ALERT_TO_EMAIL"] || "")
+      .split(",")
+      .map((e) => e.trim())
+      .filter((e) => e.length > 0 && !e.includes("example.com")),
   },
   vapid: {
     publicKey:
