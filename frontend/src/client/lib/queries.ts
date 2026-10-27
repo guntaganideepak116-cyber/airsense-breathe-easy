@@ -192,3 +192,40 @@ export function useUpdateUserPreferences() {
     },
   });
 }
+
+export function useAiRecommendation(deviceId: string | null, reading?: Reading | null) {
+  return useQuery({
+    queryKey: [
+      "ai-recommendation",
+      deviceId,
+      reading ? `${reading.mq135}-${reading.temperature}-${reading.humidity}` : "none",
+    ],
+    queryFn: () => (deviceId ? api.getAiRecommendation(deviceId, false, reading) : null),
+    enabled: !!deviceId,
+    staleTime: 60_000,
+    refetchInterval: 120_000,
+  });
+}
+
+export function useRefreshAiRecommendation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ deviceId, reading }: { deviceId: string; reading?: Reading | null }) =>
+      api.getAiRecommendation(deviceId, true, reading),
+    onSuccess: (data, variables) => {
+      if (data) {
+        qc.setQueryData(
+          [
+            "ai-recommendation",
+            variables.deviceId,
+            variables.reading
+              ? `${variables.reading.mq135}-${variables.reading.temperature}-${variables.reading.humidity}`
+              : "none",
+          ],
+          data,
+        );
+        qc.invalidateQueries({ queryKey: ["ai-recommendation", variables.deviceId] });
+      }
+    },
+  });
+}

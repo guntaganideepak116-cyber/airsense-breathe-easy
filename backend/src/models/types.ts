@@ -41,9 +41,7 @@ export interface AlertDoc {
   severity: "warning" | "critical";
   status: "active" | "resolved";
   channelsSent: {
-    whatsapp: boolean;
     email: boolean;
-    sms: boolean;
   };
   timestamp: Date;
   resolvedAt?: Date | null;
@@ -52,12 +50,8 @@ export interface AlertDoc {
 export interface UserPreferencesDoc {
   _id?: ObjectId;
   userId: string;
-  phoneNumber?: string;
-  whatsappNumber?: string;
   email?: string;
   alertChannels: {
-    sms: boolean;
-    whatsapp: boolean;
     email: boolean;
   };
   threshold: number;
@@ -83,4 +77,44 @@ export interface PushSubscriptionData {
     auth: string;
   };
   lang?: "en" | "te";
+}
+
+export type AiRecommendationStatus = "good" | "attention" | "warning" | "critical";
+export type AiRecommendationPriority = "low" | "medium" | "high";
+
+export interface AiRecommendationResult {
+  status: AiRecommendationStatus;
+  summary: string;
+  recommendations: string[];
+  priority: AiRecommendationPriority;
+  analyzedAt: string;
+  cached?: boolean;
+  sensorData: {
+    deviceId: string;
+    room?: string;
+    mq135: number;
+    temperature: number;
+    humidity: number;
+    timestamp: string;
+  };
+}
+
+export interface AiRecommendationDoc {
+  _id?: ObjectId;
+  deviceId: string;
+  roomName?: string;
+  userId?: string;
+  sensorReadingId?: string;
+  status: AiRecommendationStatus;
+  summary: string;
+  recommendations: string[];
+  priority: AiRecommendationPriority;
+  sensorData: {
+    mq135: number;
+    temperature: number;
+    humidity: number;
+    timestamp: Date;
+  };
+  cached?: boolean;
+  createdAt: Date;
 }

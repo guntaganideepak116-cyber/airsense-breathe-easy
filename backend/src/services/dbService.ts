@@ -6,6 +6,7 @@ import type {
   AlertDoc,
   UserPreferencesDoc,
   SystemLogDoc,
+  AiRecommendationDoc,
 } from "../models/types.js";
 
 let client: MongoClient | null = null;
@@ -19,6 +20,7 @@ const memReadings: SensorReadingDoc[] = [];
 const memAlerts: AlertDoc[] = [];
 const memPreferences = new Map<string, UserPreferencesDoc>();
 const memLogs: SystemLogDoc[] = [];
+const memAiRecommendations = new Map<string, AiRecommendationDoc>();
 
 export async function getDb(): Promise<Db | null> {
   const uri = config.mongodbUri;
@@ -72,6 +74,7 @@ async function initIndexes(database: Db) {
     await database.collection("alerts").createIndex({ deviceId: 1, timestamp: -1 });
     await database.collection("userPreferences").createIndex({ userId: 1 }, { unique: true });
     await database.collection("systemLogs").createIndex({ timestamp: -1 });
+    await database.collection("aiRecommendations").createIndex({ deviceId: 1, createdAt: -1 });
   } catch (e: unknown) {
     console.warn("[DB] Index creation skipped:", e instanceof Error ? e.message : e);
   }
@@ -305,10 +308,8 @@ export const dbService = {
 
     const defaultPrefs: UserPreferencesDoc = {
       userId,
-      phoneNumber: "",
-      whatsappNumber: "",
       email: "",
-      alertChannels: { sms: true, whatsapp: true, email: true },
+      alertChannels: { email: true },
       threshold: 700,
       updatedAt: new Date(),
     };
@@ -361,5 +362,33 @@ export const dbService = {
     }
     memLogs.push(fullLog);
     if (memLogs.length > 500) memLogs.shift();
+  },
+
+  async saveAiRecommendation(rec: AiRecommendationDoc): Promise<AiRecommendationDoc> {
+    const database = await getDb();
+    if (database) {
+      try {
+        await database.collection<AiRecommendationDoc>("aiRecommendations").insertOne(rec);
+        return rec;
+      } catch (err) {
+        console.warn("[DB] Error saving AI recommendation to MongoDB:", err);
+      }
+    }
+    memAiRecommendations.set(rec.deviceId, rec);
+    return rec;
+  },
+
+  async getLatestAiRecommendation(deviceId: string): Promise<AiRecommendationDoc | null> {
+    const database = await getDb();
+    if (database) {
+      try {
+        return await database
+          .collection<AiRecommendationDoc>("aiRecommendations")
+          .findOne({ deviceId }, { sort: { createdAt: -1 } });
+      } catch (err) {
+        console.warn("[DB] Error fetching AI recommendation from MongoDB:", err);
+      }
+    }
+    return memAiRecommendations.get(deviceId) ?? null;
   },
 };

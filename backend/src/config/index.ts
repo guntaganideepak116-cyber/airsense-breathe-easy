@@ -1,5 +1,23 @@
 import dotenv from "dotenv";
+import path from "path";
+import fs from "fs";
+
+// Load from current working directory
 dotenv.config();
+
+// Also attempt loading from backend/.env or workspace root .env
+const possibleEnvPaths = [
+  path.resolve(process.cwd(), ".env"),
+  path.resolve(process.cwd(), "backend/.env"),
+  path.resolve(process.cwd(), "../.env"),
+  path.resolve(process.cwd(), "../backend/.env"),
+];
+
+for (const envPath of possibleEnvPaths) {
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath, override: false });
+  }
+}
 
 export const config = {
   port: parseInt(process.env["PORT"] || "5000", 10),
@@ -9,20 +27,10 @@ export const config = {
     .map((s) => s.trim()),
   mongodbUri: process.env["MONGODB_URI"] || "",
   clerkSecretKey: process.env["CLERK_SECRET_KEY"] || "",
-  twilio: {
-    sid: process.env["TWILIO_ACCOUNT_SID"] || "",
-    authToken: process.env["TWILIO_AUTH_TOKEN"] || "",
-    from: process.env["TWILIO_WHATSAPP_FROM"] || "whatsapp:+14155238886",
-    to: process.env["ALERT_TO_WHATSAPP"] || "",
-  },
   resend: {
     apiKey: process.env["RESEND_API_KEY"] || "",
     fromEmail: process.env["ALERT_FROM_EMAIL"] || "AirSense Alerts <onboarding@resend.dev>",
     toEmail: process.env["ALERT_TO_EMAIL"] || "",
-  },
-  metaWhatsapp: {
-    phoneNumberId: process.env["WHATSAPP_PHONE_NUMBER_ID"] || "",
-    accessToken: process.env["WHATSAPP_ACCESS_TOKEN"] || "",
   },
   vapid: {
     publicKey:
@@ -32,5 +40,12 @@ export const config = {
   thresholds: {
     moderate: parseInt(process.env["MODERATE_THRESHOLD"] || "400", 10),
     poor: parseInt(process.env["POOR_THRESHOLD"] || "700", 10),
+  },
+  ai: {
+    enabled: process.env["AI_ENABLED"] !== "false",
+    provider: (process.env["AI_PROVIDER"] || "groq").toLowerCase(),
+    model: process.env["AI_MODEL"] || "qwen/qwen3.8-27b",
+    apiKey: process.env["AI_API_KEY"] || "",
+    cooldownSeconds: parseInt(process.env["AI_RECOMMENDATION_COOLDOWN_SECONDS"] || "300", 10),
   },
 };

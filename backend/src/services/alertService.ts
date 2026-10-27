@@ -1,8 +1,8 @@
-import twilio from "twilio";
 import { Resend } from "resend";
 import { config } from "../config/index.js";
 import { dbService } from "./dbService.js";
-import type { SensorReadingDoc, AlertDoc } from "../models/types.js";
+import { generateAirQualityRecommendation } from "./aiRecommendationService.js";
+import type { SensorReadingDoc, AlertDoc, AiRecommendationResult } from "../models/types.js";
 
 const ALERT_COOLDOWN_MS = 15 * 60 * 1000;
 
@@ -24,14 +24,32 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
   const severity: "warning" | "critical" = reading.mq135 >= 1000 ? "critical" : "warning";
   const threshold = 700;
 
+  // Step: Generate AI Recommendation for warning/critical alert
+  let aiRecommendation: AiRecommendationResult | null = null;
+  try {
+    aiRecommendation = await generateAirQualityRecommendation(
+      {
+        deviceId: reading.deviceId,
+        roomName,
+        mq135: reading.mq135,
+        temperature: reading.temperature,
+        humidity: reading.humidity,
+        timestamp: reading.timestamp,
+      },
+      { forceRefresh: true, userId },
+    );
+  } catch (aiErr) {
+    console.warn(
+      "[AlertEngine] AI recommendation generation failed for alert:",
+      aiErr instanceof Error ? aiErr.message : aiErr,
+    );
+  }
+
   const channelsSent = {
-    whatsapp: false,
     email: false,
-    sms: false,
   };
 
   const prefs = userId ? await dbService.getUserPreferences(userId) : null;
-  const whatsappTarget = prefs?.whatsappNumber || config.twilio.to;
   const emailTarget = prefs?.email || config.resend.toEmail;
 
   const formattedTime = new Date(reading.timestamp).toLocaleString("en-IN", {
@@ -40,96 +58,7 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
     timeStyle: "short",
   });
 
-  // 1. WhatsApp Alert via Twilio
-  if (
-    prefs?.alertChannels.whatsapp !== false &&
-    config.twilio.sid &&
-    config.twilio.authToken &&
-    whatsappTarget &&
-    !whatsappTarget.includes("0000000000")
-  ) {
-    try {
-      const client = twilio(config.twilio.sid, config.twilio.authToken);
-      const to = whatsappTarget.startsWith("whatsapp:")
-        ? whatsappTarget
-        : `whatsapp:${whatsappTarget}`;
-
-      const whatsappBody =
-        `🚨 *AIRSENSE AIR QUALITY ALERT*\n\n` +
-        `*Severity:* ${severity.toUpperCase()}\n` +
-        `*Room:* ${roomName}\n` +
-        `*Device:* ${reading.deviceId}\n` +
-        `*MQ-135 Sensor Reading:* ${reading.mq135}\n` +
-        `*Temperature:* ${reading.temperature}°C\n` +
-        `*Humidity:* ${reading.humidity}%\n` +
-        `*Time:* ${formattedTime} IST\n\n` +
-        `⚠️ Poor air quality detected. Please open windows or ensure proper ventilation immediately.`;
-
-      await client.messages.create({
-        body: whatsappBody,
-        from: config.twilio.from,
-        to,
-      });
-      channelsSent.whatsapp = true;
-      console.log(`[AlertEngine] WhatsApp alert sent via Twilio to ${to}`);
-    } catch (err: unknown) {
-      console.warn(
-        "[AlertEngine] Twilio WhatsApp dispatch failed:",
-        err instanceof Error ? err.message : err,
-      );
-    }
-  }
-
-  // 1b. WhatsApp Alert via Meta Cloud API (if configured)
-  if (
-    !channelsSent.whatsapp &&
-    prefs?.alertChannels.whatsapp !== false &&
-    config.metaWhatsapp.phoneNumberId &&
-    config.metaWhatsapp.accessToken &&
-    whatsappTarget
-  ) {
-    try {
-      const cleanPhone = whatsappTarget.replace(/[^0-9]/g, "");
-      const res = await fetch(
-        `https://graph.facebook.com/v18.0/${config.metaWhatsapp.phoneNumberId}/messages`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${config.metaWhatsapp.accessToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            messaging_product: "whatsapp",
-            to: cleanPhone,
-            type: "text",
-            text: {
-              preview_url: false,
-              body:
-                `🚨 AIRSENSE AIR QUALITY ALERT\n\n` +
-                `Severity: ${severity.toUpperCase()}\n` +
-                `Room: ${roomName}\n` +
-                `Device: ${reading.deviceId}\n` +
-                `MQ-135: ${reading.mq135}\n` +
-                `Temp: ${reading.temperature}°C | Humidity: ${reading.humidity}%\n` +
-                `Time: ${formattedTime} IST\n\n` +
-                `Poor air quality detected. Please ensure ventilation immediately.`,
-            },
-          }),
-        },
-      );
-      if (res.ok) {
-        channelsSent.whatsapp = true;
-        console.log(`[AlertEngine] WhatsApp alert sent via Meta Cloud API to ${cleanPhone}`);
-      } else {
-        const errText = await res.text();
-        console.warn("[AlertEngine] Meta WhatsApp API response error:", errText);
-      }
-    } catch (err) {
-      console.warn("[AlertEngine] Meta WhatsApp dispatch failed:", err instanceof Error ? err.message : err);
-    }
-  }
-
-  // 2. Email Alert via Resend
+  // Email Alert via Resend (Single active notification channel)
   if (
     prefs?.alertChannels.email !== false &&
     config.resend.apiKey &&
@@ -151,6 +80,7 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
             
             <div style="background-color: white; padding: 20px; border-radius: 8px; margin-top: 16px; border: 1px solid #e2e8f0;">
               <p style="margin: 0 0 12px 0;"><strong>Room / Location:</strong> ${roomName}</p>
+              <p style="margin: 0 0 12px 0;"><strong>Status:</strong> <span style="color: #ef4444; font-weight: bold; text-transform: uppercase;">${severity}</span></p>
               <p style="margin: 0 0 12px 0;"><strong>Device ID:</strong> <code>${reading.deviceId}</code></p>
               <p style="margin: 0 0 12px 0;"><strong>MQ-135 Sensor Reading:</strong> <span style="font-size: 18px; color: #ef4444; font-weight: bold;">${reading.mq135}</span></p>
               <p style="margin: 0 0 12px 0;"><strong>Temperature:</strong> ${reading.temperature}°C</p>
@@ -158,11 +88,32 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
               <p style="margin: 0 0 12px 0;"><strong>Time of Detection:</strong> ${formattedTime} IST</p>
             </div>
 
+            ${
+              aiRecommendation
+                ? `
+            <div style="margin-top: 16px; padding: 16px; background-color: #fef2f2; border-left: 4px solid #ef4444; border-radius: 6px;">
+              <p style="margin: 0 0 6px 0; font-size: 14px; font-weight: bold; color: #991b1b;">
+                🤖 AI AirSense Recommendation (${aiRecommendation.priority.toUpperCase()} Priority)
+              </p>
+              <p style="margin: 0 0 10px 0; font-size: 13px; color: #1e293b; line-height: 1.5;">
+                ${aiRecommendation.summary}
+              </p>
+              <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: bold; color: #475569;">
+                Recommended Actions:
+              </p>
+              <ul style="margin: 0; padding-left: 20px; font-size: 12px; color: #334155; line-height: 1.6;">
+                ${aiRecommendation.recommendations.map((r) => `<li>${r}</li>`).join("")}
+              </ul>
+            </div>
+            `
+                : `
             <div style="margin-top: 16px; padding: 12px; background-color: #fef2f2; border-left: 4px solid #ef4444; border-radius: 4px;">
               <p style="margin: 0; font-size: 13px; color: #991b1b;">
                 <strong>Recommended Action:</strong> Stuffy or contaminated air detected. Open windows for air circulation, turn on exhaust fans, or inspect potential indoor pollutant sources.
               </p>
             </div>
+            `
+            }
 
             <p style="margin-top: 20px; font-size: 11px; color: #94a3b8; text-align: center;">
               AirSense IoT Indoor Air Quality Monitoring System · Automated Alert

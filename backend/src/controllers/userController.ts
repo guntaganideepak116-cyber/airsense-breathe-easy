@@ -4,13 +4,9 @@ import type { AuthenticatedRequest } from "../middleware/authMiddleware.js";
 import { dbService } from "../services/dbService.js";
 
 const patchSchema = z.object({
-  phoneNumber: z.string().trim().max(20).optional(),
-  whatsappNumber: z.string().trim().max(20).optional(),
   email: z.string().trim().email().max(100).optional().or(z.literal("")),
   alertChannels: z
     .object({
-      sms: z.boolean().optional(),
-      whatsapp: z.boolean().optional(),
       email: z.boolean().optional(),
     })
     .optional(),

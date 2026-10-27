@@ -1,6 +1,6 @@
 # 🍃 AirSense — Production IoT Air Quality Monitoring System
 
-A full-stack, enterprise-grade IoT Indoor Air Quality (IAQ) monitoring platform featuring real-time MQ-135 telemetry streaming, intelligent AI ventilation advice, WhatsApp & Email alert dispatching, and interactive room diagnostics.
+A full-stack, enterprise-grade IoT Indoor Air Quality (IAQ) monitoring platform featuring real-time MQ-135 telemetry streaming, intelligent AI ventilation advice, automated HTML Email alert dispatching, and interactive room diagnostics.
 
 ---
 
@@ -29,7 +29,7 @@ AirSense/
 │   │   ├── middleware/           # Clerk authentication & error handling middleware
 │   │   ├── models/               # TypeScript data models & schemas
 │   │   ├── routes/               # Modular Express API routers
-│   │   ├── services/             # Core business services (MongoDB, Twilio, Resend, SSE, AI)
+│   │   ├── services/             # Core business services (MongoDB, Resend, SSE, AI)
 │   │   └── server.ts             # Express application entrypoint
 │   ├── package.json              # Backend dependencies
 │   └── tsconfig.json             # Backend TypeScript configuration
@@ -48,7 +48,6 @@ AirSense/
 - **npm** >= 10.x
 - **MongoDB Atlas** database URI
 - **Clerk** account (for authentication)
-- **Twilio** account (optional, for WhatsApp & SMS alerts)
 - **Resend** account (optional, for email alerts)
 
 ---
@@ -88,12 +87,6 @@ MONGODB_URI=mongodb+srv://<user>:<password>@cluster0.mongodb.net/airsense?retryW
 
 # Clerk Authentication (Secret Key)
 CLERK_SECRET_KEY=sk_test_...
-
-# Twilio (WhatsApp & SMS Alerts)
-TWILIO_ACCOUNT_SID=AC...
-TWILIO_AUTH_TOKEN=...
-TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
-ALERT_TO_WHATSAPP=whatsapp:+919876543210
 
 # Resend (Email Alerts)
 RESEND_API_KEY=re_...

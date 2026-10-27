@@ -3,10 +3,9 @@ import { useEffect, useState } from "react";
 import { useClerk } from "@clerk/clerk-react";
 import {
   BellRing,
+  CheckCircle2,
   LogOut,
   Mail,
-  MessageCircle,
-  MessageSquare,
   Radio,
   Save,
   Trash2,
@@ -34,13 +33,13 @@ export const Route = createFileRoute("/dashboard/settings")({
       {
         name: "description",
         content:
-          "Manage multi-channel alerts, push alerts, alert thresholds, devices and language for AirSense.",
+          "Manage email alerts, push alerts, alert thresholds, devices and language for AirSense.",
       },
       { property: "og:title", content: "Settings — AirSense" },
       {
         property: "og:description",
         content:
-          "Multi-channel SMS, WhatsApp and Email notification preferences, device management and Telugu/English toggle.",
+          "Email notification preferences, device management and Telugu/English toggle.",
       },
       { name: "robots", content: "noindex" },
     ],
@@ -76,7 +75,7 @@ function SettingsPage() {
     <div className="space-y-5">
       <h1 className="font-display text-2xl text-ink sm:text-3xl">{t("set.title")}</h1>
 
-      <MultiChannelAlertsSection />
+      <EmailAlertsSection />
 
       <section className="rounded-3xl border bg-card p-6">
         <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3">
@@ -199,47 +198,40 @@ function SettingsPage() {
   );
 }
 
-function MultiChannelAlertsSection() {
+function EmailAlertsSection() {
   const { data: prefs, isLoading } = useUserPreferences();
   const updatePrefs = useUpdateUserPreferences();
 
-  const [phone, setPhone] = useState("");
-  const [whatsapp, setWhatsapp] = useState("");
   const [email, setEmail] = useState("");
-  const [channels, setChannels] = useState({ sms: true, whatsapp: true, email: true });
+  const [emailEnabled, setEmailEnabled] = useState(true);
 
   useEffect(() => {
     if (prefs) {
-      setPhone(prefs.phoneNumber ?? "");
-      setWhatsapp(prefs.whatsappNumber ?? "");
       setEmail(prefs.email ?? "");
-      setChannels(prefs.alertChannels ?? { sms: true, whatsapp: true, email: true });
+      setEmailEnabled(prefs.alertChannels?.email ?? true);
     }
   }, [prefs]);
 
-  const handleToggleChannel = (channel: "sms" | "whatsapp" | "email", enabled: boolean) => {
-    const nextChannels = { ...channels, [channel]: enabled };
-    setChannels(nextChannels);
+  const handleToggleEmail = (enabled: boolean) => {
+    setEmailEnabled(enabled);
     updatePrefs.mutate(
-      { alertChannels: nextChannels },
+      { alertChannels: { email: enabled } },
       {
-        onSuccess: () => toast.success("Alert channel updated!"),
-        onError: () => toast.error("Failed to update channel preference."),
+        onSuccess: () =>
+          toast.success(enabled ? "Email alerts enabled!" : "Email alerts disabled."),
+        onError: () => toast.error("Failed to update email alert preference."),
       },
     );
   };
 
-  const handleSaveContactDetails = (e: React.FormEvent) => {
+  const handleSaveEmail = (e: React.FormEvent) => {
     e.preventDefault();
+    const cleanEmail = email.trim();
     updatePrefs.mutate(
+      { email: cleanEmail },
       {
-        phoneNumber: phone.trim(),
-        whatsappNumber: whatsapp.trim(),
-        email: email.trim(),
-      },
-      {
-        onSuccess: () => toast.success("Alert contact details saved successfully!"),
-        onError: () => toast.error("Failed to save contact details."),
+        onSuccess: () => toast.success("Recipient email address saved successfully!"),
+        onError: () => toast.error("Failed to save recipient email."),
       },
     );
   };
@@ -247,118 +239,63 @@ function MultiChannelAlertsSection() {
   return (
     <section className="rounded-3xl border bg-card p-6 shadow-sm">
       <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400">
-          <Radio className="h-5 w-5" />
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
+          <Mail className="h-5 w-5" />
         </span>
         <div className="min-w-0">
-          <p className="font-semibold text-ink">Multi-Channel Alert Dispatch</p>
+          <p className="font-semibold text-ink">Email Alert Notifications</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Configure independent parallel alert channels (SMS via Fast2SMS, WhatsApp via Meta Cloud
-            API, and Email via Resend) for instant notifications.
+            Configure automated email notifications via Resend for instant indoor air quality warnings,
+            sensor measurements, and AI guidance.
           </p>
         </div>
       </div>
 
       <div className="mt-6 space-y-4">
-        {/* SMS Toggle */}
-        <div className="flex items-center justify-between gap-4 rounded-2xl border p-4 bg-background/50">
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
-              <MessageSquare className="h-4 w-4" />
-            </span>
-            <div className="min-w-0">
-              <p className="text-sm font-medium">SMS Alerts (Fast2SMS)</p>
-              <p className="text-xs text-muted-foreground">
-                Instant SMS for air hazards & device offline events
-              </p>
-            </div>
-          </div>
-          <Switch
-            checked={channels.sms}
-            disabled={isLoading}
-            onCheckedChange={(v) => handleToggleChannel("sms", v)}
-          />
-        </div>
-
-        {/* WhatsApp Toggle */}
-        <div className="flex items-center justify-between gap-4 rounded-2xl border p-4 bg-background/50">
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-teal-50 text-teal-600 dark:bg-teal-950/40 dark:text-teal-400">
-              <MessageCircle className="h-4 w-4" />
-            </span>
-            <div className="min-w-0">
-              <p className="text-sm font-medium">WhatsApp Alerts (Meta Cloud API)</p>
-              <p className="text-xs text-muted-foreground">
-                Template notification messages delivered to WhatsApp
-              </p>
-            </div>
-          </div>
-          <Switch
-            checked={channels.whatsapp}
-            disabled={isLoading}
-            onCheckedChange={(v) => handleToggleChannel("whatsapp", v)}
-          />
-        </div>
-
-        {/* Email Toggle */}
+        {/* Email Channel Toggle */}
         <div className="flex items-center justify-between gap-4 rounded-2xl border p-4 bg-background/50">
           <div className="flex items-center gap-3 min-w-0">
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
               <Mail className="h-4 w-4" />
             </span>
             <div className="min-w-0">
-              <p className="text-sm font-medium">Email Alerts (Resend)</p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-medium">Email Alerts (Resend)</p>
+                {emailEnabled ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                    Active
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-muted-foreground border">
+                    Disabled
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-muted-foreground">
-                Detailed HTML metrics summary and dashboard action link
+                Detailed HTML summary with live MQ-135, temperature, humidity metrics & AI recommendations
               </p>
             </div>
           </div>
           <Switch
-            checked={channels.email}
-            disabled={isLoading}
-            onCheckedChange={(v) => handleToggleChannel("email", v)}
+            checked={emailEnabled}
+            disabled={isLoading || updatePrefs.isPending}
+            onCheckedChange={handleToggleEmail}
           />
         </div>
       </div>
 
-      {/* Recipient Contact Details Inputs */}
-      <form onSubmit={handleSaveContactDetails} className="mt-6 border-t pt-5 space-y-4">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Recipient Contact Numbers & Address
-        </p>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="smsPhone" className="text-xs">
-              SMS Mobile Number (10-digit Indian No.)
-            </Label>
-            <Input
-              id="smsPhone"
-              placeholder="e.g. 9876543210"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="rounded-xl"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="whatsappPhone" className="text-xs">
-              WhatsApp Number (with country code)
-            </Label>
-            <Input
-              id="whatsappPhone"
-              placeholder="e.g. 919876543210"
-              value={whatsapp}
-              onChange={(e) => setWhatsapp(e.target.value)}
-              className="rounded-xl"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="emailAddr" className="text-xs">
+      {/* Recipient Email Address Configuration */}
+      <form onSubmit={handleSaveEmail} className="mt-6 border-t pt-5 space-y-4">
+        <div>
+          <Label htmlFor="emailAddr" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Recipient Email Address
           </Label>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Destination address for hazard warnings (MQ-135 ≥ 700) and actionable ventilation recommendations.
+          </p>
+        </div>
+
+        <div className="max-w-md space-y-2">
           <Input
             id="emailAddr"
             type="email"
@@ -367,16 +304,28 @@ function MultiChannelAlertsSection() {
             onChange={(e) => setEmail(e.target.value)}
             className="rounded-xl"
           />
+          {email ? (
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>
+                Alerts will be delivered to <strong className="text-foreground">{email}</strong>
+              </span>
+            </div>
+          ) : (
+            <p className="text-xs text-amber-600 dark:text-amber-400">
+              No recipient email configured. Please enter an email address to receive alerts.
+            </p>
+          )}
         </div>
 
-        <div className="pt-2 flex justify-end">
+        <div className="pt-2 flex justify-start">
           <Button
             type="submit"
             disabled={updatePrefs.isPending}
             className="rounded-full gap-2 px-6"
           >
             <Save className="h-4 w-4" />
-            {updatePrefs.isPending ? "Saving..." : "Save Contact Details"}
+            {updatePrefs.isPending ? "Saving..." : "Save Email Address"}
           </Button>
         </div>
       </form>

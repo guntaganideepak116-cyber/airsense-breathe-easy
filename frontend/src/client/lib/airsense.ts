@@ -46,16 +46,46 @@ export type HistoryPoint = {
 };
 
 export type UserAlertPreferences = {
-  phoneNumber?: string;
-  whatsappNumber?: string;
   email?: string;
   alertChannels: {
-    sms: boolean;
-    whatsapp: boolean;
     email: boolean;
   };
   threshold?: number;
 };
+
+export type AiStatus = "good" | "attention" | "warning" | "critical";
+export type AiPriority = "low" | "medium" | "high";
+
+export interface AiRecommendationResult {
+  status: AiStatus;
+  summary: string;
+  recommendations: string[];
+  priority: AiPriority;
+  analyzedAt: string;
+  cached?: boolean;
+  sensorData: {
+    deviceId: string;
+    room?: string;
+    mq135: number;
+    temperature: number;
+    humidity: number;
+    timestamp: string;
+  };
+}
+
+export type AiRecommendationResponse =
+  | {
+      available: true;
+      state: "success";
+      data: AiRecommendationResult;
+    }
+  | {
+      available: false;
+      state: "no_data" | "offline" | "ai_unavailable";
+      message: string;
+      deviceId?: string;
+      lastSeen?: string | null;
+    };
 
 export function classify(mq135: number): AirStatus {
   if (mq135 < 400) return "good";
@@ -183,10 +213,8 @@ export const api = {
     const res = await tryFetch<UserAlertPreferences>("/api/user/alert-preferences");
     return (
       res ?? {
-        phoneNumber: "",
-        whatsappNumber: "",
         email: "",
-        alertChannels: { sms: true, whatsapp: true, email: true },
+        alertChannels: { email: true },
         threshold: 700,
       }
     );
@@ -201,12 +229,27 @@ export const api = {
     });
     return (
       res ?? {
-        phoneNumber: patch.phoneNumber ?? "",
-        whatsappNumber: patch.whatsappNumber ?? "",
         email: patch.email ?? "",
-        alertChannels: patch.alertChannels ?? { sms: true, whatsapp: true, email: true },
+        alertChannels: patch.alertChannels ?? { email: true },
         threshold: patch.threshold ?? 700,
       }
+    );
+  },
+
+  async getAiRecommendation(
+    deviceId: string,
+    refresh = false,
+    reading?: Reading | null,
+  ): Promise<AiRecommendationResponse | null> {
+    const params = new URLSearchParams({ deviceId });
+    if (refresh) params.set("refresh", "true");
+    if (reading) {
+      params.set("mq135", String(reading.mq135));
+      params.set("temperature", String(reading.temperature));
+      params.set("humidity", String(reading.humidity));
+    }
+    return await tryFetch<AiRecommendationResponse>(
+      `/api/ai/recommendation?${params.toString()}`,
     );
   },
 };
