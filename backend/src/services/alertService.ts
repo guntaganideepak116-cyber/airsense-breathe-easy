@@ -1,22 +1,33 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { config } from "../config/index.js";
 import { dbService } from "./dbService.js";
 import { generateAirQualityRecommendation } from "./aiRecommendationService.js";
 import type { SensorReadingDoc, AlertDoc, AiRecommendationResult } from "../models/types.js";
 
-// Cooldown per severity so frequent changes don't flood inboxes
+// Cooldown per severity so inboxes don't get flooded
 const COOLDOWN_MS: Record<string, number> = {
   critical: 5 * 60 * 1000,   // 5 minutes
   warning:  10 * 60 * 1000,  // 10 minutes
   moderate: 15 * 60 * 1000,  // 15 minutes
 };
 
-/** Determine severity label from mq135 value */
+/** Create Gmail SMTP transporter */
+function createTransporter() {
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: config.gmail.user,
+      pass: config.gmail.appPassword,
+    },
+  });
+}
+
+/** Determine severity from mq135 value */
 function getSeverity(mq135: number): "critical" | "warning" | "moderate" | null {
   if (mq135 >= 1000) return "critical";
   if (mq135 >= 700)  return "warning";
   if (mq135 >= 400)  return "moderate";
-  return null; // good air — no alert
+  return null;
 }
 
 /** Build the HTML email body */
@@ -34,6 +45,12 @@ function buildEmailHtml(
   };
   const headerColor = colorMap[severity] ?? "#6366f1";
 
+  const severityLabel: Record<string, string> = {
+    critical: "🚨 CRITICAL",
+    warning:  "⚠️ WARNING",
+    moderate: "📊 MODERATE",
+  };
+
   const aiBlock = aiRec
     ? `<div style="margin-top:16px;padding:16px;background-color:#fef9ec;border-left:4px solid ${headerColor};border-radius:6px;">
         <p style="margin:0 0 6px 0;font-size:14px;font-weight:bold;color:#92400e;">
@@ -45,17 +62,17 @@ function buildEmailHtml(
           ${aiRec.recommendations.map((r) => `<li>${r}</li>`).join("")}
         </ul>
       </div>`
-    : `<div style="margin-top:16px;padding:12px;background-color:#fef9ec;border-left:4px solid ${headerColor};border-radius:4px;">
+    : `<div style="margin-top:16px;padding:12px;background:#fef9ec;border-left:4px solid ${headerColor};border-radius:4px;">
         <p style="margin:0;font-size:13px;color:#92400e;">
           <strong>Recommended Action:</strong> Elevated air contaminants detected.
-          Open windows for ventilation, turn on exhaust fans, and check for indoor pollutant sources.
+          Open windows, turn on exhaust fans, and check for indoor pollutant sources.
         </p>
       </div>`;
 
   return `<div style="font-family:Arial,sans-serif;max-width:620px;margin:0 auto;padding:20px;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc;">
     <div style="background:${headerColor};color:white;padding:16px;border-radius:8px;text-align:center;">
-      <h2 style="margin:0;font-size:20px;">🚨 AirSense Air Quality Alert</h2>
-      <p style="margin:4px 0 0 0;font-size:14px;text-transform:capitalize;">${severity} level detected in ${roomName}</p>
+      <h2 style="margin:0;font-size:20px;">AirSense Air Quality Alert</h2>
+      <p style="margin:4px 0 0 0;font-size:14px;">${severityLabel[severity] ?? severity} detected in ${roomName}</p>
     </div>
 
     <div style="background:white;padding:20px;border-radius:8px;margin-top:16px;border:1px solid #e2e8f0;">
@@ -80,24 +97,22 @@ function buildEmailHtml(
 
 export async function processReadingForAlerts(reading: SensorReadingDoc): Promise<AlertDoc | null> {
   const severity = getSeverity(reading.mq135);
-
-  // Only alert for moderate, warning, or critical levels
   if (!severity) return null;
 
   const device = await dbService.getDeviceById(reading.deviceId);
   const roomName = device?.name || reading.roomName || "Indoor Room";
   const userId = device?.userId || reading.userId;
 
-  // Cooldown check per device
+  // Cooldown check
   const cooldownMs = COOLDOWN_MS[severity] ?? COOLDOWN_MS["moderate"]!;
   const since = new Date(Date.now() - cooldownMs);
   const recentAlert = await dbService.getRecentAlert(reading.deviceId, since);
   if (recentAlert) {
-    console.log(`[AlertEngine] Cooldown active for device ${reading.deviceId} — skipping.`);
+    console.log(`[AlertEngine] Cooldown active for ${reading.deviceId} — skipping.`);
     return null;
   }
 
-  // Generate AI recommendation for this reading
+  // Generate AI recommendation
   let aiRecommendation: AiRecommendationResult | null = null;
   try {
     aiRecommendation = await generateAirQualityRecommendation(
@@ -112,10 +127,7 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
       { forceRefresh: true, userId },
     );
   } catch (aiErr) {
-    console.warn(
-      "[AlertEngine] AI recommendation generation failed:",
-      aiErr instanceof Error ? aiErr.message : aiErr,
-    );
+    console.warn("[AlertEngine] AI recommendation failed:", aiErr instanceof Error ? aiErr.message : aiErr);
   }
 
   const formattedTime = new Date(reading.timestamp).toLocaleString("en-IN", {
@@ -124,10 +136,9 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
     timeStyle: "short",
   });
 
-  // ── Multi-recipient email dispatch ────────────────────────────────────────
+  // ── Gmail multi-recipient dispatch ────────────────────────────────────────
   const channelsSent = { email: false };
 
-  // Build final recipient list: env-configured group + user's personal pref email
   const groupRecipients = [...config.resend.toEmails];
   const prefs = userId ? await dbService.getUserPreferences(userId) : null;
   if (prefs?.email && !groupRecipients.includes(prefs.email)) {
@@ -138,40 +149,33 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
     (e) => e.length > 0 && !e.includes("example.com"),
   );
 
-  if (
-    config.resend.apiKey &&
-    validRecipients.length > 0 &&
-    prefs?.alertChannels?.email !== false
-  ) {
+  if (config.gmail.user && config.gmail.appPassword && validRecipients.length > 0) {
     try {
-      const resend = new Resend(config.resend.apiKey);
-      const subject =
-        severity === "critical"
-          ? `🚨 CRITICAL: Very Poor Air Quality in ${roomName} — Immediate Action Required`
-          : severity === "warning"
-            ? `⚠️ WARNING: Poor Air Quality Detected in ${roomName}`
-            : `📊 NOTICE: Moderate Air Quality Detected in ${roomName}`;
+      const transporter = createTransporter();
 
-      await resend.emails.send({
-        from: config.resend.fromEmail,
-        to: validRecipients,          // ← sends to ALL 5 emails at once
-        subject,
+      const subjectMap: Record<string, string> = {
+        critical: `CRITICAL: Very Poor Air Quality in ${roomName} — Act Now`,
+        warning:  `WARNING: Poor Air Quality Detected in ${roomName}`,
+        moderate: `NOTICE: Moderate Air Quality Detected in ${roomName}`,
+      };
+
+      await transporter.sendMail({
+        from: `"AirSense Alerts" <${config.gmail.user}>`,
+        to: validRecipients.join(", "),   // Gmail SMTP: comma-separated string
+        subject: subjectMap[severity] ?? `AirSense Alert: ${roomName}`,
         html: buildEmailHtml(roomName, reading, severity, formattedTime, aiRecommendation),
       });
 
       channelsSent.email = true;
       console.log(
-        `[AlertEngine] Email alert (${severity}) sent to ${validRecipients.length} recipient(s): ${validRecipients.join(", ")}`,
+        `[AlertEngine] Gmail alert (${severity}) sent to ${validRecipients.length} recipients: ${validRecipients.join(", ")}`,
       );
     } catch (err: unknown) {
-      console.warn(
-        "[AlertEngine] Email dispatch failed:",
-        err instanceof Error ? err.message : err,
-      );
+      console.warn("[AlertEngine] Gmail dispatch failed:", err instanceof Error ? err.message : err);
     }
   }
 
-  // Save alert record to DB
+  // Save to DB
   const threshold = severity === "moderate" ? config.thresholds.moderate : config.thresholds.poor;
   const alertDoc: AlertDoc = {
     deviceId: reading.deviceId,
@@ -194,7 +198,7 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
     deviceId: reading.deviceId,
     ...(userId && { userId }),
     level: "warn",
-    message: `Alert (${severity}) triggered for ${roomName} — MQ-135: ${reading.mq135} | Recipients: ${validRecipients.length}`,
+    message: `Alert (${severity}) for ${roomName} — MQ-135: ${reading.mq135} | Recipients: ${validRecipients.length}`,
     metadata: { channelsSent, severity, recipientCount: validRecipients.length },
   });
 

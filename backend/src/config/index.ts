@@ -36,6 +36,10 @@ export const config = {
       .map((e) => e.trim())
       .filter((e) => e.length > 0 && !e.includes("example.com")),
   },
+  gmail: {
+    user: process.env["GMAIL_USER"] || "",
+    appPassword: process.env["GMAIL_APP_PASSWORD"] || "",
+  },
   vapid: {
     publicKey:
       process.env["VAPID_PUBLIC_KEY"] ||
