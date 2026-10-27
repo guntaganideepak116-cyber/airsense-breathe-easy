@@ -9,6 +9,8 @@ frontend/dist/
 backend/dist/
 .output/
 frontend/.output/
+.vercel/
+frontend/.vercel/
 
 # Environment files
 .env
