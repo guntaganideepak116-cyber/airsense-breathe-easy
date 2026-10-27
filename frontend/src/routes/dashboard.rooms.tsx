@@ -19,7 +19,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/client/components/ui/dialog";
-import { DeviceCredentialsDialog, type Credentials } from "@/client/components/DeviceCredentialsDialog";
+import {
+  DeviceCredentialsDialog,
+  type Credentials,
+} from "@/client/components/DeviceCredentialsDialog";
 import { cn } from "@/client/lib/utils";
 
 export const Route = createFileRoute("/dashboard/rooms")({

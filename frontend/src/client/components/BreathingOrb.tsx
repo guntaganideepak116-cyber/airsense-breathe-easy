@@ -3,8 +3,8 @@ import { statusTheme } from "@/shared/lib/status";
 import { cn } from "@/client/lib/utils";
 
 /**
- * The "breathing room" motif: concentric soft rings that expand and contract
- * like a slow breath, tinted by the current air status.
+ * BreathingOrb: Concentric environmental acoustic rings indicating current room air quality.
+ * Lightweight, accessible, and free of random distracting floating particles.
  */
 export function BreathingOrb({
   status = "good",
@@ -18,45 +18,43 @@ export function BreathingOrb({
   children?: React.ReactNode;
 }) {
   const theme = statusTheme[status];
-  const dim = size === "lg" ? "h-72 w-72 sm:h-96 sm:w-96" : "h-40 w-40";
+  const dim = size === "lg" ? "h-64 w-64 sm:h-80 sm:w-80" : "h-36 w-36";
 
   return (
-    <div className={cn("relative grid place-items-center", dim, className)}>
+    <div className={cn("relative grid place-items-center select-none", dim, className)}>
+      {/* Outer ambient glow */}
       <div
         className={cn(
-          "absolute inset-0 rounded-full opacity-40 blur-2xl breathe-slow status-transition",
+          "absolute inset-0 rounded-full opacity-30 blur-xl breathe-slow status-transition",
           theme.soft,
         )}
       />
+
+      {/* Primary pulsating ring */}
       <div
         className={cn(
-          "absolute inset-[12%] rounded-full opacity-60 breathe status-transition",
+          "absolute inset-[10%] rounded-full opacity-50 breathe status-transition",
           theme.soft,
         )}
       />
+
+      {/* High-precision guide ring */}
       <div
-        className="absolute inset-[24%] rounded-full border status-transition"
-        style={{ borderColor: theme.hex, opacity: 0.35 }}
+        className="absolute inset-[22%] rounded-full border border-dashed status-transition"
+        style={{ borderColor: theme.hex, opacity: 0.3 }}
       />
+
+      {/* Inner status core */}
       <div
-        className="absolute inset-[36%] rounded-full breathe status-transition"
-        style={{ background: `color-mix(in oklab, ${theme.hex} 18%, transparent)` }}
+        className="absolute inset-[32%] rounded-full border status-transition"
+        style={{
+          borderColor: theme.hex,
+          background: `color-mix(in srgb, ${theme.hex} 12%, transparent)`,
+          opacity: 0.8,
+        }}
       />
-      {[0, 1, 2, 3, 4].map((i) => (
-        <span
-          key={i}
-          className="absolute rounded-full drift"
-          style={{
-            background: theme.hex,
-            opacity: 0.25,
-            width: 6 + i * 2,
-            height: 6 + i * 2,
-            top: `${18 + i * 14}%`,
-            left: `${12 + ((i * 23) % 70)}%`,
-            animationDelay: `${i * 1.7}s`,
-          }}
-        />
-      ))}
+
+      {/* Content slot */}
       <div className="relative z-10 text-center">{children}</div>
     </div>
   );

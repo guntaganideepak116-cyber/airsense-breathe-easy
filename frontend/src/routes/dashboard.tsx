@@ -136,16 +136,26 @@ function DashboardLayout() {
   return (
     <div className="min-h-screen bg-background text-foreground md:flex">
       {/* Desktop Fixed Left Sidebar */}
-      <aside className="hidden w-64 shrink-0 flex-col justify-between border-r bg-card/60 p-5 backdrop-blur md:flex">
+      <aside className="hidden w-64 shrink-0 flex-col justify-between border-r border-border/80 bg-card/80 p-5 backdrop-blur-md md:flex">
         <div>
           {/* Sidebar Top Header Logo */}
-          <Link to="/" className="flex items-center gap-3 px-2 py-1">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
-              <Wind className="h-5 w-5" />
+          <Link
+            to="/"
+            className="flex items-center gap-3 px-2 py-1 transition-opacity hover:opacity-90"
+          >
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-slate-950 shadow-md shadow-emerald-500/20">
+              <Wind className="h-5 w-5 stroke-[2.2]" />
             </span>
             <div className="min-w-0">
-              <p className="font-display text-xl leading-tight">AirSense</p>
-              <p className="truncate text-xs text-muted-foreground">{t("brand.tagline")}</p>
+              <div className="flex items-center gap-1.5">
+                <p className="font-display text-lg font-bold tracking-tight text-foreground">
+                  AirSense
+                </p>
+                <span className="rounded-full border border-primary/30 bg-primary/10 px-1.5 py-0.2 text-[9px] font-semibold text-primary uppercase">
+                  IoT
+                </span>
+              </div>
+              <p className="truncate text-[11px] text-muted-foreground">{t("brand.tagline")}</p>
             </div>
           </Link>
 
@@ -160,10 +170,10 @@ function DashboardLayout() {
                   to={n.to}
                   activeOptions={{ exact: n.to === "/dashboard" }}
                   className={cn(
-                    "flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-medium transition-all duration-200",
+                    "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-medium transition-all duration-150",
                     active
-                      ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                      : "text-muted-foreground hover:bg-secondary/80 hover:text-foreground",
+                      ? "bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/20"
+                      : "text-muted-foreground hover:bg-secondary/70 hover:text-foreground",
                   )}
                 >
                   {n.icon}
@@ -175,14 +185,14 @@ function DashboardLayout() {
         </div>
 
         {/* Sidebar Footer — Back Home CTA & Lang Toggle */}
-        <div className="space-y-3 border-t pt-4">
+        <div className="space-y-3 border-t border-border/80 pt-4">
           <div className="flex items-center justify-between px-2">
             <span className="text-xs text-muted-foreground">Language</span>
             <LangToggle variant="outline" />
           </div>
           <Link
             to="/"
-            className="flex w-full items-center justify-center gap-2 rounded-2xl border bg-secondary/50 py-2.5 text-xs font-semibold text-foreground transition-colors hover:bg-secondary"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-border/80 bg-secondary/50 py-2.5 text-xs font-semibold text-foreground transition-colors hover:bg-secondary"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             {t("nav.backHome")}
@@ -193,9 +203,9 @@ function DashboardLayout() {
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col min-w-0">
         {/* Compact Mobile Header */}
-        <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-background/95 px-4 py-2.5 backdrop-blur md:hidden">
+        <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border/80 bg-background/90 px-4 py-2.5 backdrop-blur-md md:hidden">
           <Link to="/" className="flex items-center gap-2 min-w-0">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-slate-950">
               <Wind className="h-4 w-4" />
             </span>
             <span className="font-display text-base font-bold text-foreground truncate">
@@ -207,7 +217,7 @@ function DashboardLayout() {
             <button
               type="button"
               onClick={() => setIsMenuOpen(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border bg-secondary/60 text-foreground hover:bg-secondary active:scale-95 transition-all"
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/80 bg-secondary/60 text-foreground hover:bg-secondary active:scale-95 transition-all"
               aria-label="Open Navigation Menu"
             >
               <Menu className="h-5 w-5" />
@@ -217,7 +227,7 @@ function DashboardLayout() {
 
         {/* Offline Banner */}
         {!online && (
-          <div className="flex items-center justify-center gap-2 bg-moderate-soft px-4 py-2 text-xs text-moderate-foreground">
+          <div className="flex items-center justify-center gap-2 border-b border-amber-500/30 bg-moderate-soft px-4 py-2 text-xs font-medium text-moderate">
             <WifiOff className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate">
               {t("dash.offlineBanner")} {lastSeen ? formatTime(lastSeen, lang) : "—"}
@@ -232,7 +242,7 @@ function DashboardLayout() {
       </div>
 
       {/* Native-Feeling Mobile Bottom Navigation Bar */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t bg-card/95 pb-[env(safe-area-inset-bottom,0px)] backdrop-blur shadow-lg md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-border/80 bg-card/90 pb-[env(safe-area-inset-bottom,0px)] backdrop-blur-md shadow-lg md:hidden">
         {mobilePrimaryNavItems.map((n) => {
           const active = pathname === n.to || (n.to === "/dashboard" && pathname === "/dashboard/");
           return (

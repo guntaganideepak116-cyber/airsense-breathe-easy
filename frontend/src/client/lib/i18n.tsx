@@ -21,12 +21,12 @@ export const dict = {
     en: "For families and schools across Andhra Pradesh & Telangana",
   },
   "hero.title": {
-    te: "గది శుభ్రంగా కనిపించవచ్చు. గాలి మాత్రం కాకపోవచ్చు.",
-    en: "The room can look clean. The air often isn't.",
+    te: "తెలివిగా శ్వాసించండి. మీ ఇంటి లోపలి వాతావరణాన్ని అర్థం చేసుకోండి.",
+    en: "Breathe Smarter. Understand Your Indoor Environment.",
   },
   "hero.sub": {
-    te: "పంట వ్యర్థాల దహనం, రోడ్డు దుమ్ము, ట్రాఫిక్ పొగ — ఇవన్నీ తరగతి గదిలోకి, పిల్లల పడక గదిలోకి కనిపించకుండా చేరతాయి. AirSense ప్రతి గదిలోని గాలిని నిరంతరం కొలుస్తుంది, గాలి పాడైన క్షణంలోనే అక్కడే హెచ్చరిస్తుంది, మీ ఫోన్‌కు చూపిస్తుంది.",
-    en: "Crop-residue burning, road dust and traffic fumes drift silently into classrooms and children's bedrooms. AirSense measures the air in each room continuously, sounds a local alert the moment it turns poor, and shows it live on your phone.",
+    te: "కనెక్ట్ చేయబడిన సెన్సార్లు, ఉపయోగకరమైన సూచనలు మరియు స్పష్టమైన రియల్-టైమ్ డాష్‌బోర్డ్ ద్వారా మీ గది వాతావరణాన్ని నిరంతరం పర్యవేక్షించండి.",
+    en: "Monitor indoor environmental conditions through connected sensors, meaningful insights, and a clear real-time dashboard.",
   },
   "hero.cta": { te: "ఒక గదిని పర్యవేక్షించడం ప్రారంభించండి", en: "Start monitoring a room" },
   "hero.cta2": { te: "లైవ్ డాష్‌బోర్డ్ చూడండి", en: "See the live dashboard" },

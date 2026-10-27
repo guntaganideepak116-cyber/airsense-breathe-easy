@@ -4,6 +4,7 @@ import {
   ArrowDownUp,
   BellRing,
   CheckCircle2,
+  Cpu,
   Download,
   Pencil,
   Radio,
@@ -117,9 +118,9 @@ function Overview() {
     const base = [
       {
         name: device?.name || "Room",
-        type: "Air Quality (MQ-135)",
-        val: `${reading.mq135}`,
-        unit: "Sensor Value",
+        type: "Air Quality (MQ-135 Raw)",
+        val: `${reading.mq135} (Raw Scale 0-1023)`,
+        unit: "Raw Sensor Response",
         time: reading.timestamp,
       },
       {
@@ -156,71 +157,80 @@ function Overview() {
       {/* Page Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl text-ink sm:text-3xl">{t("dash.title")}</h1>
-          <p className="truncate text-sm text-muted-foreground">{device?.name ?? "—"}</p>
+          <div className="flex items-center gap-2">
+            <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+              {t("dash.title")}
+            </h1>
+            <span className="rounded-md border border-border/80 bg-secondary/60 px-2 py-0.5 text-xs font-mono text-muted-foreground">
+              {device?.name ?? "Node"}
+            </span>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Real-time environmental telemetry stream and node intelligence
+          </p>
         </div>
       </div>
 
       {/* TOP STATS SUMMARY ROW */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {/* Stat 1: Monitored Rooms */}
-        <div className="rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-5 text-center shadow-sm">
-          <p className="font-display text-2xl sm:text-3xl font-bold tabular-nums text-primary">
+        <div className="rounded-2xl border border-border/80 bg-card p-4 sm:p-5 text-center shadow-sm transition-all hover:border-border">
+          <p className="font-display text-2xl sm:text-3xl font-extrabold tabular-nums text-primary">
             {devices.length}
           </p>
-          <p className="mt-1 text-[11px] sm:text-xs text-muted-foreground">
+          <p className="mt-1 text-xs font-medium text-muted-foreground">
             {t("dash.monitoredRooms")}
           </p>
         </div>
 
         {/* Stat 2: Total Real Readings */}
-        <div className="rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-5 text-center shadow-sm">
-          <p className="font-display text-2xl sm:text-3xl font-bold tabular-nums text-foreground">
+        <div className="rounded-2xl border border-border/80 bg-card p-4 sm:p-5 text-center shadow-sm transition-all hover:border-border">
+          <p className="font-display text-2xl sm:text-3xl font-extrabold tabular-nums text-foreground">
             {historyData ? historyData.length : reading ? 1 : 0}
           </p>
-          <p className="mt-1 text-[11px] sm:text-xs text-muted-foreground">
+          <p className="mt-1 text-xs font-medium text-muted-foreground">
             {t("dash.totalReadings")}
           </p>
         </div>
 
         {/* Stat 3: Data Span */}
-        <div className="rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-5 text-center shadow-sm">
-          <p className="font-display text-2xl sm:text-3xl font-bold tabular-nums text-good">
+        <div className="rounded-2xl border border-border/80 bg-card p-4 sm:p-5 text-center shadow-sm transition-all hover:border-border">
+          <p className="font-display text-2xl sm:text-3xl font-extrabold tabular-nums text-good">
             {historyData && historyData.length > 0 ? "30 Days" : "Live Active"}
           </p>
-          <p className="mt-1 text-[11px] sm:text-xs text-muted-foreground">{t("dash.dataSpan")}</p>
+          <p className="mt-1 text-xs font-medium text-muted-foreground">{t("dash.dataSpan")}</p>
         </div>
 
         {/* Stat 4: Export Data CTA */}
-        <div className="col-span-2 sm:col-span-1 flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-5 text-center shadow-sm">
+        <div className="col-span-2 sm:col-span-1 flex flex-col items-center justify-center rounded-2xl border border-border/80 bg-card p-4 sm:p-5 text-center shadow-sm transition-all hover:border-border">
           <Button
             onClick={exportCsv}
             size="sm"
-            className="w-full rounded-2xl"
+            className="w-full rounded-xl bg-secondary hover:bg-secondary/80 text-foreground border border-border/80 font-medium"
             disabled={!historyData || historyData.length === 0}
           >
-            <Download className="mr-1.5 h-4 w-4 shrink-0" />
-            <span className="truncate">{t("dash.exportCsv")}</span>
+            <Download className="mr-1.5 h-3.5 w-3.5 shrink-0 text-primary" />
+            <span className="truncate text-xs">{t("dash.exportCsv")}</span>
           </Button>
-          <p className="mt-1.5 text-[10px] sm:text-[11px] text-muted-foreground truncate">
+          <p className="mt-1.5 text-[10px] text-muted-foreground truncate">
             {reading ? formatTime(reading.timestamp, lang) : "Awaiting sensor data"}
           </p>
         </div>
       </div>
 
       {/* DEVICE / ROOM SELECTOR PILLS */}
-      <div className="no-scrollbar flex items-center gap-2 overflow-x-auto rounded-2xl sm:rounded-3xl border bg-card p-3">
+      <div className="no-scrollbar flex items-center gap-2 overflow-x-auto rounded-2xl border border-border/80 bg-card p-3 shadow-sm">
         <span className="shrink-0 mr-1 px-1 text-xs font-semibold text-muted-foreground whitespace-nowrap">
-          Select Room:
+          Active Room:
         </span>
         {devices.map((d) => (
           <button
             key={d.id}
             onClick={() => select(d.id)}
             className={cn(
-              "shrink-0 whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200 min-h-9",
+              "shrink-0 whitespace-nowrap rounded-xl px-4 py-1.5 text-xs font-semibold transition-all duration-200 min-h-8.5",
               d.id === deviceId
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
                 : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground",
             )}
           >
@@ -233,17 +243,25 @@ function Overview() {
 
       {/* MAIN AIR QUALITY SUMMARY CARD */}
       {isLoading && !reading ? (
-        <Skeleton className="h-72 rounded-3xl" />
+        <Skeleton className="h-64 rounded-2xl" />
       ) : reading ? (
-        <section className={cn("status-transition rounded-3xl border p-6 lg:p-8", theme.soft)}>
+        <section
+          className={cn(
+            "status-transition relative overflow-hidden rounded-2xl border border-border/80 p-6 lg:p-8 shadow-md",
+            theme.soft,
+          )}
+        >
           <div className="grid items-center gap-6 sm:grid-cols-[auto_minmax(0,1fr)]">
-            <BreathingOrb status={status} size="sm" className="mx-auto h-44! w-44!" />
+            <BreathingOrb status={status} size="sm" className="mx-auto h-36 w-36 sm:h-44 sm:w-44" />
             <div className="min-w-0">
-              <div className="flex items-center gap-2 text-sm text-foreground/60">
-                <span className={cn("h-2.5 w-2.5 animate-pulse rounded-full", theme.dot)} />
-                {t("dash.airquality")} ·{" "}
-                <span className="inline-flex items-center gap-1">
-                  <Radio className={cn("h-3.5 w-3.5", live && "text-good")} />
+              <div className="flex items-center gap-2 text-xs font-medium text-foreground/70">
+                <span className={cn("h-2 w-2 animate-pulse rounded-full", theme.dot)} />
+                <span className="uppercase tracking-wider font-semibold">
+                  {t("dash.airquality")}
+                </span>
+                <span>·</span>
+                <span className="inline-flex items-center gap-1 font-mono">
+                  <Radio className={cn("h-3 w-3", live && "text-good")} />
                   {live
                     ? t("dash.live")
                     : streamStatus === "reconnecting"
@@ -251,17 +269,25 @@ function Overview() {
                       : t("rooms.connecting")}
                 </span>
               </div>
-              <p className={cn("mt-2 font-display text-5xl font-bold leading-tight", theme.text)}>
+              <p
+                className={cn(
+                  "mt-2 font-display text-4xl sm:text-5xl font-extrabold leading-tight tracking-tight",
+                  theme.text,
+                )}
+              >
                 {t(theme.label)}
               </p>
-              <p className="mt-2 text-sm text-foreground/75">
-                {t("dash.sensorReading")}:{" "}
-                <span key={tick} className="tabular-nums font-bold font-mono inline-block">
+              <p className="mt-2 text-xs text-foreground/80">
+                MQ-135 Raw Sensor Response:{" "}
+                <span
+                  key={tick}
+                  className="tabular-nums font-bold font-mono text-sm text-foreground"
+                >
                   {reading.mq135}
                 </span>{" "}
-                <span className="text-xs font-normal text-muted-foreground">(Sensor Value)</span>
+                <span className="text-[11px] text-muted-foreground">(Relative Scale 0–1023)</span>
               </p>
-              <p className="mt-1 text-xs text-foreground/60">
+              <p className="mt-1 text-[11px] text-foreground/60">
                 {t("dash.updated")}:{" "}
                 <span className="tabular-nums">{formatTime(reading.timestamp, lang)}</span>
               </p>
@@ -272,14 +298,14 @@ function Overview() {
         </section>
       ) : (
         /* Empty State when device exists but no readings received yet */
-        <section className="rounded-3xl border bg-card p-8 text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary/80 text-muted-foreground">
-            <Radio className="h-8 w-8 animate-pulse text-primary" />
+        <section className="rounded-2xl border border-border/80 bg-card p-8 text-center shadow-sm">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-secondary/80 text-muted-foreground">
+            <Radio className="h-6 w-6 animate-pulse text-primary" />
           </div>
-          <h2 className="mt-4 font-display text-2xl font-bold text-foreground">
+          <h2 className="mt-4 font-display text-xl font-bold text-foreground">
             Waiting for Sensor Data
           </h2>
-          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+          <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-muted-foreground">
             No readings have arrived from device{" "}
             <code className="font-mono text-primary">{device?.name}</code> ({deviceId}) yet. Power
             on your ESP32 hardware and ensure it connects to Wi-Fi.
@@ -288,32 +314,34 @@ function Overview() {
       )}
 
       {/* ALL DEVICES LIVE DATA TABLE */}
-      <section className="rounded-3xl border bg-card p-6 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4">
+      <section className="rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/80 pb-4">
           <div className="flex items-center gap-2">
-            <TableIcon className="h-5 w-5 text-primary" />
-            <h3 className="font-display text-lg">{t("dash.selectTable")}</h3>
+            <TableIcon className="h-4 w-4 text-primary" />
+            <h3 className="font-display text-base font-bold text-foreground">
+              {t("dash.selectTable")}
+            </h3>
           </div>
-          <span className="inline-flex items-center gap-1.5 rounded-full border bg-secondary/80 px-3 py-1 text-xs font-mono text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-secondary/60 px-3 py-1 text-[11px] font-mono text-muted-foreground">
             <Sparkles className="h-3 w-3 text-good" />
             {tableRows.length > 0
-              ? `${tableRows.length} Active Measurements`
+              ? `${tableRows.length} Active Channels`
               : "Waiting for hardware stream"}
           </span>
         </div>
 
         {tableRows.length === 0 ? (
-          <div className="py-8 text-center text-sm text-muted-foreground">
+          <div className="py-8 text-center text-xs text-muted-foreground">
             No live sensor readings available yet. Once the ESP32 begins transmitting, readings will
             display here.
           </div>
         ) : (
           <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b bg-secondary/30 text-xs uppercase tracking-wider text-muted-foreground">
+                <tr className="border-b border-border/80 bg-secondary/30 text-[11px] uppercase tracking-wider text-muted-foreground">
                   <th
-                    className="cursor-pointer p-3.5 font-semibold hover:text-foreground"
+                    className="cursor-pointer p-3 font-semibold hover:text-foreground"
                     onClick={() => {
                       setSortField("name");
                       setSortDir(sortDir === "asc" ? "desc" : "asc");
@@ -324,31 +352,29 @@ function Overview() {
                     </div>
                   </th>
                   <th
-                    className="cursor-pointer p-3.5 font-semibold hover:text-foreground"
+                    className="cursor-pointer p-3 font-semibold hover:text-foreground"
                     onClick={() => {
                       setSortField("type");
                       setSortDir(sortDir === "asc" ? "desc" : "asc");
                     }}
                   >
                     <div className="flex items-center gap-1">
-                      Measurement Type <ArrowDownUp className="h-3 w-3" />
+                      Measurement Channel <ArrowDownUp className="h-3 w-3" />
                     </div>
                   </th>
-                  <th className="p-3.5 font-semibold">Timestamp</th>
-                  <th className="p-3.5 text-right font-semibold">Live Value</th>
+                  <th className="p-3 font-semibold">Timestamp</th>
+                  <th className="p-3 text-right font-semibold">Live Telemetry</th>
                 </tr>
               </thead>
-              <tbody className="divide-y text-sm">
+              <tbody className="divide-y divide-border/50 text-xs">
                 {tableRows.map((r, i) => (
                   <tr key={i} className="transition-colors hover:bg-secondary/40">
-                    <td className="p-3.5 font-medium">{r.name}</td>
-                    <td className="p-3.5 text-muted-foreground">{r.type}</td>
-                    <td className="p-3.5 font-mono text-xs text-muted-foreground">
+                    <td className="p-3 font-semibold text-foreground">{r.name}</td>
+                    <td className="p-3 text-muted-foreground">{r.type}</td>
+                    <td className="p-3 font-mono text-[11px] text-muted-foreground">
                       {r.time ? formatTime(r.time, lang) : "—"}
                     </td>
-                    <td className="p-3.5 text-right font-mono font-semibold text-primary">
-                      {r.val}
-                    </td>
+                    <td className="p-3 text-right font-mono font-bold text-primary">{r.val}</td>
                   </tr>
                 ))}
               </tbody>
@@ -364,16 +390,21 @@ function Overview() {
       <SensorReadings reading={reading} tick={tick} />
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <section className="rounded-3xl border bg-card p-6">
+        <section className="rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-sm">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-            <p className="truncate text-sm font-semibold">{t("dash.device")}</p>
+            <div className="flex items-center gap-2">
+              <Cpu className="h-4 w-4 text-primary" />
+              <p className="truncate text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                {t("dash.device")}
+              </p>
+            </div>
             {device?.online || live ? (
-              <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-good-soft px-2.5 py-1 text-xs text-good">
-                <Wifi className="h-3.5 w-3.5" /> {t("dash.online")}
+              <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-good-soft px-2.5 py-0.5 text-[11px] font-medium text-good">
+                <Wifi className="h-3 w-3" /> {t("dash.online")}
               </span>
             ) : (
-              <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
-                <WifiOff className="h-3.5 w-3.5" />{" "}
+              <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-secondary px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground">
+                <WifiOff className="h-3 w-3" />{" "}
                 {device?.lastSeen ? t("dash.offline") : "Never Connected"}
               </span>
             )}
@@ -384,10 +415,10 @@ function Overview() {
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="rounded-xl"
+                className="rounded-xl border-border/80 bg-secondary/50"
               />
               <Button
-                className="rounded-xl"
+                className="rounded-xl bg-primary text-primary-foreground font-semibold"
                 onClick={() => {
                   if (device && name.trim()) {
                     rename.mutate({ id: device.id, name: name.trim() });
@@ -404,17 +435,19 @@ function Overview() {
             </div>
           ) : (
             <div className="mt-4 flex items-center gap-3">
-              <p className="min-w-0 flex-1 truncate text-lg font-medium">{device?.name ?? "—"}</p>
+              <p className="min-w-0 flex-1 truncate text-base font-semibold text-foreground">
+                {device?.name ?? "—"}
+              </p>
               <Button
                 variant="outline"
                 size="sm"
-                className="shrink-0 rounded-full"
+                className="shrink-0 rounded-xl border-border/80 bg-secondary/50 hover:bg-secondary text-xs"
                 onClick={() => {
                   setName(device?.name ?? "");
                   setEditing(true);
                 }}
               >
-                <Pencil className="mr-1 h-3.5 w-3.5" />
+                <Pencil className="mr-1 h-3 w-3" />
                 {t("dash.rename")}
               </Button>
             </div>
@@ -422,17 +455,19 @@ function Overview() {
           <DeviceDiagnostics reading={reading} className="mt-4" />
         </section>
 
-        <section className="rounded-3xl border bg-card p-6">
-          <p className="text-sm font-semibold">{t("dash.alertStatus")}</p>
+        <section className="rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            {t("dash.alertStatus")}
+          </p>
           {reading?.buzzerActive ? (
-            <div className="mt-4 flex items-start gap-3 rounded-2xl bg-poor-soft p-4">
-              <BellRing className="mt-0.5 h-5 w-5 shrink-0 text-poor" />
-              <p className="text-sm text-foreground/80">{t("dash.buzzerFired")}</p>
+            <div className="mt-4 flex items-start gap-3 rounded-xl border border-poor/30 bg-poor-soft p-4">
+              <BellRing className="mt-0.5 h-4 w-4 shrink-0 text-poor" />
+              <p className="text-xs text-foreground/90">{t("dash.buzzerFired")}</p>
             </div>
           ) : (
-            <div className="mt-4 flex items-start gap-3 rounded-2xl bg-good-soft p-4">
-              <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-good" />
-              <p className="text-sm text-foreground/80">
+            <div className="mt-4 flex items-start gap-3 rounded-xl border border-good/30 bg-good-soft p-4">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-good" />
+              <p className="text-xs text-foreground/90">
                 {reading ? t("status.good.advice") : "Awaiting hardware readings"}
               </p>
             </div>

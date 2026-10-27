@@ -248,9 +248,7 @@ export const api = {
       params.set("temperature", String(reading.temperature));
       params.set("humidity", String(reading.humidity));
     }
-    return await tryFetch<AiRecommendationResponse>(
-      `/api/ai/recommendation?${params.toString()}`,
-    );
+    return await tryFetch<AiRecommendationResponse>(`/api/ai/recommendation?${params.toString()}`);
   },
 };
 

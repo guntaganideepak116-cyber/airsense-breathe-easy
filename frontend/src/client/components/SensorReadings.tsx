@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, Droplets, Info, Thermometer } from "lucide-react";
+import { ChevronDown, Droplets, Info, Thermometer, Wind } from "lucide-react";
 import { useI18n } from "@/client/lib/i18n";
 import { statusTheme } from "@/shared/lib/status";
 import type { Reading } from "@/client/lib/airsense";
@@ -13,15 +13,20 @@ import {
   humidityBand,
   tempBand,
 } from "@/shared/lib/aqi";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/client/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/client/components/ui/tooltip";
 import { cn } from "@/client/lib/utils";
 
 /** Smooth green → amber → red ramp across the 0–100 index. */
 function indexColor(score: number) {
   if (score <= 50) {
-    return `color-mix(in oklab, var(--moderate) ${Math.round((score / 50) * 100)}%, var(--good))`;
+    return `color-mix(in srgb, var(--moderate) ${Math.round((score / 50) * 100)}%, var(--good))`;
   }
-  return `color-mix(in oklab, var(--poor) ${Math.round(((score - 50) / 50) * 100)}%, var(--moderate))`;
+  return `color-mix(in srgb, var(--poor) ${Math.round(((score - 50) / 50) * 100)}%, var(--moderate))`;
 }
 
 function Ring({
@@ -48,7 +53,7 @@ function Ring({
           r={r}
           fill="none"
           strokeWidth={stroke}
-          className="stroke-muted"
+          className="stroke-secondary/80"
         />
         <circle
           cx={size / 2}
@@ -79,18 +84,18 @@ function BandStrip({
 }) {
   const keys = ["low", "ok", "high"] as const;
   const tone = {
-    low: "bg-sky-soft text-primary",
-    ok: "bg-good-soft text-good",
-    high: "bg-moderate-soft text-moderate",
+    low: "bg-sky-soft text-cyan-400 border border-cyan-500/20",
+    ok: "bg-good-soft text-good border border-emerald-500/20",
+    high: "bg-moderate-soft text-moderate border border-amber-500/20",
   };
   return (
-    <div className="mt-4 grid grid-cols-3 gap-1 text-center text-[11px]">
+    <div className="mt-4 grid grid-cols-3 gap-1.5 text-center text-[11px] font-medium">
       {keys.map((k, i) => (
         <span
           key={k}
           className={cn(
-            "truncate rounded-full px-2 py-1 transition-colors",
-            active === k ? tone[k] : "bg-muted/50 text-muted-foreground/60",
+            "truncate rounded-lg px-2 py-1 transition-colors",
+            active === k ? tone[k] : "bg-secondary/40 text-muted-foreground/60",
           )}
         >
           {labels[i]}
@@ -101,8 +106,8 @@ function BandStrip({
 }
 
 /**
- * Only what the hardware genuinely measures: one MQ135 contamination index
- * plus DHT22 temperature and relative humidity.
+ * SensorReadings: Dedicated telemetry presentation for MQ-135 and DHT22 hardware.
+ * Clearly labels raw ADC & relative sensor response index without unsupported claims.
  */
 export function SensorReadings({
   reading,
@@ -133,84 +138,116 @@ export function SensorReadings({
 
   return (
     <section className={cn("space-y-4", className)}>
-      <div>
-        <h2 className="font-display text-xl text-ink">{t("sens.title")}</h2>
-        <p className="text-sm text-muted-foreground">{t("sens.desc")}</p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h2 className="font-display text-xl font-bold tracking-tight text-foreground">
+            {t("sens.title")}
+          </h2>
+          <p className="text-xs text-muted-foreground">{t("sens.desc")}</p>
+        </div>
+        <div className="flex items-center gap-1.5 rounded-full border border-border/80 bg-secondary/50 px-2.5 py-1 text-[11px] text-muted-foreground">
+          <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+          <span>Active Telemetry Matrix</span>
+        </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)]">
-        {/* Air Quality Index — MQ135 */}
-        <article className="rounded-3xl border bg-card p-6">
-          <div className="flex items-center gap-2">
-            <p className="min-w-0 truncate text-sm font-semibold">{t("sens.aqi")}</p>
-            <TooltipProvider delayDuration={150}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    aria-label={t("sens.aqiInfo")}
-                    className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    <Info className="h-3.5 w-3.5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-64 text-xs leading-relaxed">
-                  {t("sens.aqiInfo")}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-
-          <div className="mt-5">
-            <Ring value={score} color={indexColor(score)}>
-              <div key={tick} className="value-pulse">
-                <p
-                  className="font-display text-4xl tabular-nums"
-                  style={{ color: reading ? indexColor(score) : "var(--muted-foreground)" }}
-                >
-                  {reading ? score : "—"}
-                  {reading && <span className="text-xl">%</span>}
-                </p>
-                <p className="text-[11px] text-muted-foreground">{t("sens.mq")}</p>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Sensor 1: MQ-135 Relative Air Contaminant Response */}
+        <article className="flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-5 shadow-sm transition-all hover:border-border">
+          <div>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="grid h-7 w-7 place-items-center rounded-lg bg-primary/10 text-primary">
+                  <Wind className="h-4 w-4" />
+                </span>
+                <span className="text-xs font-semibold text-foreground uppercase tracking-wider">
+                  {t("sens.aqi")}
+                </span>
               </div>
-            </Ring>
+              <TooltipProvider delayDuration={150}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label={t("sens.aqiInfo")}
+                      className="shrink-0 text-muted-foreground/80 transition-colors hover:text-foreground"
+                    >
+                      <Info className="h-3.5 w-3.5" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-64 text-xs leading-relaxed">
+                    {t("sens.aqiInfo")}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+
+            <div className="mt-5">
+              <Ring value={score} color={indexColor(score)}>
+                <div key={tick} className="value-pulse">
+                  <p
+                    className="font-display text-4xl font-extrabold tabular-nums"
+                    style={{ color: reading ? indexColor(score) : "var(--muted-foreground)" }}
+                  >
+                    {reading ? score : "—"}
+                    {reading && <span className="text-xl font-normal">%</span>}
+                  </p>
+                  <p className="text-[11px] font-medium text-muted-foreground">
+                    Relative Response Index
+                  </p>
+                </div>
+              </Ring>
+            </div>
+
+            {reading ? (
+              <p
+                className={cn(
+                  "mt-4 text-center font-display text-2xl font-bold uppercase tracking-wide",
+                  theme.text,
+                )}
+              >
+                {t(theme.label)}
+              </p>
+            ) : (
+              <p className="mt-4 text-center text-sm text-muted-foreground">
+                Waiting for sensor data...
+              </p>
+            )}
           </div>
 
-          {reading ? (
-            <p
-              className={cn("mt-5 text-center font-display text-3xl status-transition", theme.text)}
-            >
-              {t(theme.label)}
-            </p>
-          ) : (
-            <p className="mt-5 text-center font-display text-lg text-muted-foreground">
-              Waiting for sensor data
-            </p>
-          )}
-
-          <div className="mt-5 rounded-2xl border bg-card/50">
+          <div className="mt-5 rounded-xl border border-border/60 bg-secondary/30">
             <button
               type="button"
               aria-expanded={rawOpen}
               onClick={() => setRawOpen((v) => !v)}
               className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-[11px] text-muted-foreground transition-colors hover:text-foreground"
             >
-              {t("sens.raw")}
+              <span className="font-medium">{t("sens.raw")}</span>
               <ChevronDown
                 className={cn("h-3.5 w-3.5 transition-transform", rawOpen && "rotate-180")}
               />
             </button>
             {rawOpen && (
-              <dl className="space-y-1.5 border-t px-3 py-2.5 text-[11px]">
+              <dl className="space-y-1.5 border-t border-border/60 px-3 py-2.5 text-[11px]">
                 <div className="flex items-center justify-between gap-3">
                   <dt className="truncate text-muted-foreground">{t("sens.rawAdc")}</dt>
-                  <dd className="shrink-0 font-mono tabular-nums">{adc ?? "—"}</dd>
+                  <dd className="shrink-0 font-mono font-semibold tabular-nums text-foreground">
+                    {adc ?? "—"}
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="truncate text-muted-foreground">MQ-135 Output Reading</dt>
+                  <dd className="shrink-0 font-mono font-semibold tabular-nums text-foreground">
+                    {reading?.mq135 ?? "—"} PPM
+                  </dd>
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <dt className="truncate text-muted-foreground">{t("sens.rawIndex")}</dt>
-                  <dd className="shrink-0 font-mono tabular-nums">{reading ? `${score}%` : "—"}</dd>
+                  <dd className="shrink-0 font-mono font-semibold tabular-nums text-foreground">
+                    {reading ? `${score}%` : "—"}
+                  </dd>
                 </div>
-                <p className="pt-1 font-mono text-[10px] leading-relaxed text-muted-foreground">
+                <p className="pt-1 font-mono text-[10px] leading-relaxed text-muted-foreground/80">
                   {t("sens.rawFormula")
                     .replace(/\{clean\}/g, String(ADC_CLEAN))
                     .replace(/\{poor\}/g, String(ADC_POOR))}
@@ -220,25 +257,42 @@ export function SensorReadings({
           </div>
         </article>
 
-        {/* Temperature — DHT22 */}
-        <article className="rounded-3xl border bg-card p-6">
-          <div className="flex items-center gap-2 text-sm font-semibold">
-            <Thermometer className="h-4 w-4 text-muted-foreground" />
-            <span className="truncate">{t("dash.temp")}</span>
-          </div>
-
-          <div className="mt-6 flex items-end justify-center gap-5">
-            <div className="relative h-40 w-6 overflow-hidden rounded-full bg-muted">
-              <div
-                className="absolute inset-x-0 bottom-0 rounded-full bg-linear-to-t from-primary via-good to-moderate"
-                style={{ height: `${tPct}%`, transition: "height 700ms cubic-bezier(.22,1,.36,1)" }}
-              />
+        {/* Sensor 2: DHT22 Temperature */}
+        <article className="flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-5 shadow-sm transition-all hover:border-border">
+          <div>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="grid h-7 w-7 place-items-center rounded-lg bg-cyan-500/10 text-cyan-400">
+                  <Thermometer className="h-4 w-4" />
+                </span>
+                <span className="text-xs font-semibold text-foreground uppercase tracking-wider">
+                  {t("dash.temp")}
+                </span>
+              </div>
+              <span className="rounded-md bg-secondary/80 px-2 py-0.5 text-[10px] font-mono text-muted-foreground">
+                DHT22
+              </span>
             </div>
-            <div key={tick} className="value-pulse">
-              <p className="font-display text-4xl tabular-nums">
-                {temp != null ? `${temp}°` : "—"}
-              </p>
-              <p className="text-xs text-muted-foreground">°C · {t("sens.dht")}</p>
+
+            <div className="mt-8 flex items-end justify-center gap-6">
+              <div className="relative h-36 w-5 overflow-hidden rounded-full bg-secondary/80 border border-border/60">
+                <div
+                  className="absolute inset-x-0 bottom-0 rounded-full bg-gradient-to-t from-primary via-teal-400 to-amber-400"
+                  style={{
+                    height: `${tPct}%`,
+                    transition: "height 700ms cubic-bezier(.22,1,.36,1)",
+                  }}
+                />
+              </div>
+              <div key={tick} className="value-pulse text-left">
+                <p className="font-display text-4xl font-extrabold tabular-nums text-foreground">
+                  {temp != null ? `${temp}°` : "—"}
+                </p>
+                <p className="text-xs text-muted-foreground">Celsius (°C)</p>
+                <p className="mt-1 text-[11px] font-medium text-muted-foreground/80">
+                  Range: 0°C – 50°C
+                </p>
+              </div>
             </div>
           </div>
 
@@ -248,23 +302,34 @@ export function SensorReadings({
           />
         </article>
 
-        {/* Humidity — DHT22 */}
-        <article className="rounded-3xl border bg-card p-6">
-          <div className="flex items-center gap-2 text-sm font-semibold">
-            <Droplets className="h-4 w-4 text-muted-foreground" />
-            <span className="truncate">{t("dash.humidity")}</span>
-          </div>
-
-          <div className="mt-6">
-            <Ring value={hum ?? 0} color="var(--primary)" size={140} stroke={12}>
-              <div key={tick} className="value-pulse">
-                <p className="font-display text-3xl tabular-nums text-primary">
-                  {hum != null ? hum : "—"}
-                  <span className="text-lg">%</span>
-                </p>
-                <p className="text-[11px] text-muted-foreground">{t("sens.dht")}</p>
+        {/* Sensor 3: DHT22 Relative Humidity */}
+        <article className="flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-5 shadow-sm transition-all hover:border-border">
+          <div>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="grid h-7 w-7 place-items-center rounded-lg bg-emerald-500/10 text-emerald-400">
+                  <Droplets className="h-4 w-4" />
+                </span>
+                <span className="text-xs font-semibold text-foreground uppercase tracking-wider">
+                  {t("dash.humidity")}
+                </span>
               </div>
-            </Ring>
+              <span className="rounded-md bg-secondary/80 px-2 py-0.5 text-[10px] font-mono text-muted-foreground">
+                DHT22
+              </span>
+            </div>
+
+            <div className="mt-6">
+              <Ring value={hum ?? 0} color="var(--primary)" size={144} stroke={12}>
+                <div key={tick} className="value-pulse">
+                  <p className="font-display text-3xl font-extrabold tabular-nums text-primary">
+                    {hum != null ? hum : "—"}
+                    <span className="text-lg font-normal">%</span>
+                  </p>
+                  <p className="text-[11px] font-medium text-muted-foreground">Relative RH</p>
+                </div>
+              </Ring>
+            </div>
           </div>
 
           <BandStrip

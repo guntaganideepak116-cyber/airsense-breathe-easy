@@ -3,7 +3,12 @@ import { useI18n } from "@/client/lib/i18n";
 import { statusTheme } from "@/shared/lib/status";
 import { useOutdoorAqi } from "@/client/lib/outdoor";
 import type { AirStatus } from "@/client/lib/airsense";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/client/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/client/components/ui/tooltip";
 import { cn } from "@/client/lib/utils";
 
 /**

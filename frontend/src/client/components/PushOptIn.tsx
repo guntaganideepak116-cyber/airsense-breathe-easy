@@ -3,7 +3,13 @@ import { BellRing, X } from "lucide-react";
 import { toast } from "sonner";
 import { useI18n } from "@/client/lib/i18n";
 import { Button } from "@/client/components/ui/button";
-import { disablePush, enablePush, pushPreference, pushState, type PushState } from "@/client/lib/push";
+import {
+  disablePush,
+  enablePush,
+  pushPreference,
+  pushState,
+  type PushState,
+} from "@/client/lib/push";
 
 const DISMISS_KEY = "airsense-push-dismissed";
 

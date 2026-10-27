@@ -117,7 +117,7 @@ function RecommendationsPage() {
   const handleRefresh = () => {
     if (!deviceId) return;
     refreshAi.mutate(
-      { deviceId, reading },
+      { deviceId, reading: reading ?? null },
       {
         onSuccess: (res) => {
           if (res?.available) {
@@ -229,7 +229,8 @@ function RecommendationsPage() {
                 real-time environmental guidance.
               </p>
             </div>
-          ) : !aiResponse?.available || aiResponse.state === "ai_unavailable" ? (
+          ) : !aiResponse?.available ||
+            (aiResponse as { state?: string }).state === "ai_unavailable" ? (
             /* STATE 4: AI UNAVAILABLE */
             <div className="flex flex-col items-center justify-center py-6 text-center">
               <div className="mb-2.5 flex h-9 w-9 items-center justify-center rounded-2xl bg-secondary text-muted-foreground">
@@ -286,7 +287,9 @@ function RecommendationsPage() {
                     </span>
 
                     <span className="inline-flex items-center gap-1.5 rounded-full border bg-secondary/50 px-2.5 py-1 text-[11px] font-mono text-muted-foreground">
-                      <span>MQ-135: <strong>{data.sensorData.mq135}</strong></span>
+                      <span>
+                        MQ-135: <strong>{data.sensorData.mq135}</strong>
+                      </span>
                       <span>·</span>
                       <span>{data.sensorData.temperature}°C</span>
                       <span>·</span>

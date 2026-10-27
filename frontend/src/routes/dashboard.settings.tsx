@@ -1,15 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useClerk } from "@clerk/clerk-react";
-import {
-  BellRing,
-  CheckCircle2,
-  LogOut,
-  Mail,
-  Radio,
-  Save,
-  Trash2,
-} from "lucide-react";
+import { BellRing, CheckCircle2, LogOut, Mail, Radio, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useI18n } from "@/client/lib/i18n";
 import {
@@ -38,8 +30,7 @@ export const Route = createFileRoute("/dashboard/settings")({
       { property: "og:title", content: "Settings — AirSense" },
       {
         property: "og:description",
-        content:
-          "Email notification preferences, device management and Telugu/English toggle.",
+        content: "Email notification preferences, device management and Telugu/English toggle.",
       },
       { name: "robots", content: "noindex" },
     ],
@@ -245,8 +236,8 @@ function EmailAlertsSection() {
         <div className="min-w-0">
           <p className="font-semibold text-ink">Email Alert Notifications</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Configure automated email notifications via Resend for instant indoor air quality warnings,
-            sensor measurements, and AI guidance.
+            Configure automated email notifications via Resend for instant indoor air quality
+            warnings, sensor measurements, and AI guidance.
           </p>
         </div>
       </div>
@@ -272,7 +263,8 @@ function EmailAlertsSection() {
                 )}
               </div>
               <p className="text-xs text-muted-foreground">
-                Detailed HTML summary with live MQ-135, temperature, humidity metrics & AI recommendations
+                Detailed HTML summary with live MQ-135, temperature, humidity metrics & AI
+                recommendations
               </p>
             </div>
           </div>
@@ -287,11 +279,15 @@ function EmailAlertsSection() {
       {/* Recipient Email Address Configuration */}
       <form onSubmit={handleSaveEmail} className="mt-6 border-t pt-5 space-y-4">
         <div>
-          <Label htmlFor="emailAddr" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <Label
+            htmlFor="emailAddr"
+            className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+          >
             Recipient Email Address
           </Label>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            Destination address for hazard warnings (MQ-135 ≥ 700) and actionable ventilation recommendations.
+            Destination address for hazard warnings (MQ-135 ≥ 700) and actionable ventilation
+            recommendations.
           </p>
         </div>
 
