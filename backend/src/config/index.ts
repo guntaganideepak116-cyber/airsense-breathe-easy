@@ -31,13 +31,13 @@ export const config = {
     apiKey: process.env["RESEND_API_KEY"] || "",
     fromEmail: process.env["ALERT_FROM_EMAIL"] || "AirSense Alerts <onboarding@resend.dev>",
     // Comma-separated list of alert recipient emails
-    toEmails: (process.env["ALERT_TO_EMAIL"] || "")
+    toEmails: (process.env["ALERT_TO_EMAIL"] || "nagendrababupasam85@gmail.com,fazil6651190@gmail.com,chavalanithin196@gmail.com,guntaganideepak116@gmail.com,naginenikoustubh@gmail.com,laharishkaranam9@gmail.com")
       .split(",")
       .map((e) => e.trim())
       .filter((e) => e.length > 0 && !e.includes("example.com")),
   },
   gmail: {
-    user: process.env["GMAIL_USER"] || "",
+    user: process.env["GMAIL_USER"] || "guntaganideepak116@gmail.com",
     appPassword: process.env["GMAIL_APP_PASSWORD"] || "",
   },
   vapid: {

@@ -11,14 +11,22 @@ const COOLDOWN_MS: Record<string, number> = {
   moderate: 15 * 60 * 1000,  // 15 minutes
 };
 
-/** Create Gmail SMTP transporter */
+/** Create robust Gmail SMTP transporter */
 function createTransporter() {
   return nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
     auth: {
-      user: config.gmail.user,
-      pass: config.gmail.appPassword,
+      user: (config.gmail.user || "guntaganideepak116@gmail.com").trim(),
+      pass: (config.gmail.appPassword || "jcvwpaobqgcxkjyr").trim(),
     },
+    tls: {
+      rejectUnauthorized: false,
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
   });
 }
 
@@ -136,7 +144,6 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
     timeStyle: "short",
   });
 
-  // ── Gmail multi-recipient dispatch ────────────────────────────────────────
   const channelsSent = { email: false };
 
   const groupRecipients = [...config.resend.toEmails];
@@ -149,33 +156,74 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
     (e) => e.length > 0 && !e.includes("example.com"),
   );
 
-  if (config.gmail.user && config.gmail.appPassword && validRecipients.length > 0) {
+  const subjectMap: Record<string, string> = {
+    critical: `🚨 CRITICAL: Dangerous Air Quality in ${roomName} — Action Required`,
+    warning:  `⚠️ WARNING: Poor Air Quality Detected in ${roomName}`,
+    moderate: `📊 NOTICE: Moderate Air Quality in ${roomName}`,
+  };
+  const subject = subjectMap[severity] ?? `AirSense Alert: ${roomName}`;
+  const htmlBody = buildEmailHtml(roomName, reading, severity, formattedTime, aiRecommendation);
+
+  // ── Strategy 1: Gmail SMTP Multi-Recipient Dispatch ────────────────────────
+  const gmailUser = (config.gmail.user || "guntaganideepak116@gmail.com").trim();
+  const gmailPass = (config.gmail.appPassword || "jcvwpaobqgcxkjyr").trim();
+
+  if (gmailUser && gmailPass && validRecipients.length > 0) {
     try {
       const transporter = createTransporter();
-
-      const subjectMap: Record<string, string> = {
-        critical: `CRITICAL: Very Poor Air Quality in ${roomName} — Act Now`,
-        warning:  `WARNING: Poor Air Quality Detected in ${roomName}`,
-        moderate: `NOTICE: Moderate Air Quality Detected in ${roomName}`,
-      };
-
       await transporter.sendMail({
-        from: `"AirSense Alerts" <${config.gmail.user}>`,
-        to: validRecipients.join(", "),   // Gmail SMTP: comma-separated string
-        subject: subjectMap[severity] ?? `AirSense Alert: ${roomName}`,
-        html: buildEmailHtml(roomName, reading, severity, formattedTime, aiRecommendation),
+        from: `"AirSense Alerts" <${gmailUser}>`,
+        to: validRecipients.join(", "),
+        subject,
+        html: htmlBody,
       });
 
       channelsSent.email = true;
-      console.log(
-        `[AlertEngine] Gmail alert (${severity}) sent to ${validRecipients.length} recipients: ${validRecipients.join(", ")}`,
-      );
+      console.log(`[AlertEngine] Gmail alert (${severity}) sent to ${validRecipients.length} recipients: ${validRecipients.join(", ")}`);
     } catch (err: unknown) {
-      console.warn("[AlertEngine] Gmail dispatch failed:", err instanceof Error ? err.message : err);
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.warn("[AlertEngine] Gmail dispatch failed:", errMsg);
+      await dbService.logSystem({
+        event: "ALERT_EMAIL_FAILED",
+        deviceId: reading.deviceId,
+        ...(userId && { userId }),
+        level: "warn",
+        message: `Gmail SMTP failed: ${errMsg} — attempting Resend fallback`,
+      });
     }
   }
 
-  // Save to DB
+  // ── Strategy 2: Resend API Fallback (HTTPS Port 443 — Cloud Friendly) ──────
+  if (!channelsSent.email && config.resend.apiKey) {
+    try {
+      console.log("[AlertEngine] Attempting Resend API fallback...");
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${config.resend.apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: "AirSense Alerts <onboarding@resend.dev>",
+          to: ["guntaganideepak116@gmail.com"], // Primary registered account
+          subject,
+          html: htmlBody,
+        }),
+      });
+
+      const resData: any = await res.json();
+      if (res.ok && resData?.id) {
+        channelsSent.email = true;
+        console.log(`[AlertEngine] Resend fallback SUCCESS: ID ${resData.id}`);
+      } else {
+        console.warn("[AlertEngine] Resend API error:", resData);
+      }
+    } catch (resendErr) {
+      console.warn("[AlertEngine] Resend API fallback failed:", resendErr);
+    }
+  }
+
+  // Save Alert Record to DB
   const threshold = severity === "moderate" ? config.thresholds.moderate : config.thresholds.poor;
   const alertDoc: AlertDoc = {
     deviceId: reading.deviceId,
@@ -197,8 +245,8 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
     event: "ALERT_DISPATCHED",
     deviceId: reading.deviceId,
     ...(userId && { userId }),
-    level: "warn",
-    message: `Alert (${severity}) for ${roomName} — MQ-135: ${reading.mq135} | Recipients: ${validRecipients.length}`,
+    level: channelsSent.email ? "info" : "warn",
+    message: `Alert (${severity}) for ${roomName} — MQ-135: ${reading.mq135} | Email Sent: ${channelsSent.email}`,
     metadata: { channelsSent, severity, recipientCount: validRecipients.length },
   });
 
