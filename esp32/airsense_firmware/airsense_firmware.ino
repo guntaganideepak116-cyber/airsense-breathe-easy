@@ -1,13 +1,13 @@
 /*
  * ╔══════════════════════════════════════════════════╗
- * ║         AirSense ESP32 Firmware v1.1            ║
- * ║   MQ-135 (Air Quality) + DHT22 (Temp/Humidity)  ║
+ * ║         AirSense ESP32 Firmware v1.2            ║
+ * ║   MQ-135 + DHT22 + RGY LEDs + Buzzer Alarm      ║
  * ╚══════════════════════════════════════════════════╝
  *
- * Device ID : AIR-A9EADD
+ * Device ID : AIR-4A8F31
  * API Key   : ask_live_094169bee1e6eaa60891c9de1823e12d
  *
- * Libraries required (install via Arduino Library Manager):
+ * Libraries required:
  *   - DHT sensor library by Adafruit
  *   - Adafruit Unified Sensor
  *   - ArduinoJson by Benoit Blanchon (v6+)
@@ -20,7 +20,6 @@
 #include <ArduinoJson.h>
 
 // ─── WiFi Credentials ────────────────────────────────────────────────────────
-// Note: Exact SSID has a trailing space after "5G ":
 const char* WIFI_SSID     = "realme 11x 5G ";
 const char* WIFI_PASSWORD = "deepak116";
 
@@ -31,10 +30,20 @@ const char* API_KEY   = "ask_live_094169bee1e6eaa60891c9de1823e12d";
 // Backend API endpoint for telemetry ingestion:
 const char* API_URL = "https://airsense-breathe-easy.onrender.com/api/devices/data";
 
-// ─── Pin Definitions ─────────────────────────────────────────────────────────
+// ─── Sensor Pin Definitions ──────────────────────────────────────────────────
 #define MQ135_PIN   34    // Analog pin for MQ-135 (AO pin)
 #define DHT_PIN     4     // Digital pin for DHT22 DATA pin
 #define DHT_TYPE    DHT22
+
+// ─── LED & Buzzer Pin Definitions ────────────────────────────────────────────
+#define LED_GREEN   18    // Normal / Good Air
+#define LED_YELLOW  19    // Moderate Air
+#define LED_RED     21    // Poor Air / Smoke Alert
+#define BUZZER_PIN  22    // Alarm Buzzer
+
+// ─── Air Quality Thresholds ──────────────────────────────────────────────────
+#define THRESHOLD_MODERATE  400
+#define THRESHOLD_POOR      700
 
 // ─── Timing ──────────────────────────────────────────────────────────────────
 const unsigned long SEND_INTERVAL_MS = 5000;  // Send every 5 seconds
@@ -43,16 +52,35 @@ const unsigned long SEND_INTERVAL_MS = 5000;  // Send every 5 seconds
 DHT dht(DHT_PIN, DHT_TYPE);
 unsigned long lastSendTime = 0;
 
-const char* getWiFiStatusName(wl_status_t status) {
-  switch (status) {
-    case WL_IDLE_STATUS:     return "IDLE";
-    case WL_NO_SSID_AVAIL:   return "SSID NOT FOUND";
-    case WL_SCAN_COMPLETED:  return "SCAN COMPLETED";
-    case WL_CONNECTED:       return "CONNECTED";
-    case WL_CONNECT_FAILED:  return "CONNECT FAILED";
-    case WL_CONNECTION_LOST: return "CONNECTION LOST";
-    case WL_DISCONNECTED:    return "DISCONNECTED / CONNECTING";
-    default:                 return "UNKNOWN";
+void setAirQualityIndicators(int rawMQ135) {
+  if (rawMQ135 < THRESHOLD_MODERATE) {
+    // 🟢 GOOD AIR
+    digitalWrite(LED_GREEN, HIGH);
+    digitalWrite(LED_YELLOW, LOW);
+    digitalWrite(LED_RED, LOW);
+    digitalWrite(BUZZER_PIN, LOW);
+  } 
+  else if (rawMQ135 < THRESHOLD_POOR) {
+    // 🟡 MODERATE AIR
+    digitalWrite(LED_GREEN, LOW);
+    digitalWrite(LED_YELLOW, HIGH);
+    digitalWrite(LED_RED, LOW);
+    digitalWrite(BUZZER_PIN, LOW);
+  } 
+  else {
+    // 🔴 POOR AIR / SMOKE DETECTED
+    digitalWrite(LED_GREEN, LOW);
+    digitalWrite(LED_YELLOW, LOW);
+    digitalWrite(LED_RED, HIGH);
+    
+    // Buzzer alert tone
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(100);
+    digitalWrite(BUZZER_PIN, LOW);
+    delay(100);
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(100);
+    digitalWrite(BUZZER_PIN, LOW);
   }
 }
 
@@ -62,8 +90,25 @@ void setup() {
   delay(1000);
 
   Serial.println("\n╔══════════════════════════════════════╗");
-  Serial.println("║       AirSense ESP32 Starting        ║");
+  Serial.println("║     AirSense ESP32 + RGY & Buzzer    ║");
   Serial.println("╚══════════════════════════════════════╝");
+
+  // Initialize LED & Buzzer Pins
+  pinMode(LED_GREEN, OUTPUT);
+  pinMode(LED_YELLOW, OUTPUT);
+  pinMode(LED_RED, OUTPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+
+  // Self-test startup sequence: flash each light
+  digitalWrite(LED_GREEN, HIGH);
+  delay(200);
+  digitalWrite(LED_GREEN, LOW);
+  digitalWrite(LED_YELLOW, HIGH);
+  delay(200);
+  digitalWrite(LED_YELLOW, LOW);
+  digitalWrite(LED_RED, HIGH);
+  delay(200);
+  digitalWrite(LED_RED, LOW);
 
   dht.begin();
 
@@ -78,15 +123,15 @@ void setup() {
   while (WiFi.status() != WL_CONNECTED && attempts < 40) {
     delay(500);
     attempts++;
-    Serial.printf(". [%s]\n", getWiFiStatusName(WiFi.status()));
+    Serial.print(".");
   }
 
   if (WiFi.status() == WL_CONNECTED) {
     Serial.println("\n[WiFi] Connected successfully! ✓");
     Serial.printf("[WiFi] IP Address: %s\n", WiFi.localIP().toString().c_str());
-    Serial.printf("[API]  Target URL: %s\n\n", API_URL);
+    digitalWrite(LED_GREEN, HIGH); // Green light on when connected
   } else {
-    Serial.printf("\n[WiFi] Connection FAILED. Final Status: %s\n", getWiFiStatusName(WiFi.status()));
+    Serial.println("\n[WiFi] Connection FAILED.");
   }
 }
 
@@ -94,44 +139,30 @@ void setup() {
 void loop() {
   unsigned long now = millis();
 
-  // If WiFi disconnected, reconnect
-  if (WiFi.status() != WL_CONNECTED) {
-    if (now - lastSendTime >= 8000) {
-      lastSendTime = now;
-      Serial.println("[WiFi] Reconnecting...");
-      WiFi.disconnect();
-      WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-    }
-    return;
-  }
+  // Constantly update indicators in real-time
+  int rawMQ135 = analogRead(MQ135_PIN);
+  setAirQualityIndicators(rawMQ135);
 
   if (now - lastSendTime >= SEND_INTERVAL_MS) {
     lastSendTime = now;
-    readAndSend();
+    readAndSend(rawMQ135);
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-void readAndSend() {
-  // ── 1. Read DHT22 ──────────────────────────────────────────────────────────
-  float temperature = dht.readTemperature(); // Celsius
+void readAndSend(int rawMQ135) {
+  float temperature = dht.readTemperature();
   float humidity    = dht.readHumidity();
 
   if (isnan(temperature) || isnan(humidity)) {
-    Serial.println("[DHT22] Sensor read warning — check GPIO 4 wiring");
-    temperature = 26.5; // fallback so dashboard still updates
+    temperature = 26.5;
     humidity = 60.0;
   }
 
-  // ── 2. Read MQ-135 ─────────────────────────────────────────────────────────
-  int rawMQ135 = analogRead(MQ135_PIN); // 0–4095
-
-  // ── 3. Print to Serial Monitor ─────────────────────────────────────────────
   Serial.println("──────────────────────────────────────────");
   Serial.printf("[DHT22]  Temp: %.1f °C  |  Humidity: %.1f %%\n", temperature, humidity);
   Serial.printf("[MQ-135] Raw ADC: %d\n", rawMQ135);
 
-  // ── 4. Build JSON payload matching backend schema ──────────────────────────
   StaticJsonDocument<256> doc;
   doc["deviceId"]    = DEVICE_ID;
   doc["apiKey"]      = API_KEY;
@@ -142,9 +173,15 @@ void readAndSend() {
   String jsonBody;
   serializeJson(doc, jsonBody);
 
-  // ── 5. HTTPS POST to AirSense Backend ──────────────────────────────────────
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("[WiFi] Reconnecting...");
+    WiFi.disconnect();
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    return;
+  }
+
   WiFiClientSecure client;
-  client.setInsecure(); // Skip certificate verification for Render HTTPS
+  client.setInsecure();
 
   HTTPClient http;
   if (http.begin(client, API_URL)) {
@@ -156,18 +193,14 @@ void readAndSend() {
     int httpCode = http.POST(jsonBody);
 
     if (httpCode > 0) {
-      String response = http.getString();
       if (httpCode == 200 || httpCode == 201) {
         Serial.printf("[HTTP]  Data sent successfully! (HTTP %d) ✓\n", httpCode);
-        Serial.printf("[HTTP]  Server Response: %s\n", response.c_str());
       } else {
-        Serial.printf("[HTTP]  HTTP Error %d: %s\n", httpCode, response.c_str());
+        Serial.printf("[HTTP]  HTTP Error %d\n", httpCode);
       }
     } else {
       Serial.printf("[HTTP]  POST Failed: %s\n", http.errorToString(httpCode).c_str());
     }
     http.end();
-  } else {
-    Serial.println("[HTTP]  Unable to connect to server");
   }
 }
