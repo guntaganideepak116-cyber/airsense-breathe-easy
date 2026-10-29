@@ -1,16 +1,22 @@
 /*
- * ╔══════════════════════════════════════════════════╗
- * ║         AirSense ESP32 Firmware v1.3            ║
- * ║   MQ-135 + DHT22 + RGY LEDs + Custom Buzzer     ║
- * ╚══════════════════════════════════════════════════╝
+ * ╔═══════════════════════════════════════════════════════════════════╗
+ * ║                 AirSense ESP32 Master Firmware v2.0               ║
+ * ║       MQ-135 + DHT22 + RGY Status LEDs + Smart Audio Buzzer       ║
+ * ╚═══════════════════════════════════════════════════════════════════╝
  *
- * Device ID : AIR-4A8F31
- * API Key   : ask_live_094169bee1e6eaa60891c9de1823e12d
+ * Registered Device : AIR-4A8F31
+ * Room Name         : Deepak room
+ * Live Web URL      : https://airsense-breathe.vercel.app/dashboard
  *
- * Sound profile:
- *  - 🟢 Green (< 400): No sound (Silent)
- *  - 🟡 Yellow (400-700): Slow beep every 2 seconds
- *  - 🔴 Red (> 700): Continuous loud alarm (Max volume)
+ * Sound & Visual Profile:
+ *   - 🟢 Green (< 400 ADC)   : Good Air. Green ON. Completely SILENT.
+ *   - 🟡 Yellow (400-700 ADC): Caution. Yellow ON. Slow warning beep every 2s.
+ *   - 🔴 Red (> 700 ADC)     : SMOKE / DANGER. Red ON. Continuous LOUD siren.
+ *
+ * Required Arduino Libraries:
+ *   1. "DHT sensor library" by Adafruit
+ *   2. "Adafruit Unified Sensor" by Adafruit
+ *   3. "ArduinoJson" by Benoit Blanchon (v6+)
  */
 
 #include <WiFi.h>
@@ -19,124 +25,127 @@
 #include <DHT.h>
 #include <ArduinoJson.h>
 
-// ─── WiFi Credentials ────────────────────────────────────────────────────────
+// ═══════════════════════ 1. WIFI CREDENTIALS ═══════════════════════
+// Exact SSID has a trailing space after "5G ":
 const char* WIFI_SSID     = "realme 11x 5G ";
 const char* WIFI_PASSWORD = "deepak116";
 
-// ─── AirSense API Credentials ────────────────────────────────────────────────
+// ═══════════════════ 2. BACKEND API CREDENTIALS ════════════════════
 const char* DEVICE_ID = "AIR-4A8F31";
 const char* API_KEY   = "ask_live_094169bee1e6eaa60891c9de1823e12d";
+const char* API_URL   = "https://airsense-breathe-easy.onrender.com/api/devices/data";
 
-// Backend API endpoint for telemetry ingestion:
-const char* API_URL = "https://airsense-breathe-easy.onrender.com/api/devices/data";
-
-// ─── Sensor Pin Definitions ──────────────────────────────────────────────────
-#define MQ135_PIN   34    // Analog pin for MQ-135 (AO pin)
-#define DHT_PIN     4     // Digital pin for DHT22 DATA pin
+// ═══════════════════════ 3. PIN DEFINITIONS ════════════════════════
+#define MQ135_PIN   34    // Analog pin for MQ-135 AO
+#define DHT_PIN     4     // Digital pin for DHT22 Data
 #define DHT_TYPE    DHT22
 
-// ─── LED & Buzzer Pin Definitions ────────────────────────────────────────────
-#define LED_GREEN   18    // Normal / Good Air
-#define LED_YELLOW  19    // Moderate Air
-#define LED_RED     21    // Poor Air / Smoke Alert
-#define BUZZER_PIN  22    // Alarm Buzzer
+#define LED_GREEN   18    // Normal / Clean Air Indicator
+#define LED_YELLOW  19    // Moderate Air Indicator
+#define LED_RED     21    // Smoke / Hazardous Air Alert
+#define BUZZER_PIN  22    // Audio Alarm Buzzer
 
-// ─── Air Quality Thresholds ──────────────────────────────────────────────────
+// ════════════════════ 4. AIR QUALITY THRESHOLDS ════════════════════
 #define THRESHOLD_MODERATE  400
 #define THRESHOLD_POOR      700
 
-// ─── Timing ──────────────────────────────────────────────────────────────────
-const unsigned long SEND_INTERVAL_MS = 5000;  // Send telemetry every 5 seconds
+// Telemetry interval (send HTTP packet every 5 seconds)
+const unsigned long SEND_INTERVAL_MS = 5000;
 
-// ─── Globals ─────────────────────────────────────────────────────────────────
+// ═══════════════════════ 5. GLOBAL OBJECTS ═════════════════════════
 DHT dht(DHT_PIN, DHT_TYPE);
 unsigned long lastSendTime = 0;
 
-// Non-blocking buzzer timing variables
+// Non-blocking buzzer variables
 unsigned long lastModerateBeep = 0;
 unsigned long moderateBeepStart = 0;
 bool moderateBeepActive = false;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Real-time Sound & Light Engine
-// ─────────────────────────────────────────────────────────────────────────────
-void handleIndicatorsAndBuzzer(int rawMQ135, unsigned long currentMillis) {
+// ────────────────────────────────────────────────────────────────────
+// Real-time Sound and LED Controller (Zero Lag / Non-blocking)
+// ────────────────────────────────────────────────────────────────────
+void updateIndicators(int rawMQ135, unsigned long now) {
   if (rawMQ135 < THRESHOLD_MODERATE) {
-    // 🟢 GREEN: Good Air
+    // 🟢 GOOD AIR
     digitalWrite(LED_GREEN, HIGH);
     digitalWrite(LED_YELLOW, LOW);
     digitalWrite(LED_RED, LOW);
 
-    // SILENT: No sound for green
+    // SILENT
     digitalWrite(BUZZER_PIN, LOW);
     moderateBeepActive = false;
-  } 
+  }
   else if (rawMQ135 < THRESHOLD_POOR) {
-    // 🟡 YELLOW: Moderate Air
+    // 🟡 MODERATE AIR
     digitalWrite(LED_GREEN, LOW);
     digitalWrite(LED_YELLOW, HIGH);
     digitalWrite(LED_RED, LOW);
 
-    // SLOW BEEP: 1 short beep every 2 seconds
+    // BEEP ONCE EVERY 2 SECONDS (150ms duration)
     if (!moderateBeepActive) {
-      if (currentMillis - lastModerateBeep >= 2000) {
-        lastModerateBeep = currentMillis;
-        moderateBeepStart = currentMillis;
+      if (now - lastModerateBeep >= 2000) {
+        lastModerateBeep = now;
+        moderateBeepStart = now;
         moderateBeepActive = true;
-        digitalWrite(BUZZER_PIN, HIGH); // Beep ON
+        digitalWrite(BUZZER_PIN, HIGH);
       } else {
         digitalWrite(BUZZER_PIN, LOW);
       }
     } else {
-      // Turn beep OFF after 150 milliseconds
-      if (currentMillis - moderateBeepStart >= 150) {
+      if (now - moderateBeepStart >= 150) {
         digitalWrite(BUZZER_PIN, LOW);
         moderateBeepActive = false;
       }
     }
-  } 
+  }
   else {
-    // 🔴 RED: Smoke / Hazardous Air
+    // 🔴 HAZARDOUS AIR / SMOKE DETECTED
     digitalWrite(LED_GREEN, LOW);
     digitalWrite(LED_YELLOW, LOW);
     digitalWrite(LED_RED, HIGH);
 
-    // CONTINUOUS LOUD ALARM: Maximum volume alert
+    // CONTINUOUS LOUD ALARM (MAX VOLUME)
     digitalWrite(BUZZER_PIN, HIGH);
     moderateBeepActive = false;
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────
+// Setup Routine
+// ────────────────────────────────────────────────────────────────────
 void setup() {
   Serial.begin(115200);
   delay(1000);
 
-  Serial.println("\n╔══════════════════════════════════════╗");
-  Serial.println("║   AirSense ESP32 Sound & Vision v1.3 ║");
-  Serial.println("╚══════════════════════════════════════╝");
+  Serial.println("\n╔═════════════════════════════════════════════════════╗");
+  Serial.println("║        AirSense Master ESP32 System v2.0            ║");
+  Serial.println("║   MQ-135 + DHT22 + RGY Visuals + Smart Buzzer       ║");
+  Serial.println("╚═════════════════════════════════════════════════════╝\n");
 
-  // Setup Outputs
+  // Configure output pins
   pinMode(LED_GREEN, OUTPUT);
   pinMode(LED_YELLOW, OUTPUT);
   pinMode(LED_RED, OUTPUT);
   pinMode(BUZZER_PIN, OUTPUT);
 
-  // Quick boot test: flash green, yellow, red and quick chirp
+  // ── Hardware Self-Test on Power On ──
+  Serial.println("[Hardware] Running LED & Buzzer self-test...");
   digitalWrite(LED_GREEN, HIGH);
-  delay(150);
+  delay(200);
   digitalWrite(LED_GREEN, LOW);
   digitalWrite(LED_YELLOW, HIGH);
-  delay(150);
+  delay(200);
   digitalWrite(LED_YELLOW, LOW);
   digitalWrite(LED_RED, HIGH);
   digitalWrite(BUZZER_PIN, HIGH);
-  delay(150);
+  delay(200);
   digitalWrite(LED_RED, LOW);
   digitalWrite(BUZZER_PIN, LOW);
+  Serial.println("[Hardware] Self-test complete ✓\n");
 
   dht.begin();
 
+  // Connect to WiFi
   WiFi.mode(WIFI_STA);
   WiFi.disconnect(true);
   delay(200);
@@ -153,43 +162,49 @@ void setup() {
 
   if (WiFi.status() == WL_CONNECTED) {
     Serial.println("\n[WiFi] Connected successfully! ✓");
-    Serial.printf("[WiFi] IP Address: %s\n", WiFi.localIP().toString().c_str());
+    Serial.printf("[WiFi] Assigned IP: %s\n", WiFi.localIP().toString().c_str());
+    Serial.printf("[API]  Target Room: %s (%s)\n\n", "Deepak room", DEVICE_ID);
     digitalWrite(LED_GREEN, HIGH);
   } else {
-    Serial.println("\n[WiFi] Connection FAILED.");
+    Serial.println("\n[WiFi] Connection failed. Will retry in background.");
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────
+// Main Loop
+// ────────────────────────────────────────────────────────────────────
 void loop() {
   unsigned long now = millis();
 
-  // 1. Read air sensor immediately
+  // 1. Read real-time air quality ADC
   int rawMQ135 = analogRead(MQ135_PIN);
 
-  // 2. Drive lights & buzzer in real-time (non-blocking)
-  handleIndicatorsAndBuzzer(rawMQ135, now);
+  // 2. Drive Lights and Buzzer instantly
+  updateIndicators(rawMQ135, now);
 
-  // 3. Send HTTP telemetry every 5 seconds
+  // 3. Send Telemetry to Web Dashboard every 5 seconds
   if (now - lastSendTime >= SEND_INTERVAL_MS) {
     lastSendTime = now;
-    readAndSend(rawMQ135);
+    sendTelemetry(rawMQ135);
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-void readAndSend(int rawMQ135) {
+// ────────────────────────────────────────────────────────────────────
+// HTTP Telemetry Transmission
+// ────────────────────────────────────────────────────────────────────
+void sendTelemetry(int rawMQ135) {
   float temperature = dht.readTemperature();
   float humidity    = dht.readHumidity();
 
+  // Fallback if sensor is warming up or wiring is loose
   if (isnan(temperature) || isnan(humidity)) {
     temperature = 26.5;
-    humidity = 60.0;
+    humidity    = 60.0;
   }
 
   Serial.println("──────────────────────────────────────────");
-  Serial.printf("[DHT22]  Temp: %.1f °C  |  Humidity: %.1f %%\n", temperature, humidity);
-  Serial.printf("[MQ-135] Raw ADC: %d\n", rawMQ135);
+  Serial.printf("[DHT22]  Temperature: %.1f °C  |  Humidity: %.1f %%\n", temperature, humidity);
+  Serial.printf("[MQ-135] Raw ADC Air Reading: %d\n", rawMQ135);
 
   StaticJsonDocument<256> doc;
   doc["deviceId"]    = DEVICE_ID;
@@ -201,6 +216,7 @@ void readAndSend(int rawMQ135) {
   String jsonBody;
   serializeJson(doc, jsonBody);
 
+  // Auto-reconnect WiFi if needed
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("[WiFi] Reconnecting...");
     WiFi.disconnect();
@@ -209,7 +225,7 @@ void readAndSend(int rawMQ135) {
   }
 
   WiFiClientSecure client;
-  client.setInsecure();
+  client.setInsecure(); // SSL verification bypass for Render
 
   HTTPClient http;
   if (http.begin(client, API_URL)) {
@@ -222,12 +238,12 @@ void readAndSend(int rawMQ135) {
 
     if (httpCode > 0) {
       if (httpCode == 200 || httpCode == 201) {
-        Serial.printf("[HTTP]  Data sent successfully! (HTTP %d) ✓\n", httpCode);
+        Serial.printf("[HTTP]  Cloud Telemetry Sent! (HTTP %d) ✓\n", httpCode);
       } else {
-        Serial.printf("[HTTP]  HTTP Error %d\n", httpCode);
+        Serial.printf("[HTTP]  Server Response %d\n", httpCode);
       }
     } else {
-      Serial.printf("[HTTP]  POST Failed: %s\n", http.errorToString(httpCode).c_str());
+      Serial.printf("[HTTP]  Send Failed: %s\n", http.errorToString(httpCode).c_str());
     }
     http.end();
   }
