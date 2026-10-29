@@ -98,7 +98,8 @@ function buildEmailHtml(
     ${aiBlock}
 
     <p style="margin-top:20px;font-size:11px;color:#94a3b8;text-align:center;">
-      AirSense IoT Indoor Air Quality Monitoring System · Automated Alert
+      <strong>AirSense System</strong> · IoT Indoor Air Quality Monitoring · Automated Alert<br/>
+      This is an automated message sent by AirSense to all registered members.
     </p>
   </div>`;
 }
@@ -172,7 +173,8 @@ export async function processReadingForAlerts(reading: SensorReadingDoc): Promis
     try {
       const transporter = createTransporter();
       await transporter.sendMail({
-        from: `"AirSense Alerts" <${gmailUser}>`,
+        from: `"AirSense | Air Quality Monitor" <${gmailUser}>`,
+        replyTo: `"AirSense System" <${gmailUser}>`,
         to: validRecipients.join(", "),
         subject,
         html: htmlBody,
