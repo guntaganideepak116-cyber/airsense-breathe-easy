@@ -86,7 +86,7 @@ async function fetchDirectOpenMeteo(city: City): Promise<OutdoorWeatherReading> 
     pm10: aData.current?.pm10 != null ? Math.round(aData.current.pm10 * 10) / 10 : null,
     status: aqi != null ? classifyAqi(aqi) : "good",
     city,
-    station: `${city.name} Regional Station (Open-Meteo)`,
+    station: `${city.name.en} Regional Station (Open-Meteo)`,
     fetchedAt: new Date().toISOString(),
   };
 }
@@ -110,7 +110,7 @@ async function fetchOutdoorWeather(city: City): Promise<OutdoorWeatherReading> {
       pm10: json.airQuality?.pm10 ?? null,
       status: json.airQuality?.status ?? "good",
       city,
-      station: json.station || `${city.name} Regional Station`,
+      station: json.station || `${city.name.en} Regional Station`,
       fetchedAt: json.fetchedAt || new Date().toISOString(),
     };
   } catch {

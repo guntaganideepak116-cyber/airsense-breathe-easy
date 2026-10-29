@@ -35,6 +35,32 @@ export function aqiScoreFromSensorValue(mq135: number) {
 // Backward compatible alias
 export const aqiScoreFromPpm = aqiScoreFromSensorValue;
 
+/**
+ * Maps raw MQ-135 sensor signal to an equivalent Indoor AQI (0–500 scale)
+ * aligned with standard environmental US AQI bands for direct indoor vs outdoor comparison:
+ * - Clean Baseline (MQ <= 400): AQI 15–50 (Good 🟢)
+ * - Moderate (400 < MQ <= 700): AQI 51–100 (Moderate 🟡)
+ * - Poor / Smoke (700 < MQ <= 1500): AQI 101–300 (Poor / Contaminated 🔴)
+ * - Extreme (> 1500): AQI 301–500 (Hazardous 🔴)
+ */
+export function indoorAqiFromMq135(mq135: number | null | undefined): number | null {
+  if (mq135 == null || isNaN(mq135) || mq135 <= 0) return null;
+  if (mq135 <= 400) {
+    const norm = Math.max(0, (mq135 - 200) / (400 - 200));
+    return Math.round(15 + norm * 35);
+  }
+  if (mq135 <= 700) {
+    const norm = (mq135 - 400) / (700 - 400);
+    return Math.round(51 + norm * 49);
+  }
+  if (mq135 <= 1500) {
+    const norm = (mq135 - 700) / (1500 - 700);
+    return Math.round(101 + norm * 199);
+  }
+  const norm = Math.min(1, (mq135 - 1500) / 2500);
+  return Math.round(300 + norm * 200);
+}
+
 export type Band = "low" | "ok" | "high";
 
 export function tempBand(c: number): Band {

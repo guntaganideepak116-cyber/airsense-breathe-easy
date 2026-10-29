@@ -1,9 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Droplets, Gauge, Thermometer, Wind, Radio, AlertCircle } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowDownUp,
+  ChevronRight,
+  Droplets,
+  Gauge,
+  Radio,
+  Thermometer,
+  Wind,
+} from "lucide-react";
 import { useI18n } from "@/client/lib/i18n";
-import { useSelectedDevice, useLatest } from "@/client/lib/queries";
+import { useSelectedDevice, useDevices, useLatest, useDeviceStream } from "@/client/lib/queries";
 import { useOutdoorWeather } from "@/client/lib/outdoor";
 import { statusTheme, formatTime } from "@/shared/lib/status";
+import { indoorAqiFromMq135 } from "@/shared/lib/aqi";
 import { BreathingOrb } from "@/client/components/BreathingOrb";
 import { Skeleton } from "@/client/components/ui/skeleton";
 import { cn } from "@/client/lib/utils";
@@ -24,8 +34,14 @@ export const Route = createFileRoute("/dashboard/weather")({
 
 function WeatherPage() {
   const { t, lang } = useI18n();
-  const { deviceId, device } = useSelectedDevice();
-  const { data: reading } = useLatest(deviceId);
+  const { deviceId, device, select: setDeviceId } = useSelectedDevice();
+  const { data: devicesList } = useDevices();
+
+  // Instant real-time SSE stream with polling fallback
+  const { data: polled } = useLatest(deviceId);
+  const { reading: streamed, status: streamStatus } = useDeviceStream(deviceId);
+  const reading = streamed ?? polled;
+
   const {
     data: outdoor,
     isLoading: isOutdoorLoading,
@@ -35,8 +51,14 @@ function WeatherPage() {
   const indoorStatus = reading?.status ?? "good";
   const indoorTheme = statusTheme[indoorStatus];
 
+  // Derived real-time Indoor AQI
+  const indoorAqi = indoorAqiFromMq135(reading?.mq135);
+  const outdoorAqi = outdoor?.aqi ?? null;
+  const isIndoorWorse = indoorAqi != null && outdoorAqi != null && indoorAqi > outdoorAqi;
+
   return (
     <div className="space-y-6">
+      {/* Top Header with Room Selector */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl text-ink sm:text-3xl">{t("weather.title")}</h1>
@@ -46,6 +68,26 @@ function WeatherPage() {
               : "Indoor vs Outdoor Regional Meteorology"}
           </p>
         </div>
+
+        {/* Room / Device Selector */}
+        {devicesList && devicesList.length > 0 && (
+          <div className="relative">
+            <select
+              value={deviceId || ""}
+              onChange={(e) => setDeviceId(e.target.value)}
+              className="appearance-none rounded-xl border bg-card px-3.5 py-2 pr-9 text-xs font-semibold text-foreground shadow-sm hover:bg-secondary/40 focus:outline-none focus:ring-2 focus:ring-primary/40 cursor-pointer"
+            >
+              {devicesList.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name} ({d.id})
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              <ChevronRight className="h-3.5 w-3.5 rotate-90" />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* INDOOR SENSOR BANNER CARD */}
@@ -60,7 +102,14 @@ function WeatherPage() {
           <div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Radio className="h-4 w-4 text-primary animate-pulse" />
-              <span>Indoor Hardware Sensor (MQ-135 + DHT22)</span>
+              <span>
+                Indoor Hardware Sensor (MQ-135 + DHT22){" "}
+                {streamStatus === "live" && (
+                  <span className="text-[10px] font-semibold text-emerald-500 uppercase tracking-wider ml-1">
+                    • Live Stream
+                  </span>
+                )}
+              </span>
             </div>
             <p
               className={cn(
@@ -84,14 +133,39 @@ function WeatherPage() {
             </p>
           </div>
 
-          <div className="flex flex-col items-center justify-center rounded-2xl border bg-card/70 p-4 text-center">
-            <span className="text-xs uppercase tracking-widest text-muted-foreground">
-              MQ-135 Reading
-            </span>
-            <span className="mt-1 font-display text-3xl font-bold tabular-nums text-primary">
-              {reading?.mq135 ?? "—"}
-            </span>
-            <span className="text-[11px] text-muted-foreground">Raw Sensor Value</span>
+          {/* Right Banner Badges: Indoor AQI + Raw MQ-135 */}
+          <div className="flex flex-wrap items-center justify-center gap-2.5">
+            <div className="flex flex-col items-center justify-center rounded-2xl border bg-card/80 p-3.5 text-center min-w-[110px] shadow-sm">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                Indoor AQI
+              </span>
+              <span
+                className={cn(
+                  "mt-0.5 font-display text-3xl font-bold tabular-nums",
+                  reading ? indoorTheme.text : "text-muted-foreground",
+                )}
+              >
+                {indoorAqi ?? "—"}
+              </span>
+              <span
+                className={cn(
+                  "text-[10px] font-semibold uppercase mt-0.5",
+                  reading ? indoorTheme.text : "text-muted-foreground",
+                )}
+              >
+                {reading ? t(indoorTheme.label) : "US AQI Eq."}
+              </span>
+            </div>
+
+            <div className="flex flex-col items-center justify-center rounded-2xl border bg-card/80 p-3.5 text-center min-w-[110px] shadow-sm">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                MQ-135 Signal
+              </span>
+              <span className="mt-0.5 font-display text-3xl font-bold tabular-nums text-foreground">
+                {reading?.mq135 ?? "—"}
+              </span>
+              <span className="text-[10px] text-muted-foreground">Raw Sensor ADC</span>
+            </div>
           </div>
         </div>
       </section>
@@ -101,7 +175,36 @@ function WeatherPage() {
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">
           Indoor Hardware Readings
         </h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Card 1: Indoor Air Quality (AQI) */}
+          <div className="rounded-3xl border bg-card p-5 shadow-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-muted-foreground">
+                Indoor Air Quality (AQI)
+              </span>
+              <span className={cn("grid h-9 w-9 place-items-center rounded-xl", indoorTheme.soft)}>
+                <Gauge className={cn("h-5 w-5", indoorTheme.text)} />
+              </span>
+            </div>
+            <p
+              className={cn(
+                "mt-3 font-display text-3xl font-bold tabular-nums",
+                reading ? indoorTheme.text : "text-foreground",
+              )}
+            >
+              {indoorAqi != null ? indoorAqi : "—"}{" "}
+              <span className="text-sm font-normal text-muted-foreground">
+                {reading ? t(indoorTheme.label) : "US AQI Eq."}
+              </span>
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {reading
+                ? `Derived from MQ-135 (${reading.mq135} signal)`
+                : "Awaiting hardware packet"}
+            </p>
+          </div>
+
+          {/* Card 2: Indoor Temperature */}
           <div className="rounded-3xl border bg-card p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-muted-foreground">
@@ -119,6 +222,7 @@ function WeatherPage() {
             </p>
           </div>
 
+          {/* Card 3: Indoor Humidity */}
           <div className="rounded-3xl border bg-card p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-muted-foreground">
@@ -136,7 +240,8 @@ function WeatherPage() {
             </p>
           </div>
 
-          <div className="rounded-3xl border bg-card p-5 shadow-sm sm:col-span-2 lg:col-span-1">
+          {/* Card 4: Hardware Status */}
+          <div className="rounded-3xl border bg-card p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-muted-foreground">Hardware Status</span>
               <span className="grid h-9 w-9 place-items-center rounded-xl bg-sky-soft text-primary">
@@ -149,6 +254,65 @@ function WeatherPage() {
             <p className="mt-1 text-xs text-muted-foreground">
               {reading ? "ESP32 Wi-Fi Transmission" : "Waiting for ESP32 connection"}
             </p>
+          </div>
+        </div>
+      </div>
+
+      {/* LIVE INDOOR VS OUTDOOR COMPARISON CARD */}
+      <div
+        className={cn(
+          "rounded-3xl border p-5 shadow-sm transition-all",
+          isIndoorWorse ? "border-poor/40 bg-poor-soft/30" : "border-border/80 bg-card/70",
+        )}
+      >
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3.5">
+            <div
+              className={cn(
+                "grid h-11 w-11 shrink-0 place-items-center rounded-2xl border",
+                isIndoorWorse
+                  ? "bg-poor-soft text-poor border-poor/30"
+                  : "bg-good-soft text-good border-good/30",
+              )}
+            >
+              <ArrowDownUp className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-display text-base font-bold text-foreground">
+                  Live Indoor vs Outdoor Comparison
+                </h3>
+                {isIndoorWorse && (
+                  <span className="rounded-full bg-poor px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider animate-pulse">
+                    Smoke / Gas Alert
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {isIndoorWorse
+                  ? "⚠️ Smoke or high gas concentration detected indoors! Indoor air quality is worse than outside air. Ventilation / exhaust fan recommended."
+                  : outdoorAqi != null && indoorAqi != null
+                    ? "✅ Indoor air quality is cleaner or comparable to outdoor regional meteorology."
+                    : "Connect your ESP32 hardware to compare live room air quality directly against regional outdoor atmosphere."}
+              </p>
+            </div>
+          </div>
+
+          {/* Side-by-Side Values */}
+          <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+            <div className="flex items-center gap-2 rounded-2xl border bg-card px-3.5 py-2 text-xs shadow-sm">
+              <span className="text-muted-foreground">Indoor:</span>
+              <span className={cn("font-bold tabular-nums", indoorTheme.text)}>
+                {indoorAqi ?? "—"} AQI ({reading ? t(indoorTheme.label) : "Offline"})
+              </span>
+            </div>
+            <span className="text-xs font-mono text-muted-foreground">vs</span>
+            <div className="flex items-center gap-2 rounded-2xl border bg-card px-3.5 py-2 text-xs shadow-sm">
+              <span className="text-muted-foreground">Outdoor:</span>
+              <span className="font-bold tabular-nums text-moderate">
+                {outdoor?.aqi ?? "—"} AQI
+              </span>
+            </div>
           </div>
         </div>
       </div>
